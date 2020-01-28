@@ -1,0 +1,11 @@
+{
+  "Name": "InsertDefaultModules",
+  "ClassName": "BoolValue",
+  "Children": [],
+  "Properties": {
+    "Value": {
+      "Type": "Bool",
+      "Value": true
+    }
+  }
+}
