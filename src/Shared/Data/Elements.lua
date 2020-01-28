@@ -1,0 +1,5 @@
+return {
+    "Wood",
+    "Metal",
+    "Coal",
+}

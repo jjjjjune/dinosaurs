@@ -1,0 +1,5 @@
+return {
+    "Fire",
+    "Water",
+    "Electric",
+}

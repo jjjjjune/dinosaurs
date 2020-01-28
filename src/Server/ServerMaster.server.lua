@@ -1,9 +1,10 @@
 local import = require(game.ReplicatedStorage.Shared.Import)
 
 local loadOrder = {
-
+	"Server/Systems/Chemistry",
+	--"Server/Systems/OwnershipBull"
 }
---:epictroll: :epictroll: :epictroll: :epictroll: :epictroll:
+
 for _, path in ipairs(loadOrder) do
 	local system = import(path)
 	system:start()
