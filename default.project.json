@@ -10,11 +10,6 @@
       }
     },
 
-    "Chat": {
-      "$className": "Chat",
-      "$path": "src/Chat"
-    },
-
    "ReplicatedStorage": {
       "$className": "ReplicatedStorage",
 
