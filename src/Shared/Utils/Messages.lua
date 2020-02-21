@@ -20,6 +20,7 @@ function SignalObject.new(signals, action, callback)
 end
 
 local SIGNAL_REMOTE
+local SIGNAL_REMOTE_FUNCTION
 
 local isClient = runService:IsClient()
 local isServer = runService:IsServer()
@@ -47,6 +48,16 @@ function Messages:hook(action, callback)
     return signalObject
 end
 
+function Messages:hookRequest(action, callback)
+	local hooks = self.hooks
+    if not hooks[action] then
+        hooks[action] = {}
+    end
+    local signalObject = SignalObject.new(self, action, callback)
+    table.insert(hooks[action], signalObject)
+    return signalObject
+end
+
 function Messages:send(action, ...)
 	local actionHooksTable = self.hooks[action]
 
@@ -64,8 +75,22 @@ function Messages:send(action, ...)
 	end
 end
 
+function Messages:getFunctionResult(action, player, ...)
+	local actionHooksTable = self.hooks[action]
+
+	if actionHooksTable then
+		local args = {...}
+		local hookFunction = actionHooksTable[1] -- there can only be one of thse
+		return hookFunction.callback(unpack(args))
+	end
+end
+
 function Messages:sendServer(action, ...)
     SIGNAL_REMOTE:FireServer(action, ...)
+end
+
+function Messages:requestServer(action, ...)
+	return SIGNAL_REMOTE_FUNCTION:InvokeServer(action, ...)
 end
 
 function Messages:sendClient(player, action, ...)
@@ -139,8 +164,13 @@ function Messages:init()
 		local SIGNAL_REMOTE = Instance.new("RemoteEvent", game.ReplicatedStorage)
 		SIGNAL_REMOTE.Name = "SIGNAL_REMOTE"
 	end
+	if not game.ReplicatedStorage:FindFirstChild("SIGNAL_REMOTE_FUNCTION") then
+		local SIGNAL_REMOTE = Instance.new("RemoteFunction", game.ReplicatedStorage)
+		SIGNAL_REMOTE.Name = "SIGNAL_REMOTE_FUNCTION"
+	end
 
 	SIGNAL_REMOTE = game.ReplicatedStorage:FindFirstChild("SIGNAL_REMOTE")
+	SIGNAL_REMOTE_FUNCTION = game.ReplicatedStorage:FindFirstChild("SIGNAL_REMOTE_FUNCTION")
 
 	Messages:hook("ReplicationReady", function(player)
 		replicationReady[player] = true
@@ -161,7 +191,10 @@ function Messages:init()
     if isServer then
         SIGNAL_REMOTE.OnServerEvent:connect(function(player, action, ...)
             self:send(action, player, ...)
-        end)
+		end)
+		SIGNAL_REMOTE_FUNCTION.OnServerInvoke = (function(player,action,...)
+			return self:getFunctionResult(action, player, ...)
+		end)
     end
 end
 
