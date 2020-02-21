@@ -5,6 +5,7 @@ local Messages = import "Shared/Utils/Messages"
 local loadOrder = {
 	"Client/Systems/ClientInit",
 	"Client/Systems/Carrying",
+	"Client/Systems/Lighting",
 	--"UI/UiMain",
 }
 
