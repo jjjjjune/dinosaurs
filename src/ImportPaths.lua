@@ -9,6 +9,7 @@ return {
 	Storage = "ReplicatedStorage.Storage",
 	ClientTools = "StarterPlayer.StarterPlayerScripts.ToolBehaviors",
 	ServerTools ="ServerScriptService.ToolBehaviors",
+	ServerStorage = "ServerStorage",
 
 	Roact = "ReplicatedStorage.Lib.Roact",
 	TestEZ = "ReplicatedStorage.Lib.TestEZ",
