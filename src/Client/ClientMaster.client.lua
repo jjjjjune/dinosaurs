@@ -3,8 +3,9 @@ local import = require(game.ReplicatedStorage.Shared.Import)
 local Messages = import "Shared/Utils/Messages"
 
 local loadOrder = {
-    "Client/Systems/ClienInit",
-	"UI/UiMain",
+	"Client/Systems/ClientInit",
+	"Client/Systems/Carrying",
+	--"UI/UiMain",
 }
 
 local lastStart = time()
