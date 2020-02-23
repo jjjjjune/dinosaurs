@@ -18,9 +18,14 @@ return {
         lengthModifier = 1.5,
     },
     [4] = {
-        name = "Summer",
+        name = "Fall",
         grassColor = Color3.fromRGB(165, 102, 59),
-        leafColor = {Color3.fromRGB(190, 104, 98),Color3.fromRGB(165, 102, 59),Color3.fromRGB(218, 134, 122),Color3.fromRGB(204, 142, 105)},
+       leafColor = {
+            Color3.fromRGB(190, 104, 98),
+            Color3.fromRGB(165, 102, 59),
+            Color3.fromRGB(218, 134, 122),
+            Color3.fromRGB(204, 142, 105)
+        },
         lengthModifier = 1.5,
     }
 }
