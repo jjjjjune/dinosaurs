@@ -6,13 +6,15 @@ local loadOrder = {
 	"Client/Systems/ClientInit",
 	"Client/Systems/Carrying",
 	"Client/Systems/Lighting",
+	"Client/Systems/Footsteps",
+	"Client/Systems/ClientSound",
+	"Client/Systems/SeasonBar"
 	--"UI/UiMain",
 }
 
-local lastStart = time()
 for _, path in ipairs(loadOrder) do
 	local system = import(path)
-	lastStart = time()
+	local lastStart = time()
 	system:start()
 	--print("LOADED "..path)
 	if time() - lastStart > .1 then
