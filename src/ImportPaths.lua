@@ -4,12 +4,14 @@ return {
 	Client = "StarterPlayer.StarterPlayerScripts",
 	UI = "ReplicatedStorage.UI",
 	Lib = "ReplicatedStorage.Lib",
+	PlayerGui = "PlayerGui",
 
 	Assets = "ReplicatedStorage.Assets",
 	Storage = "ReplicatedStorage.Storage",
 	ClientTools = "StarterPlayer.StarterPlayerScripts.ToolBehaviors",
 	ServerTools ="ServerScriptService.ToolBehaviors",
 	ServerStorage = "ServerStorage",
+	ReplicatedStorage = "ReplicatedStorage",
 
 	Roact = "ReplicatedStorage.Lib.Roact",
 	TestEZ = "ReplicatedStorage.Lib.TestEZ",
