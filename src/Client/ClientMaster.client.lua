@@ -8,7 +8,9 @@ local loadOrder = {
 	"Client/Systems/Lighting",
 	"Client/Systems/Footsteps",
 	"Client/Systems/ClientSound",
-	"Client/Systems/SeasonBar"
+
+	"Client/Ui/SeasonBar",
+	"Client/Ui/RadialProgress",
 	--"UI/UiMain",
 }
 
