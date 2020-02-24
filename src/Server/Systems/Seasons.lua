@@ -4,7 +4,8 @@ local SeasonsData = import "Shared/Data/SeasonsData"
 local RunService = game:GetService("RunService")
 
 local currentSeason = 1
-local seasonLength = 3
+local seasonLength = 10
+local lastSeasonChange = tick()
 
 local function getSeasonLengthModifier()
     return SeasonsData[currentSeason].lengthModifier
@@ -16,11 +17,10 @@ local function advanceSeason()
         currentSeason = 1
     end
     Messages:send("SeasonSetTo", currentSeason)
-    Messages:sendAllClients("SeasonSetTo", currentSeason)
+    Messages:sendAllClients("SeasonSetTo", currentSeason, seasonLength*getSeasonLengthModifier())
 end
 
 local function initializeMainSeasonLoop()
-    local lastSeasonChange = tick()
     RunService.Stepped:connect(function()
         if tick() - lastSeasonChange > seasonLength*getSeasonLengthModifier() then
             advanceSeason()
@@ -34,7 +34,7 @@ local Seasons = {}
 function Seasons:start()
     initializeMainSeasonLoop()
     Messages:hookRequest("GetSeason", function(player)
-        return currentSeason
+        return currentSeason, (tick() - lastSeasonChange), seasonLength*getSeasonLengthModifier()
     end)
 end
 
