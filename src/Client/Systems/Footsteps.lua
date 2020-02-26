@@ -37,7 +37,7 @@ local function getMaterial(part)
     local material = "basic"
     if CollectionService:HasTag(part, "Grass") then
         material = "grass"
-        if part.Color.r > .6 and part.Color.g > .6 and part.Color.b > .6 then
+        if part.Color.r > .6 and part.Color.g > .6 and part.Color.b > .6 and part.Material ~= Enum.Material.Neon then
             material = "snow"
         end
         return material
@@ -51,7 +51,7 @@ local function getMaterial(part)
     if part.BrickColor.Name == "Dark taupe" then
         return "wood"
     end
-    if part.Name == "Water" then
+    if part.Name == "Water" or part.Material == Enum.Material.Neon then
         return "hi"
     end
     if CollectionService:HasTag(part, "Sand") then
