@@ -48,17 +48,14 @@ local function initializeAndHookSeasonUi()
         local tween = TweenService:Create(wheel, tweenInfo, {Rotation = goalRotation})
         tween:Play()
     end)
-    spawn(function()
-        while wait(2) do
-            Messages:send("SetRadialProgressButtonAmount", SeasonUi.MainImage.Health, math.random(1, 10)/10)
-        end
-    end)
 end
 
 local SeasonBar = {}
 
 function SeasonBar:start()
-    initializeAndHookSeasonUi()
+    FastSpawn(function()
+        initializeAndHookSeasonUi()
+    end)
 end
 
 return SeasonBar

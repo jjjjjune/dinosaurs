@@ -9,6 +9,8 @@ local loadOrder = {
 	"Server/Systems/Classes",
 	"Server/Systems/Seasons",
 	"Server/Systems/Plants",
+	"Server/Systems/Animations",
+	"Server/Systems/Items"
 }
 
 for _, path in ipairs(loadOrder) do

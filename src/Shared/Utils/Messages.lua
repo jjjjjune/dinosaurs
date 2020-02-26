@@ -94,6 +94,9 @@ function Messages:requestServer(action, ...)
 end
 
 function Messages:sendClient(player, action, ...)
+	if typeof(player) ~= "Instance" then
+		warn("for action ", action, " you might have forgotten to use a player as your first arg")
+	end
 	if not replicationReady[player] then
 		if not actionQueue[player] then
 			actionQueue[player] = {}

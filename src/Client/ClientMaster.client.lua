@@ -1,17 +1,23 @@
 local import = require(game.ReplicatedStorage.Shared.Import)
-
-local Messages = import "Shared/Utils/Messages"
+local player = game.Players.LocalPlayer
+local FastSpawn = import "Shared/Utils/FastSpawn"
 
 local loadOrder = {
 	"Client/Systems/ClientInit",
-	"Client/Systems/Carrying",
 	"Client/Systems/Lighting",
 	"Client/Systems/Footsteps",
 	"Client/Systems/ClientSound",
+	"Client/Systems/ClientStats",
+	"Client/Systems/Binds",
+	"Client/Systems/ClientAnimations",
+	"Client/Systems/Items",
+}
 
+local ui = {
+	"Client/Ui/Tooltips",
 	"Client/Ui/SeasonBar",
 	"Client/Ui/RadialProgress",
-	--"UI/UiMain",
+	"Client/Ui/StatsUi",
 }
 
 for _, path in ipairs(loadOrder) do
@@ -22,4 +28,13 @@ for _, path in ipairs(loadOrder) do
 	if time() - lastStart > .1 then
 		warn(path, " IS YIELDING????")
 	end
+end
+
+repeat wait() until player:FindFirstChild("PlayerGui")
+
+for _, path in ipairs(ui) do
+	local system = import(path)
+	FastSpawn(function() 
+		system:start(player.PlayerGui)
+	end)
 end
