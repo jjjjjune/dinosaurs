@@ -8,6 +8,9 @@ function PlayerWrapper:start()
     Players.PlayerAdded:connect(function(player)
         Messages:send("PlayerAdded", player)
     end)
+    Players.PlayerRemoving:connect(function(player)
+        Messages:send("PlayerRemoving", player)
+    end)
 end
 
 return PlayerWrapper
