@@ -93,6 +93,7 @@ function Binds.unbindTagFromAction(collectionServiceTag, actionName)
     for _, event in pairs(boundActionTags[actionName].events[collectionServiceTag]) do
         event:disconnect()
     end
+    tagsCache[collectionServiceTag] = nil
 end
 
 function Binds.bindTagToAction(collectionServiceTag, actionName, callback)
@@ -123,8 +124,6 @@ function Binds.bindTagToAction(collectionServiceTag, actionName, callback)
                 end
             end
         )
-    else
-        warn("TAG: ", collectionServiceTag, " IS ALREADY BOUND!")
     end
     table.insert(boundActionTags[actionName].tags, collectionServiceTag)
 end
