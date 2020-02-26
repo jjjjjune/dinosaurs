@@ -12,11 +12,11 @@ local function attemptCarryItem(item)
     end
     local character = GetCharacter()
     Messages:sendServer("CarryItem", item)
-    item:SetPrimaryPartCFrame(character.Head.CFrame * CFrame.new(0,4,0))
+    --[[item:SetPrimaryPartCFrame(character.Head.CFrame * CFrame.new(0,4,0))
     local tempWeld = Instance.new("WeldConstraint", item)
     tempWeld.Name = "TemporaryInstantWeld"
     tempWeld.Part0 = item.PrimaryPart
-    tempWeld.Part1 = character.Head
+    tempWeld.Part1 = character.Head--]]
     Messages:send("PlayAnimationClient", "Carry")
     return true
 end
