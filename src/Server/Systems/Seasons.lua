@@ -23,8 +23,8 @@ end
 local function initializeMainSeasonLoop()
     RunService.Stepped:connect(function()
         if tick() - lastSeasonChange > seasonLength*getSeasonLengthModifier() then
-            advanceSeason()
             lastSeasonChange = tick()
+            advanceSeason()
         end
     end)
 end
