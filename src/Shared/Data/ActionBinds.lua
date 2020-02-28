@@ -13,4 +13,11 @@ return {
         gamepadBind = Enum.KeyCode.ButtonY,
         color = Color3.fromRGB(255,201,15)
     },
+    USE = {
+        pc = "M1",
+        pcBind = "Mouse1",
+        gamepad = "RT",
+        gamepadBind = Enum.KeyCode.ButtonR2,
+        color = Color3.fromRGB(39,31,122),
+    }
 }
