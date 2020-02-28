@@ -5,19 +5,51 @@ local GetCharacter = import "Shared/Utils/GetCharacter"
 local CollectionService = game:GetService("CollectionService")
 local ActionBinds = import "Shared/Data/ActionBinds"
 local ContextActionService = game:GetService("ContextActionService")
+local TagsToModulesMap = import "Shared/Data/TagsToModulesMap"
+
+local itemModule
+local carryItemInstance
+
+local function getItemModule(itemInstance)
+    local itemModule
+    for tag, moduleState in pairs(TagsToModulesMap) do
+        if CollectionService:HasTag(itemInstance, tag) then
+            itemModule = moduleState
+            break
+        end
+    end
+    if not itemModule then
+        itemModule = import "Shared/ItemModules/Default"
+    end
+    return itemModule
+end
+
+local function equipCarryItem(itemInstance)
+    itemModule = getItemModule(itemInstance)
+    itemModule.clientEquip(itemInstance)
+    carryItemInstance = itemInstance
+    Messages:send("CreateContextualBind", "USE", function()
+        itemModule.clientUse(itemInstance)
+        Messages:sendServer("UseItem", itemInstance)
+    end)
+end
+
+local function unequipCarryItem()
+    itemModule.clientUnequip(carryItemInstance)
+    itemModule = nil
+    Messages:send("DestroyContextualBind", "USE")
+end
 
 local function attemptCarryItem(item)
     if item.Parent ~= workspace then
         return
     end
-    local character = GetCharacter()
     Messages:sendServer("CarryItem", item)
-    --[[item:SetPrimaryPartCFrame(character.Head.CFrame * CFrame.new(0,4,0))
-    local tempWeld = Instance.new("WeldConstraint", item)
-    tempWeld.Name = "TemporaryInstantWeld"
-    tempWeld.Part0 = item.PrimaryPart
-    tempWeld.Part1 = character.Head--]]
-    Messages:send("PlayAnimationClient", "Carry")
+    local holdAnimation = "Carry"
+    if item:FindFirstChild("HoldAnimation") then
+        holdAnimation = item.HoldAnimation.Value
+    end
+    Messages:send("PlayAnimationClient", holdAnimation)
     return true
 end
 
@@ -52,12 +84,24 @@ local function bindCarry()
             unbindCarry()
         end
     end)
+    Binds.bindTagToAction("Entity", "INTERACT", function(item)
+        -- will be in a diff system
+    end)
+    Binds.bindTagToAction("Grabbable", "GRAB", function(item)
+        -- this will be for picking up and moving small plants or other structures, which will probably happen in an "edit" mode
+    end)
 end
 
 local Items = {}
 
 function Items:start()
+    Messages:hook("Unequip", function()
+        Messages:send("StopAnimationClient", "Carry")
+        unequipCarryItem()
+        bindCarry()
+    end)
     Messages:hook("Throw", function()
+        unequipCarryItem()
         attemptThrowItem()
         bindCarry()
     end)
@@ -65,11 +109,13 @@ function Items:start()
         if carryItemInstance:FindFirstChild("TemporaryInstantWeld") then
             carryItemInstance.TemporaryInstantWeld:Destroy()
         end
+        equipCarryItem(carryItemInstance)
     end)
     Messages:hook("CharacterAddedClient", function(character)
         bindCarry()
         character:WaitForChild("Humanoid").Died:connect(function()
             unbindCarry()
+            unequipCarryItem()
         end)
     end)
 end

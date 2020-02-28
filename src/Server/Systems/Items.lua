@@ -1,6 +1,7 @@
 local import = require(game.ReplicatedStorage.Shared.Import)
 local Messages = import "Shared/Utils/Messages"
 local CollectionService = game:GetService("CollectionService")
+local TagsToModulesMap = import "Shared/Data/TagsToModulesMap"
 
 local function attemptCarryItem(player, item)
     local character = player.Character
@@ -23,7 +24,6 @@ local function attemptCarryItem(player, item)
         return
     end
     Messages:send("PlaySound", "UiClick", character.Head)
-    print("Play sound")
     character.PrimaryPart.RootPriority = 200
     item.Parent = character
     item.PrimaryPart.RootPriority = 10 -- for later when you're throwing
@@ -62,6 +62,21 @@ local function throwAllPlayerItems(player)
     end
 end
 
+local function getItemModule(itemInstance)
+    local itemModule
+    for tag, moduleState in pairs(TagsToModulesMap) do
+        if CollectionService:HasTag(itemInstance, tag) then
+            itemModule = moduleState
+            break
+        end
+    end
+    if not itemModule then
+        itemModule = import "Shared/ItemModules/Default"
+    end
+    return itemModule
+end
+
+
 local Items = {}
 
 function Items.createItem(itemName, position)
@@ -73,7 +88,16 @@ function Items.createItem(itemName, position)
 end
 
 function Items:start()
-    -- todo: force drop an item if a player is carrying it on leave
+    Messages:hook("UseItem", function(player, item)
+        if item.Parent == player.Character then
+            local module = getItemModule(item)
+            if module.serverUse(player, item) then
+                throwAllPlayerItems(player)
+                Messages:sendClient(player, "Unequip")
+                item:Destroy()
+            end
+        end
+    end)
     Messages:hook("DestroyItem", function(item)
         if item.Parent:FindFirstChild("Humanoid") then
             local player = game.Players:GetPlayerFromCharacter(item.Parent)
@@ -87,7 +111,7 @@ function Items:start()
     Messages:hook("PlayerDied", function(player, character)
         throwAllPlayerItems(player)
     end)
-    Messages:hook("PLayerRemoving", function(player)
+    Messages:hook("PlayerRemoving", function(player)
         if player.Character then
             throwAllPlayerItems(player)
         end
