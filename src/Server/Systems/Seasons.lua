@@ -16,8 +16,8 @@ local function advanceSeason()
     if currentSeason > #SeasonsData then
         currentSeason = 1
     end
-    Messages:send("SeasonSetTo", currentSeason)
     Messages:sendAllClients("SeasonSetTo", currentSeason, seasonLength*getSeasonLengthModifier())
+    Messages:send("SeasonSetTo", currentSeason) -- this order is important for dumb tween reasons
 end
 
 local function initializeMainSeasonLoop()

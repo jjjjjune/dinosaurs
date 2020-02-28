@@ -70,4 +70,21 @@ return {
             Color = Color3.fromRGB(38, 132, 213),
         }
     },
+    --[[Rain = {
+        [game.Lighting] = {
+            Ambient = Color3.fromRGB(142, 114, 255),
+            Brightness = .2,
+            ColorShift_Bottom = Color3.fromRGB(0,0,0),
+            ColorShift_Top = Color3.fromRGB(0,0,0),
+            OutdoorAmbient = Color3.fromRGB(128,128,128),
+            FogColor = Color3.fromRGB(52,58,63),
+            FogEnd = 1800,
+        },
+        [workspace.Effects.Sky] = {
+            Color = Color3.fromRGB(27,42,53),
+        },
+        [workspace.Effects.Water] = {
+            Color = Color3.fromRGB(79,81,91),
+        }
+    },--]]
 }
