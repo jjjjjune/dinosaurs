@@ -26,6 +26,15 @@ function RespawnManager:start()
             player:LoadCharacter()
         end
     end)
+    Messages:hook("PlayerRemoving", function(player)
+        for _, skull in pairs(CollectionService:GetTagged("PlayerSkull")) do
+            if skull.Player.Value == player then
+                Messages:send("PlaySound", "Smoke", skull.PrimaryPart.Position)
+                Messages:send("PlayParticle", "DeathSmoke",  20, skull.PrimaryPart.Position)
+                Messages:send("DestroyItem", skull)
+            end
+        end
+    end)
     Messages:hook("CharacterAdded", function(player, character)
         for _, skull in pairs(CollectionService:GetTagged("PlayerSkull")) do
             if skull.Player.Value == player then
