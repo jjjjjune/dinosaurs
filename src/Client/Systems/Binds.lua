@@ -39,17 +39,19 @@ local function handleActionUi(actionName, boundData)
     local shouldShow = false
     local position = GetCharacterPosition(true)
     local foundPosition
+    local foundTarget
     if position then
         for _, tag in pairs(boundData.tags) do
             local item = getClosestItemOfTag(position, tag)
             if item then
+                foundTarget = item
                 foundPosition = item.PrimaryPart.Position
                 shouldShow = true
             end
         end
     end
     if shouldShow then
-        Messages:send("ShowTooltip", actionName, foundPosition)
+        Messages:send("ShowTooltip", actionName, foundPosition, foundTarget)
     else
         Messages:send("HideTooltip", actionName)
     end

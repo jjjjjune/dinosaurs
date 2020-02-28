@@ -7,6 +7,7 @@ local TooltipGeneric = PlayerGui:WaitForChild("Tooltips"):WaitForChild("TooltipG
 local GetDevice = import "Shared/Utils/GetDevice"
 local RunService = game:GetService("RunService")
 
+local currentTargets = {}
 local tooltipFrames = {} 
 
 local CONTROLS_PRIORITY = 2
@@ -56,13 +57,25 @@ end
 local Tooltips = {}
 
 function Tooltips:start()
-    Messages:hook("ShowTooltip", function(actionName, worldPosition)
+    Messages:hook("ShowTooltip", function(actionName, worldPosition, target)
         local button = getTooltipButton(actionName)
         button.Visible = true
         local vector, onScreen = workspace.CurrentCamera:WorldToScreenPoint(worldPosition)
-        button.Position = UDim2.new(0, vector.X, 0, vector.Y)
+        local foundSameTarget = false
+        for ac, actionTarget in pairs(currentTargets) do
+            if actionTarget == target and ac ~= actionName then
+                foundSameTarget = true
+            end
+        end
+        if not foundSameTarget then
+            currentTargets[actionName] = target
+            button.Position = UDim2.new(0, vector.X, 0, vector.Y)
+        else
+            button.Position = UDim2.new(0, vector.X + 48, 0, vector.Y)
+        end
     end)
     Messages:hook("HideTooltip", function(actionName)
+        currentTargets[actionName] = nil
         local button = getTooltipButton(actionName)
         button.Visible = false
     end)

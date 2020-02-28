@@ -18,6 +18,7 @@ local ui = {
 	"Client/Ui/SeasonBar",
 	"Client/Ui/RadialProgress",
 	"Client/Ui/StatsUi",
+	"Client/Ui/ContextualBinds",
 }
 
 for _, path in ipairs(loadOrder) do
