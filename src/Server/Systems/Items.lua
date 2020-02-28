@@ -74,6 +74,13 @@ end
 
 function Items:start()
     -- todo: force drop an item if a player is carrying it on leave
+    Messages:hook("DestroyItem", function(item)
+        if item.Parent:FindFirstChild("Humanoid") then
+            local player = game.Players:GetPlayerFromCharacter(item.Parent)
+            throwAllPlayerItems(player)
+        end
+        item:Destroy()
+    end)
     Messages:hook("CreateItem", function(itemName, position)
         Items.createItem(itemName, position)
     end)
