@@ -6,8 +6,11 @@ local PlayerGui
 
 local stats = {}
 
-local function onStatUpdated(statName, statValue)
+local function onStatUpdated(statName, statValue, statMax)
     stats[statName] = statValue
+    if statMax then
+        stats[statName.."max"] = statMax
+    end
     Messages:send("UpdateStatUi", statName, statValue, stats[statName.."max"] or statValue)
 end
 
@@ -16,8 +19,8 @@ local StatsClient = {}
 function StatsClient:start()
     onStatUpdated("health", 100)
     onStatUpdated("healthmax", 100)
-    Messages:hook("OnStatUpdated", function(statName, statValue)
-        onStatUpdated(statName, statValue)
+    Messages:hook("OnStatUpdated", function(statName, statValue, statMax)
+        onStatUpdated(statName, statValue, statMax)
     end)
     Messages:hook("CharacterAddedClient", function(character)
         local humanoid = character:WaitForChild("Humanoid")
