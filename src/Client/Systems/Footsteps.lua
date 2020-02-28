@@ -8,7 +8,9 @@ local FootstepsFolder = import "ReplicatedStorage/Footsteps"
 
 local RunService = game:GetService("RunService")
 
-local FOOT_STEP_DISTANCE = 4
+local FOOT_STEP_DISTANCE = 5
+local soundDebounce = .2
+local lastSound = time()
 local oldBind
 local hum, rFoot, lFoot, lastLeftPosition, lastRightPosition
 
@@ -35,7 +37,7 @@ end
 
 local function getMaterial(part)
     local material = "basic"
-    if CollectionService:HasTag(part, "Grass") then
+    if CollectionService:HasTag(part, "Grass") and part.Transparency == 0 then
         material = "grass"
         if part.Color.r > .6 and part.Color.g > .6 and part.Color.b > .6 and part.Material ~= Enum.Material.Neon then
             material = "snow"
@@ -61,6 +63,11 @@ local function getMaterial(part)
 end
 
 local function onFootstep(part, foot, resultPosition)
+    if time() - lastSound < soundDebounce then
+        return
+    else
+        lastSound = time()
+    end
     local material = getMaterial(part)
     local sounds = materialToSoundMap[material]
     local chosenSoundInstance = sounds[math.random(1, #sounds)]
@@ -85,9 +92,9 @@ local function onFootstep(part, foot, resultPosition)
 end
 
 local function onFrameChange()
-    local rayDir = Vector3.new(0,-1,0)
-    local didHitLeft, currentLeftPosition = CastRay(lFoot.Position, rayDir, {hum.Parent})
-    local didHitRight, currentRightPosition = CastRay(rFoot.Position, rayDir, {hum.Parent})
+    local rayDir = Vector3.new(0,-2.5,0)
+    local didHitLeft, currentLeftPosition = CastRay(lFoot.Position + Vector3.new(0,1.5,0), rayDir, {hum.Parent})
+    local didHitRight, currentRightPosition = CastRay(rFoot.Position+ Vector3.new(0,1.5,0), rayDir, {hum.Parent})
     if didHitLeft then
         if ((currentLeftPosition) - lastLeftPosition).magnitude > FOOT_STEP_DISTANCE then
             onFootstep(didHitLeft, lFoot, currentLeftPosition)
