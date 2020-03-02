@@ -92,13 +92,13 @@ function Tooltips:start()
                 end)
             end
         end
+        --[[Messages:send("PlaySoundOnClient",{
+            instance = game.ReplicatedStorage.UiSounds.Select,
+        })--]]
     end)
     RunService.RenderStepped:connect(function()
         skinTooltipsToDevice()
     end)
-    --[[Binds.bindTagToAction("Entity", "INTERACT", function(item)
-        print("the entity is: ", item and item.Name)
-    end)--]]
 end
 
 return Tooltips

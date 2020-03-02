@@ -21,7 +21,7 @@ local function wetAllWater()
 end
 
 local function connectEvent(freshWater)
-    freshWater.Water.Touched:connect(function(hit)
+    --[[freshWater.Water.Touched:connect(function(hit)
         if freshWater.Water.Transparency < 1 then 
             if hit.Parent:FindFirstChild("Humanoid") then
                 local player = game.Players:GetPlayerFromCharacter(hit.Parent)
@@ -30,7 +30,7 @@ local function connectEvent(freshWater)
                 end
             end
         end
-    end)
+    end)--]]
 end
 
 local Water = {}

@@ -2,30 +2,28 @@ return {
     {
         name = "Spring",
         grassColor = Color3.fromRGB(91, 154, 76),
-        leafColor = Color3.fromRGB(75, 151, 75),
+        leafColor = {"rbxassetid://4739482175"},
         lengthModifier = 1.5,
     },
    {
         name = "Summer",
         grassColor = Color3.fromRGB(40, 127, 71),
-        leafColor = Color3.fromRGB(75, 151, 75),
+        leafColor = {"rbxassetid://4739482175"},
         lengthModifier = 1.5,
     },
     {
         name = "Fall",
-        grassColor = Color3.fromRGB(165, 102, 59),
+        grassColor = Color3.fromRGB(234, 125, 98),
        leafColor = {
-            Color3.fromRGB(190, 104, 98),
-            Color3.fromRGB(165, 102, 59),
-            Color3.fromRGB(218, 134, 122),
-            Color3.fromRGB(204, 142, 105)
+            "rbxassetid://4739541407",
+            "rbxassetid://4739511171"
         },
         lengthModifier = 1.5,
     },
     {
         name = "Winter",
         grassColor = Color3.fromRGB(202, 203, 209),
-        leafColor = Color3.fromRGB(205, 205, 205),
+        leafColor = {"rbxassetid://4739511216"},
         lengthModifier = 1,
     },
 }

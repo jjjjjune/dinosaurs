@@ -57,9 +57,14 @@ local function attemptThrowItem()
     local character = GetCharacter()
     for _, possibleItem in pairs(character:GetChildren()) do
         if CollectionService:HasTag(possibleItem, "Item") then
+            Messages:send("PlaySoundOnClient",{
+                instance = game.ReplicatedStorage.Sounds.HeavyWhoosh,
+                part = character.Head
+            })
             possibleItem:WaitForChild("ServerWeld")
             possibleItem.ServerWeld:Destroy()
             possibleItem.Parent = workspace
+            possibleItem.PrimaryPart.CFrame = possibleItem.PrimaryPart.CFrame * CFrame.new(0,0,-2)
             possibleItem.PrimaryPart.Velocity = character.HumanoidRootPart.Velocity * 2
             Messages:sendServer("Throw", possibleItem)
             Messages:send("StopAnimationClient", "Carry")
@@ -83,12 +88,6 @@ local function bindCarry()
             end, false, bindInfo.pcBind, bindInfo.gamepadBind)
             unbindCarry()
         end
-    end)
-    Binds.bindTagToAction("Entity", "INTERACT", function(item)
-        -- will be in a diff system
-    end)
-    Binds.bindTagToAction("Grabbable", "GRAB", function(item)
-        -- this will be for picking up and moving small plants or other structures, which will probably happen in an "edit" mode
     end)
 end
 

@@ -24,13 +24,12 @@ local function onSeasonChanged(newSeason)
     end
     for _, grass in pairs(CollectionService:GetTagged("Leaf")) do
         local color = seasonData.leafColor
-        local tweenInfo = TweenInfo.new(3, Enum.EasingStyle.Quad,Enum.EasingDirection.Out)
+        --local tweenInfo = TweenInfo.new(3, Enum.EasingStyle.Quad,Enum.EasingDirection.Out)
         if typeof(color) == "table" then
-            color = color[random(1, #color)]
+            color = color[random(1, #color)] or color[1]
         end
-        local properties = {Color = color}
-        local tween = TweenService:Create(grass, tweenInfo, properties)
-        tween:Play()
+        --local properties = {Color = color}
+        grass.TextureID = color
     end
 end
 
@@ -39,7 +38,9 @@ local function setPhase(plantModel, phaseNumber)
     local phaseFolder = PlantPhases[type]
     local newModel = phaseFolder[phaseNumber..""]:Clone()
     newModel.PrimaryPart = newModel.Base
-    newModel:SetPrimaryPartCFrame(plantModel.PrimaryPart.CFrame)
+    local cf = plantModel.PrimaryPart.CFrame *  CFrame.new(0, -plantModel.PrimaryPart.Size.Y/2, 0)
+    cf = cf * CFrame.new(0,newModel.PrimaryPart.Size.Y/2,0)
+    newModel:SetPrimaryPartCFrame(cf)
     plantModel:Destroy()
     newModel.Parent = workspace
     local phase = Instance.new("IntValue", newModel)
@@ -62,7 +63,7 @@ local function onPlantFinishedGrowing(plantModel)
 end
 
 local function growPlant(plantModel)
-    local currentPhase = (plantModel:FindFirstChild("Phase") and plantModel.Phase.Value) or 1
+    local currentPhase = ((tonumber(plantModel.Name) ~= 0) and tonumber(plantModel.Name)) or 1
     local maxPhase = getMaxPhase(plantModel.Type.Value)
     setPhase(plantModel, math.min(maxPhase, currentPhase+1))
     if currentPhase+1 == maxPhase then
@@ -78,6 +79,14 @@ local function growAllPlants()
     end
 end
 
+local function createPlant(plantName, pos, phase)
+    local plantModel = PlantPhases[plantName]["1"]:Clone()
+    plantModel.PrimaryPart = plantModel.Base
+    plantModel:SetPrimaryPartCFrame(CFrame.new(pos) * CFrame.new(0, plantModel.PrimaryPart.Size.Y/2, 0))
+    plantModel.Parent = workspace
+    setPhase(plantModel, phase)
+end
+
 local Plants = {}
 
 function Plants:start()
@@ -85,6 +94,7 @@ function Plants:start()
         growAllPlants()
         onSeasonChanged(newSeason)
     end)
+    Messages:hook("CreatePlant", createPlant)
 end
 
 return Plants

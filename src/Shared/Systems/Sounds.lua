@@ -22,6 +22,8 @@ local function playSound(soundName, position, group, pitchshift, useFolder, forc
     local sound
 	local part
 
+	print("info: ", soundName, position, group, pitchshift)
+
 	local folder = SoundsFolder
 	if useFolder then
 		folder = useFolder
@@ -43,19 +45,21 @@ local function playSound(soundName, position, group, pitchshift, useFolder, forc
 			sound = folder[soundName]:Clone()
 		end
 		--shift sound's pitch randomly
-		if pitchshift then
-			if forcePitch then
-				sound.PlaybackSpeed = pitchshift
-			else
-				sound.PlaybackSpeed=math.random(1000-pitchshift,1000+pitchshift)*0.001
-			end
-		end
-		if group then
-			sound.SoundGroup = game:GetService("SoundService")[group]
-		end
+		
 	else
         sound = folder[soundName]:Clone()
-    end
+	end
+	if pitchshift then
+		print("shifting pitch")
+		if forcePitch then
+			sound.PlaybackSpeed = pitchshift
+		else
+			sound.PlaybackSpeed=math.random(1000-pitchshift,1000+pitchshift)/1000
+		end
+	end
+	if group then
+		sound.SoundGroup = game:GetService("SoundService")[group]
+	end
     sound.Parent = part or workspace
 	sound:Play()
 	if sound.Parent == workspace then

@@ -31,6 +31,24 @@ local function getClosestItemOfTag(position, tag)
             end
         end
     end
+    if not closestItem then
+        local checkPart = Instance.new("Part")
+        checkPart.CanCollide = false
+        CollectionService:AddTag(checkPart, "RayIgnore")
+        checkPart.Transparency = 1
+        checkPart.Size = Vector3.new(9,9,9)
+        checkPart.CFrame = CFrame.new(position)
+        checkPart.Anchored = true
+        checkPart.Touched:connect(function() end)
+        checkPart.Parent = workspace
+        for _, p in pairs(checkPart:GetTouchingParts()) do
+            if CollectionService:HasTag(p.Parent, tag) then
+                closestItem = p.Parent
+                break
+            end
+        end
+        checkPart:Destroy()
+    end
     lastFoundTagItem[tag] = closestItem
     return closestItem
 end

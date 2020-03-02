@@ -23,7 +23,7 @@ local function attemptCarryItem(player, item)
     if not alive then 
         return
     end
-    Messages:send("PlaySound", "UiClick", character.Head)
+    Messages:send("PlaySound", "UiClick", character.Head, 200)
     character.PrimaryPart.RootPriority = 200
     item.Parent = character
     item.PrimaryPart.RootPriority = 10 -- for later when you're throwing
@@ -41,7 +41,7 @@ local function throw(player, item)
         item.ServerWeld:Destroy()
     end
     item.Parent = workspace
-    Messages:send("PlaySound", "HeavyWhoosh", item.PrimaryPart)
+    Messages:reproOnClients(player, "PlaySound", "HeavyWhoosh", item.PrimaryPart.Position)
     delay(6, function()
         if item:IsDescendantOf(game) and item.PrimaryPart:CanSetNetworkOwnership() then 
             local netOwner = item.PrimaryPart:GetNetworkOwner() 

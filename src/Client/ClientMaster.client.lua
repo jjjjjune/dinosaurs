@@ -11,6 +11,7 @@ local loadOrder = {
 	"Client/Systems/Binds",
 	"Client/Systems/ClientAnimations",
 	"Client/Systems/Items",
+	"Client/Systems/Entities",
 }
 
 local ui = {
@@ -25,7 +26,6 @@ for _, path in ipairs(loadOrder) do
 	local system = import(path)
 	local lastStart = time()
 	system:start()
-	--print("LOADED "..path)
 	if time() - lastStart > .1 then
 		warn(path, " IS YIELDING????")
 	end

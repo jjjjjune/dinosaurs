@@ -17,6 +17,9 @@ function ClientSound:start()
         elseif soundInfo.part then
             soundInstance.Parent = soundInfo.part
             Debris:AddItem(soundInstance, soundInstance.TimeLength)
+        else
+            soundInstance.Parent = workspace
+            Debris:AddItem(soundInstance, soundInstance.TimeLength)
         end
         soundInstance:Play()
     end)
