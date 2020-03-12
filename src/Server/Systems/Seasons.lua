@@ -4,7 +4,7 @@ local SeasonsData = import "Shared/Data/SeasonsData"
 local RunService = game:GetService("RunService")
 
 local currentSeason = 1
-local seasonLength = 10
+local seasonLength = 300
 local lastSeasonChange = tick()
 
 local function getSeasonLengthModifier()

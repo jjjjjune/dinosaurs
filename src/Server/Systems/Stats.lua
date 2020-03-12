@@ -3,8 +3,8 @@ local Messages = import "Shared/Utils/Messages"
 local RunService = game:GetService("RunService")
 
 local STATS = {
-    {name = "hunger", max = 10, decayRate = 8, decayAmount = -1},
-    {name = "thirst", max = 10, decayRate = 6, decayAmount = -1},
+    {name = "hunger", max = 10, decayRate = 80, decayAmount = -1},
+    {name = "thirst", max = 10, decayRate = 60, decayAmount = -1},
 }
 
 local playerStats = {}
