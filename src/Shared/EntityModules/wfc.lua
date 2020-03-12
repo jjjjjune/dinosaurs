@@ -135,21 +135,6 @@ local function getLeastEntropicTile()
     return leastEntropicTile
 end
 
-local function collapse(tile, lastTile)
-    if #tile.possibilities < 1 then
-        tile.possibilities = lastTile.possibilities -- if a tile ends in an error state lets just grab the last tile's stuff
-        warn("Tile possibilities dropped to less than one (should not happen, system is over constrained)")
-    end
-    --[[if lastTile and tableContains(tile.possibilities, lastTile.possibilities[1]) then
-        if math.random(1, 10) < 9 then
-            tile.possibilities = {lastTile.possibilities[1]}
-        end
-    end--]]
-    tile.collapseResult = tile.possibilities[math.random(1, #tile.possibilities)]
-    tile.possibilities = {tile.collapseResult}
-    table.insert(finalTiles, tile)
-end
-
 local function tableContains(t, v)
     for i, x in pairs(t) do
         if x == v then
@@ -157,6 +142,21 @@ local function tableContains(t, v)
         end
     end
     return false
+end
+
+local function collapse(tile, lastTile)
+    if #tile.possibilities < 1 then
+        tile.possibilities = lastTile.possibilities -- if a tile ends in an error state lets just grab the last tile's stuff
+        warn("Tile possibilities dropped to less than one (should not happen, system is over constrained)")
+    end
+    if lastTile and tableContains(tile.possibilities, lastTile.possibilities[1]) then
+        if math.random(1, 10) < 9 then
+            tile.possibilities = {lastTile.possibilities[1]}
+        end
+    end
+    tile.collapseResult = tile.possibilities[math.random(1, #tile.possibilities)]
+    tile.possibilities = {tile.collapseResult}
+    table.insert(finalTiles, tile)
 end
 
 local function visualizeTiles(goldX, goldY)
@@ -347,7 +347,7 @@ end
 
 
 
-local areaSize = 100
+local areaSize = 40
 
 local tileSize = 32
 
@@ -357,7 +357,7 @@ local octaves = 10
 
 local mountainScale = .05
 
-local heightScale = 600
+local heightScale = 400
 
 local tiles = {}
 local useColors = {}
@@ -396,19 +396,6 @@ for x = 1, areaSize do
     for y = 1, areaSize do
         if tiles[x][y] > highest then 
             highest = tiles[x][y]
-        end
-    end
-end
-
-print("CENTER X Y IS", centerX, centerY)
-
-for x = 1, areaSize do
-    for y = 1, areaSize do
-        local dist = (Vector2.new(x,y) - Vector2.new(centerX, centerY)).magnitude
-        local maxDist = areaSize
-        local mountainScale = .1
-        if dist < areaSize/10 then
-            tiles[x][y] = highest
         end
     end
 end
@@ -468,8 +455,8 @@ for x = 1, areaSize do
             local startX = x
             local startY = y
             repeat
-                local areaX = math.random(math.ceil(areaSize*.08), math.ceil(areaSize*.22))
-                local areaY = math.random(math.ceil(areaSize*.08), math.ceil(areaSize*.22))
+                local areaX = math.random(math.ceil(areaSize*.04), math.ceil(areaSize*.12))
+                local areaY = math.random(math.ceil(areaSize*.04), math.ceil(areaSize*.12))
                 local areaSize = Vector2.new(areaX, areaY)
                 if math.random(1, 2) == 1 then
                     areaSize = Vector2.new(areaSize.X * -1, areaSize.Y)
@@ -498,6 +485,20 @@ for x = 1, areaSize do
     end
 end
 
+local centerTiles = {}
+
+for x = 1, areaSize do
+    for y = 1, areaSize do
+        local dist = (Vector2.new(x,y) - Vector2.new(centerX, centerY)).magnitude
+        local maxDist = (Vector2.new(0,0) - Vector2.new(areaSize, areaSize)).magnitude
+        local maxAcceptableDist = maxDist*.04
+        if dist < maxAcceptableDist then
+            print("CENTER RAISING")
+            tiles[x][y] = highest+40
+        end
+    end
+end
+
 local function interpolateBySurrounding(color, x, y)
     local allColor = color
     local totalCols = 0
@@ -516,13 +517,14 @@ end
 
 workspace.Tiles:ClearAllChildren()
 
+highest = 0
 
 local function renderTiles()
     for x = 1, areaSize do
         wait()
         for y = 1, areaSize do
             useColors[x][y] = interpolateBySurrounding(useColors[x][y],x,y)
-            local height = tiles[x][y]
+            local height = tiles[x][y]--math.max(1, tiles[x][y] - 600)
             local part = Instance.new("Part")
             part.Size = Vector3.new(tileSize, height, tileSize)
             part.Anchored = true
@@ -542,8 +544,49 @@ local function renderTiles()
             part.Parent = workspace.Tiles
             grass.Parent = workspace.Tiles
             grass.Color = useColors[x][y]
+            if centerTiles[x] and centerTiles[x][y] then
+                grass.Color = Color3.new(1,0,0)
+                local v = Instance.new("SpawnLocation", workspace.Tiles)
+                v.Anchored = true
+                v.Transparency = 1
+                v.CanCollide = false
+                v.CFrame = grass.CFrame
+            end
+            if grass.Position.Y > highest then
+                highest = grass.Position.Y
+            end
+            local checkHeight = tiles[x][y+1]
+            if checkHeight then
+                if (checkHeight - height) > heightScale/18 and math.random(1, 3) == 1 then
+                    print("it is: ", checkHeight - height)
+                    local wedge = Instance.new("WedgePart")
+                    wedge.Size = Vector3.new(grass.Size.X, checkHeight - height - grass.Size.Y, grass.Size.Z)
+                    wedge.CFrame = grass.CFrame * CFrame.new(0,(wedge.Size.Y/2 + grass.Size.Y/2),0)
+                    wedge.CFrame = wedge.CFrame * CFrame.Angles(0, 0,0)
+                    wedge.Parent = workspace.Tiles
+                    wedge.Color = part.Color
+                    grass.Color = wedge.Color
+                end
+            end
+            checkHeight = tiles[x][y-1]
+            if checkHeight then
+                if (checkHeight - height) > heightScale/18 and math.random(1, 3) == 1 then
+                    print("it is: ", checkHeight - height)
+                    local wedge = Instance.new("WedgePart")
+                    wedge.Size = Vector3.new(grass.Size.X, checkHeight - height - grass.Size.Y, grass.Size.Z)
+                    wedge.CFrame = grass.CFrame * CFrame.new(0,(wedge.Size.Y/2 + grass.Size.Y/2),0)
+                    wedge.CFrame = wedge.CFrame * CFrame.Angles(0, math.pi,0)
+                    wedge.Parent = workspace.Tiles
+                    wedge.Color = part.Color
+                    grass.Color = wedge.Color
+                end
+            end
         end
     end
 end
 
+workspace.Water.CFrame = CFrame.new(0, highest - 4000, 0)
+
 renderTiles()
+
+--workspace.Water.CFrame = CFrame.new(0, highest - 40, 0)
