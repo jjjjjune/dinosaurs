@@ -6,4 +6,8 @@ PlantDrops.Pine = {
     {name = "Pine Seed", min = 0, max = 2, chance = 55},
 }
 
+PlantDrops["Blue Mushroom"] = {
+    {name = "Blue Mushroom", min = 1, max = 3, chance = 50},
+}
+
 return PlantDrops
