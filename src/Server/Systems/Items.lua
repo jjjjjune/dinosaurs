@@ -28,12 +28,27 @@ local function attemptCarryItem(player, item)
     item.Parent = character
     item.PrimaryPart.RootPriority = 10 -- for later when you're throwing
     item.PrimaryPart:SetNetworkOwner(player)
-    item.PrimaryPart.CFrame = player.Character.Head.CFrame * CFrame.new(0, item.PrimaryPart.Size.Y/2 + player.Character.Head.Size.Y/2, 0)
+    local targetPart = player.Character.Head
+    if item:FindFirstChild("AttachPart") then
+        print("yea attach part")
+        targetPart = player.Character[item.AttachPart.Value]
+        if item.AttachPart.Value == "RightHand" then
+            item.PrimaryPart.CFrame = targetPart.CFrame * CFrame.Angles(-math.pi/2,0,0)
+        end
+    else
+        print("no attach part")
+        item.PrimaryPart.CFrame = targetPart.CFrame * CFrame.new(0, item.PrimaryPart.Size.Y/2 + targetPart.Size.Y/2, 0)
+    end
     local serverWeld = Instance.new("WeldConstraint", item)
-    serverWeld.Part0 = player.Character.Head
+    serverWeld.Part0 = targetPart
     serverWeld.Part1 = item.PrimaryPart
     serverWeld.Name = "ServerWeld"
     Messages:sendClient(player, "SetCarryItem", item)
+    for _, v in pairs(item:GetChildren()) do
+        if v:IsA("BasePart") then
+            v.CanCollide = false
+        end
+    end
 end
 
 local function throw(player, item)
@@ -41,6 +56,11 @@ local function throw(player, item)
         item.ServerWeld:Destroy()
     end
     item.Parent = workspace
+    for _, v in pairs(item:GetChildren()) do
+        if v:IsA("BasePart") then
+            v.CanCollide = true
+        end
+    end
     Messages:reproOnClients(player, "PlaySound", "HeavyWhoosh", item.PrimaryPart.Position)
     delay(6, function()
         if item:IsDescendantOf(game) and item.PrimaryPart:CanSetNetworkOwnership() then 
