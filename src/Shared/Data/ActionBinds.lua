@@ -18,6 +18,6 @@ return {
         pcBind = "Mouse1",
         gamepad = "RT",
         gamepadBind = Enum.KeyCode.ButtonR2,
-        color = Color3.fromRGB(39,31,122),
+        color = Color3.fromRGB(249,164,183),
     }
 }
