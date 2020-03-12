@@ -44,7 +44,7 @@ local function getMaterial(part)
         end
         return material
     end
-    if part.BrickColor.Name == "Flint" then
+    if part.BrickColor.Name == "Flint" or CollectionService:HasTag(part, "Stone") then
         return "stone"
     end
     if part.BrickColor.Name == "Pine Cone" then
