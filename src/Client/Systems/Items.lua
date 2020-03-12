@@ -6,6 +6,7 @@ local CollectionService = game:GetService("CollectionService")
 local ActionBinds = import "Shared/Data/ActionBinds"
 local ContextActionService = game:GetService("ContextActionService")
 local TagsToModulesMap = import "Shared/Data/TagsToModulesMap"
+local UseTexts = import "Shared/Data/UseTexts"
 
 local itemModule
 local carryItemInstance
@@ -31,13 +32,19 @@ local function equipCarryItem(itemInstance)
     Messages:send("CreateContextualBind", "USE", function()
         itemModule.clientUse(itemInstance)
         Messages:sendServer("UseItem", itemInstance)
-    end)
+    end, UseTexts[itemInstance.Name] or "USE")
+    Messages:send("CreateContextualBind", "GRAB", nil, "THROW")
 end
 
 local function unequipCarryItem()
-    itemModule.clientUnequip(carryItemInstance)
-    itemModule = nil
+    if itemModule then 
+        itemModule.clientUnequip(carryItemInstance)
+        itemModule = nil
+    else
+        warn("bad item module? look into this")
+    end
     Messages:send("DestroyContextualBind", "USE")
+    Messages:send("DestroyContextualBind", "GRAB")
 end
 
 local function attemptCarryItem(item)
@@ -66,8 +73,12 @@ local function attemptThrowItem()
             possibleItem.Parent = workspace
             possibleItem.PrimaryPart.CFrame = possibleItem.PrimaryPart.CFrame * CFrame.new(0,0,-2)
             possibleItem.PrimaryPart.Velocity = character.HumanoidRootPart.Velocity * 2
+            local holdAnimation = "Carry"
+            if possibleItem:FindFirstChild("HoldAnimation") then
+                holdAnimation = possibleItem.HoldAnimation.Value
+            end
+            Messages:send("StopAnimationClient", holdAnimation)
             Messages:sendServer("Throw", possibleItem)
-            Messages:send("StopAnimationClient", "Carry")
         end
     end
 end
