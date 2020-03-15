@@ -16,7 +16,9 @@ local loadOrder = {
 	"Server/Systems/Stats",
 	"Server/Systems/Water",
 	"Server/Systems/Entities",
+	"Server/Systems/ToolStorage",
 
+	"Shared/Systems/Data",
 	"Shared/Systems/Sounds",
 }
 

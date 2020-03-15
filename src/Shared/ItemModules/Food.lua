@@ -4,7 +4,7 @@ local Messages = import "Shared/Utils/Messages"
 local Food = {}
 
 function Food.clientUse(item)
-    -- monch, clone food item for effect, effect
+    Messages:send("PlayAnimationClient", "Eat")
 end
 
 function Food.serverUse(player, item)

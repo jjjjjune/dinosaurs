@@ -10,6 +10,7 @@ local UseTexts = import "Shared/Data/UseTexts"
 
 local itemModule
 local carryItemInstance
+local lastToolUse = time()
 
 local function getItemModule(itemInstance)
     local itemModule
@@ -25,19 +26,14 @@ local function getItemModule(itemInstance)
     return itemModule
 end
 
-local function equipCarryItem(itemInstance)
-    itemModule = getItemModule(itemInstance)
-    itemModule.clientEquip(itemInstance)
-    carryItemInstance = itemInstance
-    Messages:send("CreateContextualBind", "USE", function()
-        itemModule.clientUse(itemInstance)
-        Messages:sendServer("UseItem", itemInstance)
-    end, UseTexts[itemInstance.Name] or "USE")
-    Messages:send("CreateContextualBind", "GRAB", nil, "THROW")
-end
-
 local function unequipCarryItem()
-    if itemModule then 
+    print("UN EQUIP BEING CALLED")
+    local holdAnimation = "Carry"
+    if carryItemInstance:FindFirstChild("HoldAnimation") then
+        holdAnimation = carryItemInstance.HoldAnimation.Value
+    end
+    Messages:send("StopAnimationClient", holdAnimation)
+    if itemModule then
         itemModule.clientUnequip(carryItemInstance)
         itemModule = nil
     else
@@ -45,7 +41,9 @@ local function unequipCarryItem()
     end
     Messages:send("DestroyContextualBind", "USE")
     Messages:send("DestroyContextualBind", "GRAB")
+    Messages:send("DestroyContextualBind", "STORE")
 end
+
 
 local function attemptCarryItem(item)
     if item.Parent ~= workspace then
@@ -66,7 +64,8 @@ local function attemptThrowItem()
         if CollectionService:HasTag(possibleItem, "Item") then
             Messages:send("PlaySoundOnClient",{
                 instance = game.ReplicatedStorage.Sounds.HeavyWhoosh,
-                part = character.Head
+                part = character.Head, 
+                volume = (possibleItem.PrimaryPart.Velocity.Magnitude > 2 and .25) or .1
             })
             possibleItem:WaitForChild("ServerWeld")
             possibleItem.ServerWeld:Destroy()
@@ -87,27 +86,69 @@ local function unbindCarry()
     Binds.unbindTagFromAction("Item", "GRAB")
 end
 
+local function carryItem(item)
+    local bindInfo = ActionBinds.GRAB
+    ContextActionService:BindAction("Throw", function(contextActionName, inputState, inputObject)
+        if inputState == Enum.UserInputState.Begin then
+            Messages:send("Throw")
+        end
+    end, false, bindInfo.pcBind, bindInfo.gamepadBind)
+    unbindCarry()
+end
+
+
 local function bindCarry()
     ContextActionService:UnbindAction("Throw")
     Binds.bindTagToAction("Item", "GRAB", function(item)
         if attemptCarryItem(item) then
-            local bindInfo = ActionBinds.GRAB
-            ContextActionService:BindAction("Throw", function(contextActionName, inputState, inputObject)
-                if inputState == Enum.UserInputState.Begin then
-                    Messages:send("Throw")
-                end
-            end, false, bindInfo.pcBind, bindInfo.gamepadBind)
-            unbindCarry()
+           carryItem(item)
         end
     end)
+end
+
+local function equipCarryItem(itemInstance)
+    print("EQUIP BEING CALLED")
+    itemModule = getItemModule(itemInstance)
+    itemModule.clientEquip(itemInstance)
+    carryItemInstance = itemInstance
+    Messages:send("CreateContextualBind", "USE", function()
+        local canUse = true
+        if itemModule.debounce and time() - lastToolUse < itemModule.debounce then
+            canUse = false
+        end
+        if canUse then
+            lastToolUse = time()
+            itemModule.clientUse(itemInstance)
+            Messages:sendServer("UseItem", itemInstance)
+        end
+    end, UseTexts[itemInstance.Name] or "USE")
+    Messages:send("CreateContextualBind", "GRAB", nil, "THROW")
+    if CollectionService:HasTag(itemInstance, "Tool") then
+
+        Messages:send("CreateContextualBind", "STORE", function()
+            unequipCarryItem()
+            Messages:send("StoreTool", carryItemInstance)
+            bindCarry()
+            -- the server will tell us what to do with respect to equipping/unequipping
+        end, "STORE")
+
+    end
 end
 
 local Items = {}
 
 function Items:start()
+    Messages:hook("ForceSetItem", function(item)
+        if attemptCarryItem(item) then
+            carryItem(item)
+         end
+    end)
     Messages:hook("Unequip", function()
-        Messages:send("StopAnimationClient", "Carry")
         unequipCarryItem()
+        bindCarry()
+    end)
+    Messages:hook("ForceThrowItems", function()
+        attemptThrowItem()
         bindCarry()
     end)
     Messages:hook("Throw", function()
@@ -116,10 +157,13 @@ function Items:start()
         bindCarry()
     end)
     Messages:hook("SetCarryItem", function(carryItemInstance)
-        if carryItemInstance:FindFirstChild("TemporaryInstantWeld") then
-            carryItemInstance.TemporaryInstantWeld:Destroy()
+        if carryItemInstance then 
+            if carryItemInstance:FindFirstChild("TemporaryInstantWeld") then
+                carryItemInstance.TemporaryInstantWeld:Destroy()
+            end
+            unbindCarry() -- just in case!
+            equipCarryItem(carryItemInstance)
         end
-        equipCarryItem(carryItemInstance)
     end)
     Messages:hook("CharacterAddedClient", function(character)
         bindCarry()

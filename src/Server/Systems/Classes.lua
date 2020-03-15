@@ -4,7 +4,7 @@ local Players = game:GetService("Players")
 
 local PlayerClassesFolder = import "ServerStorage/PlayerClasses"
 
-local possibleClasses = {"Citizen", "Gatherer", "Warrior"}
+local possibleClasses = {"Citizen", "Gatherer"} -- , "Warrior"
 
 local function setClass(character, className)
     local classAsset = PlayerClassesFolder[className]

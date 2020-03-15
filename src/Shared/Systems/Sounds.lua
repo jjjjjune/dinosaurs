@@ -22,8 +22,6 @@ local function playSound(soundName, position, group, pitchshift, useFolder, forc
     local sound
 	local part
 
-	print("info: ", soundName, position, group, pitchshift)
-
 	local folder = SoundsFolder
 	if useFolder then
 		folder = useFolder

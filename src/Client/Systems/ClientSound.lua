@@ -9,6 +9,9 @@ function ClientSound:start()
     Messages:hook("PlaySoundOnClient", function(soundInfo)
         local soundInstance = soundInfo.instance or SoundsFolder:FindFirstChild(soundInfo.soundName)
         soundInstance = soundInstance:Clone()
+        if soundInfo.Volume then
+            soundInstance.Volume = soundInfo.Volume
+        end
         if soundInfo.position then
             local soundAttachment = Instance.new("Attachment", workspace.Terrain)
             Debris:AddItem(soundAttachment, soundInstance.TimeLength)

@@ -4,7 +4,7 @@ return {
         pcBind = Enum.KeyCode.E,
         gamepad = "X",
         gamepadBind = Enum.KeyCode.ButtonX,
-        color = Color3.fromRGB(54,134,168)
+        color = Color3.fromRGB(60, 211, 206)
     },
     INTERACT = {
         pc = "F",
@@ -18,6 +18,13 @@ return {
         pcBind = "Mouse1",
         gamepad = "RT",
         gamepadBind = Enum.KeyCode.ButtonR2,
-        color = Color3.fromRGB(249,164,183),
-    }
+        color = Color3.fromRGB(137, 230, 114),
+    },
+    STORE = {
+        pc = "R",
+        pcBind = Enum.KeyCode.R,
+        gamepad = "LT",
+        gamepadBind = Enum.KeyCode.ButtonL1,
+        color = Color3.fromRGB(255,91,181),
+    },
 }

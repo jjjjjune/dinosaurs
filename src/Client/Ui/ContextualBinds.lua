@@ -7,6 +7,20 @@ local GetDevice = import "Shared/Utils/GetDevice"
 
 local currentBinds = {}
 
+local function animate(tooltip)
+    for _, v in pairs(tooltip:GetChildren()) do
+        if not v:FindFirstChild("Tweening") then 
+            local tweening = Instance.new("BoolValue", v)
+            tweening.Name = "Tweening"
+            v:TweenPosition(v.Position + UDim2.new(0,0,0,4), "Out", "Quad", .1, false, function()
+                v:TweenPosition(v.Position - UDim2.new(0,0,0,4), "Out", "Quad", .1, false, function()
+                    tweening:Destroy()
+                end)
+            end)
+        end
+    end
+end
+
 local function updateBindsUi()
     local tooltipFrame = BindsUi.Frame.TooltipGeneric
     local descriptionFrame = BindsUi.Frame.DescriptionLabel
@@ -28,6 +42,11 @@ local function updateBindsUi()
         tooltip.Name = actionName
         tooltip.LayoutOrder = counter
         tooltip.Visible = true
+
+        tooltip.Activated:connect(function()
+            bindInfo.callback()
+            animate(tooltip)
+        end)
 
         if device == "Desktop" then
             tooltip.TextLabel.Text = actionBindInfo.pc
@@ -69,12 +88,16 @@ function ContextualBinds:start()
             ContextActionService:BindAction("contextual"..actionName, function(contextActionName, inputState, inputObject)
                 if inputState == Enum.UserInputState.Begin then
                     callback()
+                    if BindsUi.Frame:FindFirstChild(actionName) then
+                        animate(BindsUi.Frame[actionName])
+                    end
                 end
             end, false, unpack(actions))
         end
         currentBinds[actionName] = {
             title = title or "REP",
-            action = actionName
+            action = actionName,
+            callback = callback,
         }
         updateBindsUi()
     end)

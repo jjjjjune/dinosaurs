@@ -4,6 +4,7 @@ local CollectionService = game:GetService("CollectionService")
 local TagsToModulesMap = import "Shared/Data/TagsToModulesMap"
 
 local function attemptCarryItem(player, item)
+    print("making ", player, " carry ", item)
     local character = player.Character
     if not character then
         return
@@ -17,10 +18,12 @@ local function attemptCarryItem(player, item)
         end
     end
     if foundItem == true then
+        print("player already has an item!")
         return
     end
     local alive = character:FindFirstChild("Humanoid") and character.Humanoid.Health > 0
     if not alive then 
+        print("no alive")
         return
     end
     Messages:send("PlaySound", "UiClick", character.Head, 200)
@@ -100,7 +103,7 @@ end
 local Items = {}
 
 function Items.createItem(itemName, position)
-    local itemModel = game.ServerStorage.Items[itemName]:Clone()
+    local itemModel = game.ReplicatedStorage.Items[itemName]:Clone()
     itemModel.PrimaryPart = itemModel.Base
     itemModel:SetPrimaryPartCFrame(CFrame.new(position))
     itemModel.Parent = workspace
@@ -131,6 +134,7 @@ function Items:start()
     Messages:hook("PlayerDied", function(player, character)
         throwAllPlayerItems(player)
     end)
+    Messages:hook("ThrowAllItems", throwAllPlayerItems)
     Messages:hook("PlayerRemoving", function(player)
         if player.Character then
             throwAllPlayerItems(player)

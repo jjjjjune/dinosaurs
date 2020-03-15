@@ -18,12 +18,12 @@ local Weather = {}
 function Weather:start()
     Messages:hook("SeasonSetTo", function(currentSeason)
         if currentSeason == 1 then
-            createWeather("Rain", 8)
+            createWeather("Rain", 180)
             Messages:send("WetAllWater")
         elseif currentSeason == 2 then
             Messages:send("DryAllWater")
         elseif currentSeason == 4 then
-            createWeather("Snow", 8)
+            createWeather("Snow", 180)
         end
     end)
     Messages:hook("PlayerAdded", function(player)

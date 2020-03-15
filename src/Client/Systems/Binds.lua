@@ -19,6 +19,9 @@ end
 local function getClosestItemOfTag(position, tag)
     local closestDistance = MIN_FIND_DISTANCE
     local closestItem
+    if not tagsCache[tag] then
+        return
+    end
     for _, item in pairs(tagsCache[tag]) do
         if isValid(item) then 
             local itemPos = item.PrimaryPart and item.PrimaryPart.Position
@@ -84,16 +87,31 @@ end
 local function performActionCallbackForAction(actionName)
     local foundItem
     local tagBindInfo = boundActionTags[actionName]
-    for _, tag in pairs(tagBindInfo.tags) do
-        if lastFoundTagItem[tag] then
-            foundItem = lastFoundTagItem[tag]
+    if tagBindInfo then 
+        for _, tag in pairs(tagBindInfo.tags) do
+            if lastFoundTagItem[tag] then
+                foundItem = lastFoundTagItem[tag]
+            end
+            if foundItem then
+                tagBindInfo.callbacks[tag](foundItem)
+                Messages:send("PlayPressedEffect", actionName)
+                break
+            end
         end
-        if foundItem then
-            tagBindInfo.callbacks[tag](foundItem)
-            Messages:send("PlayPressedEffect", actionName)
-            break
+    else
+        warn("no bound action for : ", actionName)
+    end
+end
+
+local function getTagged(collectionServiceTag)
+    local initial = CollectionService:GetTagged(collectionServiceTag)
+    local new = {}
+    for _, v in pairs(initial) do
+        if v:IsDescendantOf(workspace) then
+            table.insert(new, v)
         end
     end
+    return new
 end
 
 local Binds = {}
@@ -125,13 +143,15 @@ function Binds.bindTagToAction(collectionServiceTag, actionName, callback)
         }
     end
     if not tagsCache[collectionServiceTag] then
-        tagsCache[collectionServiceTag] = CollectionService:GetTagged(collectionServiceTag)
+        tagsCache[collectionServiceTag] = getTagged(collectionServiceTag)
         local tagsTable = tagsCache[collectionServiceTag]
         boundActionTags[actionName].callbacks[collectionServiceTag] = callback
         boundActionTags[actionName].events[collectionServiceTag] = {}
         boundActionTags[actionName].events[collectionServiceTag][1] = CollectionService:GetInstanceAddedSignal(collectionServiceTag):connect(
             function(instance)
-                table.insert(tagsTable, instance)
+                if instance:IsDescendantOf(workspace) then 
+                    table.insert(tagsTable, instance)
+                end
             end
         )
         boundActionTags[actionName].events[collectionServiceTag][2] = CollectionService:GetInstanceRemovedSignal(collectionServiceTag):connect(
