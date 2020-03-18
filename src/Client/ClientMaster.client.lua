@@ -14,8 +14,10 @@ local loadOrder = {
 	"Client/Systems/Entities",
 	"Client/Systems/ToolStorage",
 
-	"Client/Systems/LavaBubbles"
+	"Client/Systems/LavaBubbles",
 	--"Client/Systems/Data"
+
+	"Shared/Systems/Particles",
 }
 
 local ui = {

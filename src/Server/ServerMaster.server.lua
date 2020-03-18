@@ -11,14 +11,15 @@ local loadOrder = {
 	"Server/Systems/Plants",
 	"Server/Systems/Animations",
 	"Server/Systems/Items",
-	"Server/Systems/Particles",
 	"Server/Systems/Weather",
 	"Server/Systems/Stats",
 	"Server/Systems/Water",
 	"Server/Systems/Entities",
 	"Server/Systems/ToolStorage",
 	"Server/Systems/Sacrifices",
+	"Server/Systems/Rocks",
 
+	"Shared/Systems/Particles",
 	"Shared/Systems/Data",
 	"Shared/Systems/Sounds",
 }

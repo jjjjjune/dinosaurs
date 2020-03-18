@@ -6,7 +6,7 @@ local TagsToModulesMap = {}
 
 TagsToModulesMap.Food = import "Shared/ItemModules/Food"
 TagsToModulesMap.Seed = import "Shared/ItemModules/Seed"
-TagsToModulesMap.Tool = import "Shared/ItemModules/Tool"
+TagsToModulesMap.Pickaxe = import "Shared/ItemModules/Pickaxe"
 
 -- entities
 
