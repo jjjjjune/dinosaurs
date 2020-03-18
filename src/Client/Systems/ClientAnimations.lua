@@ -39,8 +39,6 @@ function Animations:start()
 				speed = speed~=nil and speed or 1
 				blend = blend~=nil and blend or 0.1
 				track:Play(blend,1,speed)
-			else
-				print("track doesn't exist.. weird")
 			end
         end
     end)

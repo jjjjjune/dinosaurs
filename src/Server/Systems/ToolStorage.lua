@@ -17,7 +17,6 @@ local function storeTool(player, itemInstance)
     if prevItem then
         local Items = import "Server/Systems/Items"
         local itemModel = Items.createItem(prevItem, Vector3.new(0,1000,0))
-        print("force setting item")
         Messages:sendClient(player, "ForceSetItem", itemModel)
     end
     slotData.item = itemInstance.Name

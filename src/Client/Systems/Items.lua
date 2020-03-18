@@ -27,7 +27,6 @@ local function getItemModule(itemInstance)
 end
 
 local function unequipCarryItem()
-    print("UN EQUIP BEING CALLED")
     local holdAnimation = "Carry"
     if carryItemInstance:FindFirstChild("HoldAnimation") then
         holdAnimation = carryItemInstance.HoldAnimation.Value
@@ -70,8 +69,8 @@ local function attemptThrowItem()
             possibleItem:WaitForChild("ServerWeld")
             possibleItem.ServerWeld:Destroy()
             possibleItem.Parent = workspace
-            possibleItem.PrimaryPart.CFrame = possibleItem.PrimaryPart.CFrame * CFrame.new(0,0,-2)
-            possibleItem.PrimaryPart.Velocity = character.HumanoidRootPart.Velocity * 2
+            possibleItem.PrimaryPart.CFrame = character.HumanoidRootPart.CFrame * CFrame.new(0,0,-2)
+            possibleItem.PrimaryPart.Velocity = character.HumanoidRootPart.Velocity * 1.25
             local holdAnimation = "Carry"
             if possibleItem:FindFirstChild("HoldAnimation") then
                 holdAnimation = possibleItem.HoldAnimation.Value
@@ -107,7 +106,6 @@ local function bindCarry()
 end
 
 local function equipCarryItem(itemInstance)
-    print("EQUIP BEING CALLED")
     itemModule = getItemModule(itemInstance)
     itemModule.clientEquip(itemInstance)
     carryItemInstance = itemInstance

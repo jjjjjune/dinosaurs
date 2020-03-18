@@ -25,6 +25,7 @@ local ui = {
 	"Client/Ui/StatsUi",
 	"Client/Ui/ContextualBinds",
 	"Client/Ui/Tools",
+	"Client/Ui/SacrificeUi"
 }
 
 for _, path in ipairs(loadOrder) do

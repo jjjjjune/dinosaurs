@@ -70,6 +70,74 @@ return {
             Color = Color3.fromRGB(38, 132, 213),
         }
     },
+    WinterNight = {
+        [game.Lighting] = {
+            Ambient = Color3.fromRGB(15, 39, 252),
+            Brightness = .1,
+            ColorShift_Bottom = Color3.fromRGB(0, 234, 255),
+            ColorShift_Top = Color3.fromRGB(0, 124, 135),
+            OutdoorAmbient = Color3.fromRGB(7, 44, 125),
+            FogColor = Color3.fromRGB(58, 80, 161),
+            FogEnd = 2000,
+        },
+        [workspace.Effects.Sky] = {
+            Color = Color3.fromRGB(27, 42, 53),
+        },
+        [workspace.Effects.Water] = {
+            Color = Color3.fromRGB(0, 32, 96),
+        }
+    },
+    SpringNight = {
+        [game.Lighting] = {
+            Ambient = Color3.fromRGB(41, 36, 74),
+            Brightness = .1,
+            ColorShift_Bottom = Color3.fromRGB(0, 0, 0),
+            ColorShift_Top = Color3.fromRGB(0, 0, 0),
+            OutdoorAmbient = Color3.fromRGB(33, 21, 21),
+            FogColor = Color3.fromRGB(74, 36, 36),
+            FogEnd = 2000,
+        },
+        [workspace.Effects.Sky] = {
+            Color = Color3.fromRGB(86, 36, 36),
+        },
+        [workspace.Effects.Water] = {
+            Color = Color3.fromRGB(136, 62, 62),
+        }
+    },
+    SummerNight = {
+        [game.Lighting] = {
+            Ambient = Color3.fromRGB(41, 36, 74),
+            Brightness = .1,
+            ColorShift_Bottom = Color3.fromRGB(0, 0, 0),
+            ColorShift_Top = Color3.fromRGB(0, 0, 0),
+            OutdoorAmbient = Color3.fromRGB(33, 21, 21),
+            FogColor = Color3.fromRGB(74, 36, 36),
+            FogEnd = 2000,
+        },
+        [workspace.Effects.Sky] = {
+            Color = Color3.fromRGB(86, 36, 36),
+        },
+        [workspace.Effects.Water] = {
+            Color = Color3.fromRGB(136, 62, 62),
+        }
+    },
+    FallNight = {
+        [game.Lighting] = {
+            Ambient = Color3.fromRGB(15, 39, 252),
+            Brightness = .1,
+            ColorShift_Bottom = Color3.fromRGB(0, 234, 255),
+            ColorShift_Top = Color3.fromRGB(0, 124, 135),
+            OutdoorAmbient = Color3.fromRGB(7, 44, 125),
+            FogColor = Color3.fromRGB(58, 80, 161),
+            FogEnd = 2000,
+        },
+        [workspace.Effects.Sky] = {
+            Color = Color3.fromRGB(27, 42, 53),
+        },
+        [workspace.Effects.Water] = {
+            Color = Color3.fromRGB(0, 32, 96),
+        }
+    },
     --[[Rain = {
         [game.Lighting] = {
             Ambient = Color3.fromRGB(142, 114, 255),

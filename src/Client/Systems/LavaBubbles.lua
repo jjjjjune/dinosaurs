@@ -5,9 +5,8 @@ local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 
 local function tickLava(lavaPart)
-    local limitForPart = lavaPart.Size.magnitude * 3
-    print("limit is: ", limitForPart)
-    local lavaDist = lavaPart.Size.X
+    local limitForPart = lavaPart.Size.magnitude * 1
+    local lavaDist = lavaPart.Size.X/3
     if #lavaPart:GetChildren() < limitForPart then
         local bubblePart = Instance.new("Part")
         bubblePart.Material = lavaPart.Material
@@ -27,12 +26,7 @@ local function tickLava(lavaPart)
         local sizeProps = {
             Size = (Vector3.new(1,1,1) * math.random()) * math.random(1,3)
         }
-        --[[local transparencyProps = {
-            Transparency = .5
-        }--]]
 
-        --local transparencyTween = TweenService:Create(bubblePart, tweenInfo, transparencyProps)
-        --transparencyTween:Play()
         local sizeTween = TweenService:Create(bubblePart, tweenInfo, sizeProps)
         sizeTween.Completed:connect(function()
             if math.random(1, 3) < 3 then 

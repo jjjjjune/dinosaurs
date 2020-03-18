@@ -16,7 +16,7 @@ local currentWeather = nil
 
 local lastTweens = {}
 
-local function onSeasonSetTo(currentSeason)
+local function onSeasonSetTo(currentSeason, isNight)
     for _, tween in pairs(lastTweens) do
         if tween.PlaybackState == Enum.PlaybackState.Playing then
             tween:Pause()
@@ -24,6 +24,9 @@ local function onSeasonSetTo(currentSeason)
     end
     lastTweens = {}
     currentSeasonName = (SeasonsData[currentSeason] and SeasonsData[currentSeason].name) or currentSeason
+    if isNight then
+        currentSeasonName = currentSeasonName.."Night"
+    end
     -- that last bit there is for weather
     local tweenInfo = TweenInfo.new(3, Enum.EasingStyle.Quad,Enum.EasingDirection.Out)
     for instance, properties in pairs(SeasonLighting[currentSeasonName]) do
@@ -68,9 +71,10 @@ function Lighting:start()
     FastSpawn(function()
         workspace:WaitForChild("Effects"):WaitForChild("Sky")
         setInitialLighting()
-        Messages:hook("SeasonSetTo", function(currentSeason)
-            onSeasonSetTo(currentSeason)
-        end)
+        
+    end)
+    Messages:hook("SeasonSetTo", function(currentSeason, length, isNight)
+        onSeasonSetTo(currentSeason, isNight)
     end)
     Messages:hook("WeatherSetTo", function(weather)
         if SeasonLighting[weather] then

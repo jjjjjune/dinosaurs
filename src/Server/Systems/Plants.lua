@@ -94,6 +94,7 @@ function Plants:start()
         growAllPlants()
         onSeasonChanged(newSeason)
     end)
+    Messages:hook("GrowAllPlants", growAllPlants)
     Messages:hook("CreatePlant", createPlant)
     growAllPlants()
 end

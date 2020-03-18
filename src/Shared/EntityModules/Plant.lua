@@ -45,7 +45,6 @@ function Entity.clientUse(entityInstance)
 end
 
 function Entity.serverUse(player, entityInstance)
-    print("server use")
     local sound = "Chop"
     if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
         if (player.Character.PrimaryPart.Position - entityInstance.PrimaryPart.Position).magnitude < 40  then

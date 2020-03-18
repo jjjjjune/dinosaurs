@@ -4,7 +4,6 @@ local CollectionService = game:GetService("CollectionService")
 local TagsToModulesMap = import "Shared/Data/TagsToModulesMap"
 
 local function attemptCarryItem(player, item)
-    print("making ", player, " carry ", item)
     local character = player.Character
     if not character then
         return
@@ -18,12 +17,10 @@ local function attemptCarryItem(player, item)
         end
     end
     if foundItem == true then
-        print("player already has an item!")
         return
     end
     local alive = character:FindFirstChild("Humanoid") and character.Humanoid.Health > 0
     if not alive then 
-        print("no alive")
         return
     end
     Messages:send("PlaySound", "UiClick", character.Head, 200)
@@ -33,13 +30,11 @@ local function attemptCarryItem(player, item)
     item.PrimaryPart:SetNetworkOwner(player)
     local targetPart = player.Character.Head
     if item:FindFirstChild("AttachPart") then
-        print("yea attach part")
         targetPart = player.Character[item.AttachPart.Value]
         if item.AttachPart.Value == "RightHand" then
             item.PrimaryPart.CFrame = targetPart.CFrame * CFrame.Angles(-math.pi/2,0,0)
         end
     else
-        print("no attach part")
         item.PrimaryPart.CFrame = targetPart.CFrame * CFrame.new(0, item.PrimaryPart.Size.Y/2 + targetPart.Size.Y/2, 0)
     end
     local serverWeld = Instance.new("WeldConstraint", item)

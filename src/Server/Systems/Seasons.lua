@@ -4,8 +4,10 @@ local SeasonsData = import "Shared/Data/SeasonsData"
 local RunService = game:GetService("RunService")
 
 local currentSeason = 1
-local seasonLength = 150
+local seasonLength = 30
 local lastSeasonChange = tick()
+
+local isNight = false
 
 local function getSeasonLengthModifier()
     return SeasonsData[currentSeason].lengthModifier
@@ -16,8 +18,11 @@ local function advanceSeason()
     if currentSeason > #SeasonsData then
         currentSeason = 1
     end
-    Messages:sendAllClients("SeasonSetTo", currentSeason, seasonLength*getSeasonLengthModifier())
-    Messages:send("SeasonSetTo", currentSeason) -- this order is important for dumb tween reasons
+    if currentSeason == 4 then
+        --isNight = not isNight
+    end
+    Messages:sendAllClients("SeasonSetTo", currentSeason, seasonLength*getSeasonLengthModifier(), isNight)
+    Messages:send("SeasonSetTo", currentSeason) -- this order is important for dumb tween reasons   
 end
 
 local function initializeMainSeasonLoop()
