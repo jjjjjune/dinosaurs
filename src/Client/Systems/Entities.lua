@@ -5,7 +5,7 @@ local Messages = import "Shared/Utils/Messages"
 local TagsToModulesMap = import "Shared/Data/TagsToModulesMap"
 
 local function useEntity(item)
-    for tagName, entityState in pairs(TagsToModulesMap) do
+    for tagName, entityState in pairs(TagsToModulesMap.Entities) do
         if  CollectionService:HasTag(item, tagName) then
             entityState.clientUse(item)
             Messages:sendServer("UseEntity", item)

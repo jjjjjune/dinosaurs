@@ -3,6 +3,26 @@ local Messages = import "Shared/Utils/Messages"
 local CollectionService = game:GetService("CollectionService")
 local TagsToModulesMap = import "Shared/Data/TagsToModulesMap"
 
+local function prepare(item)
+    if CollectionService:HasTag(item, "Building") then
+        if not item.PrimaryPart:FindFirstChild("WeldConstraint") then
+            for _, v in pairs(item:GetChildren()) do
+                if v:IsA("BasePart") then
+                    local w = Instance.new("WeldConstraint")
+                    w.Part0 = v
+                    w.Part1 = item.PrimaryPart
+                    w.Parent = v
+                end
+            end
+        end
+        for _, v in pairs(item:GetChildren()) do
+            if v:IsA("BasePart") then
+                v.Anchored = false
+            end
+        end
+    end
+end
+
 local function attemptCarryItem(player, item)
     local character = player.Character
     if not character then
@@ -27,6 +47,7 @@ local function attemptCarryItem(player, item)
     character.PrimaryPart.RootPriority = 200
     item.Parent = character
     item.PrimaryPart.RootPriority = 10 -- for later when you're throwing
+    prepare(item)
     item.PrimaryPart:SetNetworkOwner(player)
     local targetPart = player.Character.Head
     if item:FindFirstChild("AttachPart") then
@@ -49,7 +70,7 @@ local function attemptCarryItem(player, item)
     end
 end
 
-local function throw(player, item)
+local function throw(player, item, desiredCF)
     if item:FindFirstChild("ServerWeld") then
         item.ServerWeld:Destroy()
     end
@@ -68,12 +89,15 @@ local function throw(player, item)
             end
         end
     end)
+    if CollectionService:HasTag(item, "Building") then
+        print("this is where we would anchor the building etc")
+    end
 end
 
 local function throwAllPlayerItems(player)
     local character = player.Character
     for _, p in pairs(character:GetChildren()) do
-        if CollectionService:HasTag(p, "Item") then
+        if CollectionService:HasTag(p, "Item") or CollectionService:HasTag(p, "Building")then
                 throw(player, p)
             break
         end
@@ -138,9 +162,12 @@ function Items:start()
     Messages:hook("CarryItem", function(player, item)
         attemptCarryItem(player, item)
     end)
-    Messages:hook("Throw", function(player, item)
+    Messages:hook("Throw", function(player, item, desiredCF)
         if item.Parent == player.Character then
-            throw(player, item)
+            print("throwing!")
+            throw(player, item, desiredCF)
+        else
+            print("not in character")
         end
     end)
 end

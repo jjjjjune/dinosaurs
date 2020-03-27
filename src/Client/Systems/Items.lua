@@ -14,8 +14,9 @@ local lastToolUse = time()
 
 local function getItemModule(itemInstance)
     local itemModule
-    for tag, moduleState in pairs(TagsToModulesMap) do
+    for tag, moduleState in pairs(TagsToModulesMap.Items) do
         if CollectionService:HasTag(itemInstance, tag) then
+            print("WE GOT ONE FOR : ", tag)
             itemModule = moduleState
             break
         end
@@ -60,7 +61,7 @@ end
 local function attemptThrowItem()
     local character = GetCharacter()
     for _, possibleItem in pairs(character:GetChildren()) do
-        if CollectionService:HasTag(possibleItem, "Item") then
+        if CollectionService:HasTag(possibleItem, "Item") or CollectionService:HasTag(possibleItem, "Building")then
             Messages:send("PlaySoundOnClient",{
                 instance = game.ReplicatedStorage.Sounds.HeavyWhoosh,
                 part = character.Head, 
@@ -83,6 +84,7 @@ end
 
 local function unbindCarry()
     Binds.unbindTagFromAction("Item", "GRAB")
+    Binds.unbindTagFromAction("Building", "GRAB")
 end
 
 local function carryItem(item)
@@ -99,6 +101,11 @@ end
 local function bindCarry()
     ContextActionService:UnbindAction("Throw")
     Binds.bindTagToAction("Item", "GRAB", function(item)
+        if attemptCarryItem(item) then
+           carryItem(item)
+        end
+    end)
+    Binds.bindTagToAction("Building", "GRAB", function(item)
         if attemptCarryItem(item) then
            carryItem(item)
         end
