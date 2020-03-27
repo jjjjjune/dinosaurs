@@ -106,7 +106,7 @@ end
 
 local function getItemModule(itemInstance)
     local itemModule
-    for tag, moduleState in pairs(TagsToModulesMap) do
+    for tag, moduleState in pairs(TagsToModulesMap.Items) do
         if CollectionService:HasTag(itemInstance, tag) then
             itemModule = moduleState
             break
