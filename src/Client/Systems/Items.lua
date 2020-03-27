@@ -70,7 +70,7 @@ local function attemptThrowItem()
             possibleItem.ServerWeld:Destroy()
             possibleItem.Parent = workspace
             possibleItem.PrimaryPart.CFrame = character.HumanoidRootPart.CFrame * CFrame.new(0,0,-2)
-            possibleItem.PrimaryPart.Velocity = character.HumanoidRootPart.Velocity * 1.25
+            possibleItem.PrimaryPart.Velocity = character.HumanoidRootPart.Velocity * 2
             local holdAnimation = "Carry"
             if possibleItem:FindFirstChild("HoldAnimation") then
                 holdAnimation = possibleItem.HoldAnimation.Value

@@ -18,6 +18,7 @@ local loadOrder = {
 	"Server/Systems/ToolStorage",
 	"Server/Systems/Sacrifices",
 	"Server/Systems/Rocks",
+	"Server/Systems/Masks",
 
 	"Shared/Systems/Particles",
 	"Shared/Systems/Data",

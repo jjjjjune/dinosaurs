@@ -412,6 +412,6 @@ local function getWfcGridOfSize(size)
     return tiles
 end
 
-local grid = getWfcGridOfSize(3)
+--local grid = getWfcGridOfSize(3)
 
-visualizeTiles()
+--visualizeTiles()

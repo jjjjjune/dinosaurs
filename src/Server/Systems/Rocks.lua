@@ -10,9 +10,7 @@ local function random(min, max)
 end
 
 local function chop(entity)
-    print("choppin!")
     local Items = import "Server/Systems/Items"
-    print("yeah")
     local pos = entity.PrimaryPart.Position
     local dropTable = RockDrops[entity.Type.Value]
     local itemsToMake = {}
@@ -32,9 +30,7 @@ local function chop(entity)
             end
         end
     end
-    print("ALRIGHT MAKING!!")
     for _, itemName in pairs(itemsToMake) do
-        print("makin!")
         local newPos = pos + Vector3.new(random(-5,5), 0, random(-5,5))
         Items.createItem(itemName, newPos)
     end

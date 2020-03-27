@@ -45,7 +45,9 @@ function RespawnManager:start()
         end
     end)
     Messages:hook("PlayerAdded", function(player)
+        print("LOADING CHARACTER")
         player:LoadCharacter()
+        print("done loading...")
     end)
     Messages:hook("SeasonSetTo", function(currentSeason)
         for _, p in pairs(game.Players:GetPlayers()) do

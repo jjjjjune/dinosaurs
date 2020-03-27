@@ -12,5 +12,6 @@ TagsToModulesMap.Pickaxe = import "Shared/ItemModules/Pickaxe"
 
 TagsToModulesMap.FreshWater = import "Shared/EntityModules/FreshWater"
 TagsToModulesMap.Plant = import "Shared/EntityModules/Plant"
+TagsToModulesMap.Workbench = import "Shared/EntityModules/Workbench"
 
 return TagsToModulesMap

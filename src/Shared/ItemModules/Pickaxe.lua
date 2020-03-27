@@ -46,13 +46,13 @@ Tool.debounce = .4
 
 function Tool.clientUse(item)
     local rock = getClosestRock(game.Players.LocalPlayer)
-    local shouldDestroy = rock:FindFirstChild("Health") and rock.Health.Value == 1
     delay(.2, function()
         Messages:send("PlaySoundOnClient",{
-            instance = game.ReplicatedStorage.Sounds.Swing1,
-            part = item.PrimaryPart,
+            instance = game.ReplicatedStorage.Sounds.Swing2,
+            part = item.PrimaryPart
         })
         if rock then
+            local shouldDestroy = rock:FindFirstChild("Health") and rock.Health.Value == 1
             local pos = getHitPosition(game.Players.LocalPlayer, rock)
             if shouldDestroy then
                 Messages:send("PlayParticle", "HitSparks", 40, pos)

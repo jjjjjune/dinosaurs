@@ -21,13 +21,15 @@ local loadOrder = {
 }
 
 local ui = {
+	"Client/Ui/Button",
 	"Client/Ui/Tooltips",
 	"Client/Ui/SeasonBar",
 	"Client/Ui/RadialProgress",
 	"Client/Ui/StatsUi",
 	"Client/Ui/ContextualBinds",
 	"Client/Ui/Tools",
-	"Client/Ui/SacrificeUi"
+	"Client/Ui/SacrificeUi",
+	"Client/Ui/Crafting"
 }
 
 for _, path in ipairs(loadOrder) do
