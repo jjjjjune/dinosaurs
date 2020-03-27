@@ -45,7 +45,7 @@ local function getClosestItemOfTag(position, tag)
         checkPart.Touched:connect(function() end)
         checkPart.Parent = workspace
         for _, p in pairs(checkPart:GetTouchingParts()) do
-            if CollectionService:HasTag(p.Parent, tag) then
+            if CollectionService:HasTag(p.Parent, tag) and isValid(p.Parent) then
                 closestItem = p.Parent
                 break
             end
