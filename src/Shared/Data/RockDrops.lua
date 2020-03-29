@@ -2,7 +2,7 @@ local RockDrops ={}
 
 RockDrops.Coal = {
     {name = "Coal", min = 1, max = 2, chance = 50},
-    
+
     {name = "Stone", min = 0, max = 1, chance = 55},
 }
 

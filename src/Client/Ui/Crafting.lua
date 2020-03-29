@@ -18,7 +18,7 @@ local function skin(inventorySlot, item, folder)
     newCam.CFrame = CFrame.new(origin + Vector3.new(size.x*2, size.y*2, size.z*2), origin)
 end
 
-local function openCrafting(stationType)
+local function openCrafting(stationType, station)
     CraftingUi.Visible = true
     local frame = CraftingUi.ScrollFrameContainer.ScrollingFrame
     local typeRecipes = Recipes[stationType]
@@ -47,14 +47,19 @@ local function openCrafting(stationType)
         frame.CanvasSize = frame.CanvasSize + UDim2.new(0,0,0,craftFrame.AbsoluteSize.Y + 10)
         craftFrame.LayoutOrder = string.byte(recipe.product)
         craftFrame.Visible = true
+        if not game.Players.LocalPlayer.Character:FindFirstChild(recipe.ingredient) then
+            craftFrame.Craft.ImageColor3 = Color3.fromRGB(200,200,200)
+        else
+            Messages:send("RegisterButton", craftFrame.Craft, craftFrame.CraftShadow, function()
+                Messages:sendServer("CraftItem", station, stationType, index)
+                CraftingUi.Visible = false
+            end)
+        end
         skin(craftFrame.IngredientFrame, recipe.ingredient, "Items")
         skin(craftFrame.IngredientShadow, recipe.ingredient, "Items")
         skin(craftFrame.ProductFrame, recipe.product, folderName)
         skin(craftFrame.ProductShadow, recipe.product, folderName)
         craftFrame.ItemName.Text = recipe.product
-        Messages:send("RegisterButton", craftFrame.Craft, craftFrame.CraftShadow, function()
-            Messages:sendServer("CraftItem", stationType, index)
-        end)
     end
 end
 

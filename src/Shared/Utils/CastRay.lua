@@ -7,6 +7,6 @@ return function(origin, direction, additionalIgnore)
             table.insert(ignore, v)
         end
     end
-    local hit, pos = workspace:FindPartOnRayWithIgnoreList(ray, ignore)
-    return hit, pos
+    local hit, pos, normal = workspace:FindPartOnRayWithIgnoreList(ray, ignore)
+    return hit, pos, normal
 end

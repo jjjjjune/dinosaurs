@@ -58,26 +58,49 @@ local function attemptCarryItem(item)
     return true
 end
 
-local function attemptThrowItem()
+local function attemptThrowItem() -- the fact that this is for both normal items and buildings
+    -- is one of the most unfortunate aspects of this code base so far
     local character = GetCharacter()
     for _, possibleItem in pairs(character:GetChildren()) do
         if CollectionService:HasTag(possibleItem, "Item") or CollectionService:HasTag(possibleItem, "Building")then
-            Messages:send("PlaySoundOnClient",{
-                instance = game.ReplicatedStorage.Sounds.HeavyWhoosh,
-                part = character.Head, 
-                volume = (possibleItem.PrimaryPart.Velocity.Magnitude > 2 and .25) or .1
-            })
+            if not CollectionService:HasTag(possibleItem, "Building") then 
+                Messages:send("PlaySoundOnClient",{
+                    instance = game.ReplicatedStorage.Sounds.HeavyWhoosh,
+                    part = character.Head, 
+                    volume = (possibleItem.PrimaryPart.Velocity.Magnitude > 2 and .25) or .1
+                })
+            else
+                Messages:send("PlaySoundOnClient",{
+                    instance = game.ReplicatedStorage.Sounds.ClickHigh,
+                    part = character.Head, 
+                })
+            end
             possibleItem:WaitForChild("ServerWeld")
             possibleItem.ServerWeld:Destroy()
             possibleItem.Parent = workspace
-            possibleItem.PrimaryPart.CFrame = character.HumanoidRootPart.CFrame * CFrame.new(0,0,-2)
-            possibleItem.PrimaryPart.Velocity = character.HumanoidRootPart.Velocity * 2
+            if not CollectionService:HasTag(possibleItem, "Building") then 
+                possibleItem.PrimaryPart.CFrame = character.HumanoidRootPart.CFrame * CFrame.new(0,0,-4)
+                possibleItem.PrimaryPart.Velocity = character.HumanoidRootPart.Velocity * 1.5
+            else
+                for _, v in pairs(possibleItem:GetDescendants()) do
+                    if v:IsA("BasePart") then
+                        v.Velocity = Vector3.new()
+                    end
+                end
+            end
             local holdAnimation = "Carry"
             if possibleItem:FindFirstChild("HoldAnimation") then
                 holdAnimation = possibleItem.HoldAnimation.Value
             end
             Messages:send("StopAnimationClient", holdAnimation)
-            Messages:sendServer("Throw", possibleItem)
+            if CollectionService:HasTag(possibleItem, "Building") then
+                local Building = import "Client/Systems/Building"
+                print("placed building")
+                possibleItem:SetPrimaryPartCFrame(Building.placementCF)
+                Messages:sendServer("Throw", possibleItem, Building.placementCF, Building.placementTarget)
+            else
+                Messages:sendServer("Throw", possibleItem)
+            end
         end
     end
 end
@@ -127,7 +150,8 @@ local function equipCarryItem(itemInstance)
             Messages:sendServer("UseItem", itemInstance)
         end
     end, UseTexts[itemInstance.Name] or "USE")
-    Messages:send("CreateContextualBind", "GRAB", nil, "THROW")
+    local throwOrPlaceText = (CollectionService:HasTag(itemInstance, "Building") and "PLACE") or "THROW"
+    Messages:send("CreateContextualBind", "GRAB", nil, throwOrPlaceText)
     if CollectionService:HasTag(itemInstance, "Tool") then
 
         Messages:send("CreateContextualBind", "STORE", function()

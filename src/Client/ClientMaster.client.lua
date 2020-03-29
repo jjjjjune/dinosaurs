@@ -13,6 +13,8 @@ local loadOrder = {
 	"Client/Systems/Items",
 	"Client/Systems/Entities",
 	"Client/Systems/ToolStorage",
+	"Client/Systems/Building",
+	"Client/Systems/DamageEffects",
 
 	"Client/Systems/LavaBubbles",
 	--"Client/Systems/Data"
@@ -29,7 +31,7 @@ local ui = {
 	"Client/Ui/ContextualBinds",
 	"Client/Ui/Tools",
 	"Client/Ui/SacrificeUi",
-	"Client/Ui/Crafting"
+	"Client/Ui/Crafting",
 }
 
 for _, path in ipairs(loadOrder) do

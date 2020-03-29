@@ -1,3 +1,6 @@
+local import = require(game.ReplicatedStorage.Shared.Import)
+local Messages = import "Shared/Utils/Messages"
+
 local Item = {}
 
 function Item.clientUse(item)
@@ -7,14 +10,16 @@ function Item.serverUse(player, item)
 end
 
 function Item.clientEquip(item)
-    print("INITIATE BUILDING MODE")
+    print("START BUILDING")
+    Messages:send("StartBuilding", item)
 end
 
 function Item.serverEquip(player, item)
 end
 
 function Item.clientUnequip(item)
-    print("GET RID OF BUILDIN MODE")
+    print("END BUILDING")
+    Messages:send("EndBuilding", item)
 end
 
 function Item.serverUnequip(player, item)

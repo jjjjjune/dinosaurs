@@ -19,6 +19,7 @@ local loadOrder = {
 	"Server/Systems/Sacrifices",
 	"Server/Systems/Rocks",
 	"Server/Systems/Masks",
+	"Server/Systems/Crafting",
 
 	"Shared/Systems/Particles",
 	"Shared/Systems/Data",

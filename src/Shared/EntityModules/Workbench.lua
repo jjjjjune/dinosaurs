@@ -7,7 +7,7 @@ function Entity.clientUse(entityInstance)
     Messages:send("PlaySoundOnClient",{
         instance = game.ReplicatedStorage.Sounds.Pop
     })
-    Messages:send("OpenCrafting", "Workbench")
+    Messages:send("OpenCrafting", "Workbench", entityInstance)
 end
 
 function Entity.serverUse(player, entityInstance)

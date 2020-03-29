@@ -46,7 +46,7 @@ Tool.debounce = .4
 
 function Tool.clientUse(item)
     local rock = getClosestRock(game.Players.LocalPlayer)
-    delay(.2, function()
+    delay(.3, function()
         Messages:send("PlaySoundOnClient",{
             instance = game.ReplicatedStorage.Sounds.Swing2,
             part = item.PrimaryPart
@@ -60,13 +60,15 @@ function Tool.clientUse(item)
                     instance = game.ReplicatedStorage.Sounds.HitPan2,
                     part = item.PrimaryPart,
                 })
-                rock.Parent = nil
+                Messages:send("PlayDamageEffect", rock)
+                --rock.Parent = nil
             else
                 Messages:send("PlayParticle", "HitSparks", 10, pos)
                 Messages:send("PlaySoundOnClient",{
                     instance = game.ReplicatedStorage.Sounds.HitPan,
                     part = item.PrimaryPart,
                 })
+                Messages:send("PlayDamageEffect", rock)
             end
         end
     end)
@@ -75,6 +77,7 @@ function Tool.clientUse(item)
 end
 
 function Tool.serverUse(player, item)
+    print("server using")
     Messages:reproOnClients(player, "PlaySound", "Swing2", item.PrimaryPart.Position)
     local rock = getClosestRock(player)
     if rock then

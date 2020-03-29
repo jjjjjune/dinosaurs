@@ -1,5 +1,6 @@
 return {
     ["Apple"] = "EAT",
     ["Pickaxe"] = "SWING",
-    ["Pine Seed"] = "PLANT"
+    ["Pine Seed"] = "PLANT",
+    ["Building"] = "ROTATE",
 }
