@@ -7,13 +7,14 @@ local goal = 4
 
 local currentSeason = 1
 
-local function onSacrificedItem(item)
+local function onSacrificedItem(item, pit)
     local itemName = item.Name
     local sacrificePoints = 1
 
-    Messages:send("PlaySound", "Smoke", item.PrimaryPart.Position)
-    Messages:send("PlayParticle", "DeathSmoke",  10, item.PrimaryPart.Position)
-    Messages:sendAllClients("UpdateSacrificePercent", current/goal)
+    local lavaPos = Vector3.new(item.PrimaryPart.Position.X, pit.Lava.Position.Y, item.PrimaryPart.Position.Z)
+
+    Messages:send("PlaySound", "Smoke", lavaPos)
+    Messages:send("PlayParticle", "DeathSmoke",  10, lavaPos)
 
     if itemName == "PlayerSkull" then
         local player = item:FindFirstChild("Player")
@@ -25,16 +26,18 @@ local function onSacrificedItem(item)
 
     item:Destroy()
     current = math.min(goal, current + sacrificePoints)
+
+    Messages:sendAllClients("UpdateSacrificePercent", current/goal)
 end
 
 local function initializeAltar(altar)
     altar.Lava.Touched:connect(function(hit)
         if hit.Parent:FindFirstChild("Humanoid") then
-            hit.Parent.Humanoid:TakeDamage(10)
+            --hit.Parent.Humanoid:TakeDamage(10)
         end
         if CollectionService:HasTag(hit.Parent, "Item") then
             if hit.Parent.Parent == workspace then
-                onSacrificedItem(hit.Parent)
+                onSacrificedItem(hit.Parent, altar)
             end
         end
     end)
@@ -55,6 +58,7 @@ local function evaluateSeason()
         if actualCurrentSeason == 4 then
             Messages:send("CreateWeather", "Snow", 30)
         end
+        Messages:send("LowerOcean")
     elseif percent <= 95 then
         Messages:send("WetAllWater")
         if actualCurrentSeason ~= 4 then
@@ -62,6 +66,7 @@ local function evaluateSeason()
         else
             Messages:send("CreateWeather", "Snow", 30)
         end
+        Messages:send("LowerOcean")
     else
         Messages:send("WetAllWater")
         if actualCurrentSeason ~= 4 then
@@ -70,6 +75,7 @@ local function evaluateSeason()
             Messages:send("CreateWeather", "Snow", 30)
         end
         Messages:send("GrowAllPlants")
+        Messages:send("LowerOcean")
     end
 end
 

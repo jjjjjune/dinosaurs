@@ -7,6 +7,7 @@ local TagsToModulesMap = import "Shared/Data/TagsToModulesMap"
 local function useEntity(item)
     for tagName, entityState in pairs(TagsToModulesMap.Entities) do
         if  CollectionService:HasTag(item, tagName) then
+            print("usijg entity")
             entityState.clientUse(item)
             Messages:sendServer("UseEntity", item)
             break

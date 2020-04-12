@@ -1,8 +1,10 @@
 local import = require(game.ReplicatedStorage.Shared.Import)
 
 local loadOrder = {
-	"Server/Systems/PlayerWrapper",
+	"Server/Systems/ServerData",
+	"Server/Systems/Gamemode",
 	"Server/Systems/CharacterWrapper",
+	"Server/Systems/PlayerWrapper",
 	"Server/Systems/RespawnManager",
 	"Server/Systems/Chemistry",
 	"Server/Systems/Carrying",
@@ -20,7 +22,11 @@ local loadOrder = {
 	"Server/Systems/Rocks",
 	"Server/Systems/Masks",
 	"Server/Systems/Crafting",
-
+	"Server/Systems/Ocean",
+	"Server/Systems/Buildings",
+	"Server/Systems/MapGeneration",
+	"Server/Systems/Ecosystem",
+	
 	"Shared/Systems/Particles",
 	"Shared/Systems/Data",
 	"Shared/Systems/Sounds",

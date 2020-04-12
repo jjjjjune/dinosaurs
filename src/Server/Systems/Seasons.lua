@@ -2,6 +2,7 @@ local import = require(game.ReplicatedStorage.Shared.Import)
 local Messages = import "Shared/Utils/Messages"
 local SeasonsData = import "Shared/Data/SeasonsData"
 local RunService = game:GetService("RunService")
+local ServerData = import "Server/Systems/ServerData"
 
 local currentSeason = 1
 local seasonLength = 30
@@ -21,6 +22,7 @@ local function advanceSeason()
     if currentSeason == 4 then
         --isNight = not isNight
     end
+    ServerData:setValue("currentSeason", currentSeason)
     Messages:sendAllClients("SeasonSetTo", currentSeason, seasonLength*getSeasonLengthModifier(), isNight)
     Messages:send("SeasonSetTo", currentSeason) -- this order is important for dumb tween reasons   
 end
@@ -37,6 +39,9 @@ end
 local Seasons = {}
 
 function Seasons:start()
+    currentSeason = ServerData:getValue("currentSeason") or currentSeason
+    --Messages:sendAllClients("SeasonSetTo", currentSeason, seasonLength*getSeasonLengthModifier(), isNight)
+    Messages:send("SeasonSetTo", currentSeason) -- this order is important for dumb tween reasons   
     initializeMainSeasonLoop()
     Messages:hookRequest("GetSeason", function(player)
         return currentSeason, (tick() - lastSeasonChange), seasonLength*getSeasonLengthModifier()

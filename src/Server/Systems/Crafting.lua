@@ -13,7 +13,7 @@ local function craftItem(player, station, stationType, index)
     end
     local Items = import "Server/Systems/Items"
     local product = Items.createItem(recipe.product, Vector3.new(0,10000000,0))
-    Messages:send("PlaySound", "GoodCraft", product.Position)
+    Messages:send("PlaySound", "GoodCraft", product.PrimaryPart.Position)
     product:SetPrimaryPartCFrame(station.PrimaryPart.CFrame * CFrame.new(0, station.PrimaryPart.Size.Y/2 + product.PrimaryPart.Size.Y/2, 0))
     Messages:send("PlayParticle", "DeathSmoke",  20, product.PrimaryPart.CFrame)
 end

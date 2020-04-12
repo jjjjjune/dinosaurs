@@ -29,7 +29,6 @@ local function startBuilding(buildingModel)
     end
     for _, x in pairs(placementModel:GetChildren()) do
         if x:IsA("JointInstance") or x:IsA("WeldConstraint") then
-            print("ok destroying hjoin")
             x:Destroy()
         end
     end
@@ -45,7 +44,6 @@ local Building = {}
 
 function Building.step()
     if placementModel then
-        print("yeah")
         setCharTransparency()
         local camera = Workspace.CurrentCamera
         local mouse = game.Players.LocalPlayer:GetMouse()

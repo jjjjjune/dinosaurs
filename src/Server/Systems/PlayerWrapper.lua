@@ -11,6 +11,9 @@ function PlayerWrapper:start()
     Players.PlayerRemoving:connect(function(player)
         Messages:send("PlayerRemoving", player)
     end)
+    for _, p in pairs(game.Players:GetPlayers()) do -- funny studio
+        Messages:send("PlayerAdded", p)
+    end
 end
 
 return PlayerWrapper

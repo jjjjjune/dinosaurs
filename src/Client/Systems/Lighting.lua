@@ -53,12 +53,9 @@ local function weatherStep()
         end
         local effect = WeatherEffectsFolder:FindFirstChild(currentWeather)
         local pos = GetCharacterPosition()
-        local hit, hitPos = CastRay(pos, Vector3.new(0,100,0), {game.Players.LocalPlayer.Character, WeatherEffectsFolder})
-        if not hit then
-            effect.ParticleEmitter.Rate = 300
+        if pos then 
+            local hit, hitPos = CastRay(pos, Vector3.new(0,100,0), {workspace})
             effect.CFrame = CFrame.new(hitPos)
-        else
-            effect.ParticleEmitter.Rate = 0
         end
     else
         WeatherEffectsFolder:ClearAllChildren()

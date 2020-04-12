@@ -16,7 +16,6 @@ local function getItemModule(itemInstance)
     local itemModule
     for tag, moduleState in pairs(TagsToModulesMap.Items) do
         if CollectionService:HasTag(itemInstance, tag) then
-            print("WE GOT ONE FOR : ", tag)
             itemModule = moduleState
             break
         end

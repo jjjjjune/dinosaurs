@@ -31,6 +31,7 @@ local function chop(entity)
     for _, itemName in pairs(itemsToMake) do
         local newPos = pos + Vector3.new(random(-5,5), 0, random(-5,5))
         Items.createItem(itemName, newPos)
+        Messages:send("PlayParticle", "DeathSmoke",  20, newPos)
     end
 end
 

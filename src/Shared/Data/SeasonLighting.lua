@@ -33,7 +33,7 @@ return {
             Color = Color3.fromRGB(76,255,127),
         },
         [workspace.Effects.Water] = {
-            Color = Color3.fromRGB(61, 146, 185),
+            Color = Color3.fromRGB(123, 236, 214),
         }
     },
     Summer = {

@@ -79,15 +79,24 @@ local function growAllPlants()
     end
 end
 
-local function createPlant(plantName, pos, phase)
+local function createPlant(plantName, posOrCF, phase)
     local plantModel = PlantPhases[plantName]["1"]:Clone()
     plantModel.PrimaryPart = plantModel.Base
-    plantModel:SetPrimaryPartCFrame(CFrame.new(pos) * CFrame.new(0, plantModel.PrimaryPart.Size.Y/2, 0))
+    if typeof(posOrCF) == "CFrame" then
+        plantModel:SetPrimaryPartCFrame(posOrCF * CFrame.new(0, plantModel.PrimaryPart.Size.Y/2, 0))
+    else
+        plantModel:SetPrimaryPartCFrame(CFrame.new(posOrCF) * CFrame.new(0, plantModel.PrimaryPart.Size.Y/2, 0))
+    end
     plantModel.Parent = workspace
     setPhase(plantModel, phase)
+    return plantModel
 end
 
 local Plants = {}
+
+function Plants.createPlant(plantName, posOrCF, phase)
+    return createPlant(plantName, posOrCF, phase)
+end
 
 function Plants:start()
     Messages:hook("SeasonSetTo",function(newSeason)

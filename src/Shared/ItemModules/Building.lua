@@ -10,7 +10,6 @@ function Item.serverUse(player, item)
 end
 
 function Item.clientEquip(item)
-    print("START BUILDING")
     Messages:send("StartBuilding", item)
 end
 
@@ -18,7 +17,6 @@ function Item.serverEquip(player, item)
 end
 
 function Item.clientUnequip(item)
-    print("END BUILDING")
     Messages:send("EndBuilding", item)
 end
 

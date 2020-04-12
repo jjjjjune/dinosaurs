@@ -12,6 +12,7 @@ return {
 	ServerTools ="ServerScriptService.ToolBehaviors",
 	ServerStorage = "ServerStorage",
 	ReplicatedStorage = "ReplicatedStorage",
+	ReplicatedFirst = "ReplicatedFirst",
 
 	Roact = "ReplicatedStorage.Lib.Roact",
 	TestEZ = "ReplicatedStorage.Lib.TestEZ",

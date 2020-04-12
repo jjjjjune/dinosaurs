@@ -8,7 +8,7 @@ local function useEntity(player, item)
         player:Kick("what")
     end
     for tagName, entityState in pairs(TagsToModulesMap.Entities) do
-        if  CollectionService:HasTag(item, tagName) then
+        if CollectionService:HasTag(item, tagName) then
             entityState.serverUse(player, item)
             break
         end
