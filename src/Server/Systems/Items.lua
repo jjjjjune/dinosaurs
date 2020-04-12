@@ -29,7 +29,7 @@ local function attemptCarryItem(player, item)
         return
     end
     local foundItem = false
-    if item.Parent == workspace then
+    if item:IsDescendantOf(workspace) then
         for _, v in pairs(character:GetChildren()) do
             if CollectionService:HasTag(v, "Item") then
                 foundItem = true

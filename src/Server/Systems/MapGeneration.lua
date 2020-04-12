@@ -492,8 +492,8 @@ function MapGeneration:start()
     local savedTileMap = ServerData:getValue("tileMap")
     if savedTileMap then
         loadFromSerializedMap(savedTileMap)
-        Messages:send("MapDoneGenerating", false)
         onWaterUpdated()
+        Messages:send("MapDoneGenerating", false)
         return
     else
         generateInitialMap()

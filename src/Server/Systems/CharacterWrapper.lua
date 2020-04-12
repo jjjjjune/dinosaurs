@@ -6,7 +6,6 @@ local CharacterWrapper = {}
 function CharacterWrapper:start()
     Messages:hook("PlayerAdded", function(player)
         player.CharacterAdded:connect(function(character)
-
             Messages:send("CharacterAdded", player, character)
             Messages:sendClient(player, "CharacterAddedClient", character)
             character:WaitForChild("Humanoid").Died:connect(function()

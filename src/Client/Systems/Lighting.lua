@@ -40,6 +40,7 @@ local function setInitialLighting()
     spawn(function()
         local currentSeason = Messages:requestServer("GetSeason")
         currentSeasonName = SeasonsData[currentSeason].name
+        onSeasonSetTo(currentSeason)
     end)
 end
 
@@ -53,7 +54,7 @@ local function weatherStep()
         end
         local effect = WeatherEffectsFolder:FindFirstChild(currentWeather)
         local pos = GetCharacterPosition()
-        if pos then 
+        if pos then
             local hit, hitPos = CastRay(pos, Vector3.new(0,100,0), {workspace})
             effect.CFrame = CFrame.new(hitPos)
         end
@@ -68,7 +69,6 @@ function Lighting:start()
     FastSpawn(function()
         workspace:WaitForChild("Effects"):WaitForChild("Sky")
         setInitialLighting()
-        
     end)
     Messages:hook("SeasonSetTo", function(currentSeason, length, isNight)
         onSeasonSetTo(currentSeason, isNight)

@@ -47,17 +47,14 @@ function RespawnManager:start()
     Messages:hook("PlayerAdded", function(player)
         local Gamemode = import "Server/Systems/Gamemode"
         if Gamemode.loaded then
-            player:LoadCharacter()
-        end
-    end)
-    Messages:hook("GameLoaded", function()
-        for _, player in pairs(game.Players:GetPlayers()) do
+            print("loading char situation 1")
             player:LoadCharacter()
         end
     end)
     Messages:hook("SeasonSetTo", function(currentSeason)
         for _, p in pairs(game.Players:GetPlayers()) do
             if (not p.Character) or (p.Character and p.Character:FindFirstChild("Humanoid") and p.Character.Humanoid.Health <= 0) then
+                print("loading char situation 3")
                 p:LoadCharacter()
             end
         end

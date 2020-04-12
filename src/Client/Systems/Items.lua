@@ -45,7 +45,7 @@ end
 
 
 local function attemptCarryItem(item)
-    if item.Parent ~= workspace then
+    if not item:IsDescendantOf(workspace) then
         return
     end
     Messages:sendServer("CarryItem", item)
@@ -197,7 +197,9 @@ function Items:start()
         bindCarry()
         character:WaitForChild("Humanoid").Died:connect(function()
             unbindCarry()
-            unequipCarryItem()
+            if carryItemInstance then
+                unequipCarryItem()
+            end
         end)
     end)
 end

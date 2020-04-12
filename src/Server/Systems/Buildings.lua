@@ -14,12 +14,12 @@ local function backupBuildings()
         if building:IsDescendantOf(workspace) then
             local primaryPart = building.PrimaryPart
             local pos = primaryPart.Position
-            local orientation = primaryPart.Orientation
+            local ox, oy, oz  = primaryPart.CFrame:toOrientation()
 
             local info = {}
             info.name = building.Name
             info.position = {x = round(pos.X, .15), y = round(pos.Y, .15), z = round(pos.Z, .15)}
-            info.orientation = {x = round(orientation.X, 1), y = round(orientation.Y, 1), z = round(orientation.Z, 1)}
+            info.orientation = {x = ox, y = oy, z = oz}
             table.insert(buildings, info)
         end
     end
@@ -27,12 +27,12 @@ local function backupBuildings()
         if building:IsDescendantOf(workspace) then
             local primaryPart = building.PrimaryPart
             local pos = primaryPart.Position
-            local orientation = primaryPart.Orientation
+            local ox, oy, oz  = primaryPart.CFrame:toOrientation()
 
             local info = {}
             info.name = building.Name
             info.position = {x = round(pos.X, .15), y = round(pos.Y, .15), z = round(pos.Z, .15)}
-            info.orientation = {x = round(orientation.X, 1), y = round(orientation.Y, 1), z = round(orientation.Z, 1)}
+            info.orientation = {x = ox, y = oy, z = oz}
             table.insert(buildings, info)
         end
     end
@@ -51,9 +51,9 @@ local function loadBuildings()
             local orientation = building.orientation
             print(pos, orientation)
             print(orientation.x, orientation.y, orientation.z)
-            local rotCF = CFrame.fromOrientation(Vector3.new(orientation.x, orientation.y, orientation.z))
+            local rotCF = CFrame.fromOrientation(orientation.x, orientation.y, orientation.z)
             local posCF = CFrame.new(Vector3.new(pos.x, pos.y, pos.z))
-            model:SetPrimaryPartCFrame(rotCF*posCF)
+            model:SetPrimaryPartCFrame(posCF*rotCF)
         end
     end
 end
@@ -62,16 +62,12 @@ local Buildings = {}
 
 function Buildings:start()
     Messages:hook("MapDoneGenerating", function(isFirstTime)
-        print("MAP IS DONE GENERATING")
         if isFirstTime then
-            print("IS FIRST TIME")
             local folder = game.ServerStorage.StartTileBuildings
             for _, building in pairs(folder:GetChildren()) do
                 local x = building:Clone()
                 x.Parent = workspace.Buildings
             end
-        else
-            print("IS NOT FIRST TIME")
         end
     end)
     spawn(function()
