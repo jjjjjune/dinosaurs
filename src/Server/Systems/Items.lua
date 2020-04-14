@@ -193,6 +193,7 @@ function Items:start()
         else
             print("not in character")
         end
+        Messages:send("OnItemThrown", item)
     end)
 end
 

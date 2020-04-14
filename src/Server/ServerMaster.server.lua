@@ -25,6 +25,7 @@ local loadOrder = {
 	"Server/Systems/Ocean",
 	"Server/Systems/Buildings",
 	"Server/Systems/MapGeneration",
+	"Server/Systems/Storage",
 	"Server/Systems/Ecosystem",
 	
 	"Shared/Systems/Particles",

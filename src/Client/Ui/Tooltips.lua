@@ -71,7 +71,7 @@ function Tooltips:start()
             currentTargets[actionName] = target
             button.Position = UDim2.new(0, vector.X, 0, vector.Y)
         else
-            button.Position = UDim2.new(0, vector.X + 48, 0, vector.Y)
+            button.Position = UDim2.new(0, vector.X + 36, 0, vector.Y)
         end
     end)
     Messages:hook("HideTooltip", function(actionName)

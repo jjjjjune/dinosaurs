@@ -27,6 +27,12 @@ Recipes.Workbench = {
         default = true,
         building = true,
     },
+    {
+        product = "Small Bin",
+        ingredient = "Log",
+        default = true,
+        building = true,
+    },
 }
 
 return Recipes

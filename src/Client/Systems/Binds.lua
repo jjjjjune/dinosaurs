@@ -61,6 +61,7 @@ local function handleActionUi(actionName, boundData)
     local position = GetCharacterPosition(true)
     local foundPosition
     local foundTarget
+    local charPosition = GetCharacterPosition()
     if position then
         for _, tag in pairs(boundData.tags) do
             local item = getClosestItemOfTag(position, tag)
@@ -68,19 +69,27 @@ local function handleActionUi(actionName, boundData)
                 foundTarget = item
                 foundPosition = item.PrimaryPart.Position
                 shouldShow = true
+                if charPosition and charPosition.Y < foundPosition.Y then
+                    foundPosition = Vector3.new(foundPosition.X, charPosition.Y, foundPosition.Z)
+                end
+                break -- breaking here so it wont give you results for multiple tags 
             end
         end
     end
-    if shouldShow then
-        Messages:send("ShowTooltip", actionName, foundPosition, foundTarget)
-    else
-        Messages:send("HideTooltip", actionName)
-    end
+    return shouldShow, foundPosition, foundTarget
 end
 
 local function bindStep()
     for actionName, boundData in pairs(boundActionTags) do
-        handleActionUi(actionName, boundData)
+
+        local shouldShowForAction, foundPosition, foundTarget = handleActionUi(actionName, boundData)
+
+        if shouldShowForAction then
+            Messages:send("ShowTooltip", actionName, foundPosition, foundTarget) 
+        else
+            Messages:send("HideTooltip", actionName)
+        end
+
     end
 end
 

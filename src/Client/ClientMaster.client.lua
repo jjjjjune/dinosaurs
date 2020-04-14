@@ -25,7 +25,7 @@ local loadOrder = {
 local ui = {
 	"Client/Ui/Button",
 	"Client/Ui/Tooltips",
-	"Client/Ui/SeasonBar",
+	--"Client/Ui/SeasonBar",
 	"Client/Ui/RadialProgress",
 	"Client/Ui/StatsUi",
 	"Client/Ui/ContextualBinds",

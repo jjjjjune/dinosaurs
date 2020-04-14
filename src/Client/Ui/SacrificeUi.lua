@@ -4,7 +4,8 @@ local SacrificeUiInstance = game.Players.LocalPlayer.PlayerGui:WaitForChild("Sac
 
 local function updateSacrificePercent(newPercent)
     newPercent = math.min(.97, newPercent)
-    SacrificeUiInstance.Container.Progress:TweenSize(UDim2.new(newPercent,0,.8,0), "Out", "Quad", .3)
+    SacrificeUiInstance.Background.Progress:TweenPosition(UDim2.new((1-newPercent)*-1,0,0,0), "Out", "Quad", .3)
+    SacrificeUiInstance.Background.Progress.FG:TweenPosition(UDim2.new((1+newPercent),0,1,0), "Out", "Quad", .3)
 end
 
 local SacrificeUi = {}

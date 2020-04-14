@@ -4,6 +4,7 @@ local SeasonsData = import "Shared/Data/SeasonsData"
 local CollectionService = game:GetService("CollectionService")
 local TweenService = game:GetService("TweenService")
 local PlantPhases = import "ServerStorage/PlantPhases"
+local ServerData = import "Server/Systems/ServerData"
 
 local function random(min, max)
     local randomObj = Random.new()
@@ -92,6 +93,46 @@ local function createPlant(plantName, posOrCF, phase)
     return plantModel
 end
 
+local function loadSavedPlants()
+    local plants = ServerData:getValue("plants")
+    if not plants then
+        return
+    end
+    for _, plant in pairs(plants) do
+        local plantModel = game.ServerStorage.PlantPhases[plant.type][plant.phase]:Clone()
+        plantModel.Parent = workspace
+        local pos = plant.position
+        local orientation = plant.orientation
+        local rotCF = CFrame.fromOrientation(orientation.x, orientation.y, orientation.z)
+        local posCF = CFrame.new(Vector3.new(pos.x, pos.y, pos.z))
+        plantModel:SetPrimaryPartCFrame(posCF*rotCF)
+    end
+end
+
+local function round(n, mult)
+    mult = mult or 1
+    return math.floor((n + mult/2)/mult) * mult
+end
+
+local function backUpPlants()
+    local plants = {}
+    for _, plant in pairs(CollectionService:GetTagged("Plant")) do
+        if plant:IsDescendantOf(workspace) then
+            local primaryPart = plant.PrimaryPart
+            local pos = primaryPart.Position
+            local ox, oy, oz  = primaryPart.CFrame:toOrientation()
+
+            local info = {}
+            info.type = plant.Type.Value
+            info.phase = plant.Name
+            info.position = {x = round(pos.X, .15), y = round(pos.Y, .15), z = round(pos.Z, .15)}
+            info.orientation = {x = ox, y = oy, z = oz}
+            table.insert(plants, info)
+        end
+    end
+    ServerData:setValue("plants", plants)
+end
+
 local Plants = {}
 
 function Plants.createPlant(plantName, posOrCF, phase)
@@ -103,9 +144,14 @@ function Plants:start()
         growAllPlants()
         onSeasonChanged(newSeason)
     end)
+    loadSavedPlants()
     Messages:hook("GrowAllPlants", growAllPlants)
     Messages:hook("CreatePlant", createPlant)
-    growAllPlants()
+    spawn(function()
+        while wait(5) do
+            backUpPlants()
+        end
+    end)
 end
 
 return Plants

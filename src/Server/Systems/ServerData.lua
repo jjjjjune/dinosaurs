@@ -6,7 +6,7 @@ local SERVER_DATA_STORE = "ServerDataStore"
 local DataStoreService = game:GetService("DataStoreService")
 
 local function getServerId()
-    return "TestServer31"
+    return "TestServer36"
 end
 
 local ServerData = {}
@@ -19,16 +19,19 @@ function ServerData:getValue(key, value)
     return self.cache[key]
 end
 
+function ServerData:saveCache()
+    self.dataStore:SetAsync(getServerId(), self.cache)
+end
+
 function ServerData:start()
     self.dataStore = DataStoreService:GetGlobalDataStore(SERVER_DATA_STORE)
     self.cache = self.dataStore:GetAsync(getServerId()) or {}
     spawn(function()
-        while wait(30) do
-            print("server data save")
-            self.dataStore:SetAsync(getServerId(), self.cache)
-            print("done")
+        while wait(60) do
+            self:saveCache()
         end
     end)
+    game:BindToClose(function() self:saveCache() end)
 end
 
 return ServerData
