@@ -6,8 +6,9 @@ local ServerData = import "Server/Systems/ServerData"
 local CollectionService = game:GetService("CollectionService")
 local RunService = game:GetService("RunService")
 
-local ITEM_DESPAWN_TIME = 10
+local ITEM_DESPAWN_TIME = 300 -- five mins
 
+local lastPositions = {}
 local lastInteractedOrInStorageTimer = {}
 local lastStorageCheck = tick()
 

@@ -6,7 +6,7 @@ local SERVER_DATA_STORE = "ServerDataStore"
 local DataStoreService = game:GetService("DataStoreService")
 
 local function getServerId()
-    return "TestServer36"
+    return "TestServer40"
 end
 
 local ServerData = {}

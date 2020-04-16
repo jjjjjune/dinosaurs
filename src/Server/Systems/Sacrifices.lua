@@ -32,7 +32,7 @@ end
 
 local function initializeAltar(altar)
     altar.Lava.Touched:connect(function(hit)
-        if hit.Parent:FindFirstChild("Humanoid") then
+        if hit.Parent and hit.Parent:FindFirstChild("Humanoid") then
             --hit.Parent.Humanoid:TakeDamage(10)
         end
         if CollectionService:HasTag(hit.Parent, "Item") then

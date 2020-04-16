@@ -421,7 +421,7 @@ local function loadFromSerializedMap(map)
     for _, tileInfo in pairs(map) do
         local cellName = tileInfo.name
         if cellName ~= "skyForward" and cellName ~= "skyRight" and cellName ~= "skyBackward" and cellName ~= "skyLeft" then 
-            local rotation = tileNameToRotationMap[cellName]
+            local rotation = tileNameToRotationMap[cellName] or CFrame.Angles(0,0,0)
             cellName = string.gsub(cellName, "Forward", "")
             cellName = string.gsub(cellName, "Backward", "")
             cellName = string.gsub(cellName, "Left", "")
@@ -463,10 +463,14 @@ local function setInitialOceanHeight()
 end
 
 local function generateInitialMap()
+    local xsize = 9
+    local ysize = 5
+    local zsize = 9
+
     local grid
     repeat
         local status, error = pcall(function()
-            grid = getWfcGridOfSize(9,5,9)
+            grid = getWfcGridOfSize(xsize,ysize,zsize)
         end)
         if error then
             warn(error)
@@ -475,6 +479,18 @@ local function generateInitialMap()
         wait()
     until grid
     Messages:hook("WaterPositionUpdated", onWaterUpdated)
+
+    local halfx = math.ceil(xsize/2)
+    local halfz = math.ceil(zsize/2)
+    local centerY = ysize - 1
+
+    for _, v in pairs(allTiles) do
+        if v.x == halfx and v.y == centerY and v.z == halfz then
+            print("OK SETTIN TILEEE")
+            v.possibilities[1] = "starttile"
+            break
+        end
+    end
 
     backUpMap(allTiles)
     loadFromSerializedMap(ServerData:getValue("tileMap")) -- displays the map

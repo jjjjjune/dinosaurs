@@ -7,7 +7,6 @@ local PlayerClassesFolder = import "ServerStorage/PlayerClasses"
 local possibleClasses = {"Citizen", "Gatherer"} -- , "Warrior"
 
 local function setClass(character, className)
-    print("SET CLASSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS")
     local classAsset = PlayerClassesFolder[className]
     for _, value in pairs(classAsset.Humanoid:GetChildren()) do 
         if value:IsA("NumberValue") then 
@@ -30,7 +29,6 @@ local function setClass(character, className)
     if character:FindFirstChild("Pants") then
         character.Pants:Destroy()
     end
-    print("okay done doing all of that")
 end
 
 local Classes = {}
@@ -40,6 +38,7 @@ function Classes:start()
         wait()
         local class = possibleClasses[math.random(1, #possibleClasses)]
         setClass(character, class)
+        Messages:send("CharacterAppearanceSet", player, character)
     end)
     for _, p in pairs(game.Players:GetPlayers()) do
         if p and p.Character then

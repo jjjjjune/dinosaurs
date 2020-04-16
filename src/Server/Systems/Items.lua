@@ -148,7 +148,7 @@ function Items.createItem(itemName, position)
     itemModel.PrimaryPart = itemModel.Base
     itemModel:SetPrimaryPartCFrame(CFrame.new(position))
     itemModel.Parent = workspace
-    Messages:send("PlaySound", "Pop", position)
+    --Messages:send("PlaySound", "Pop", position)
     return itemModel
 end
 

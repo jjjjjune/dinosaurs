@@ -30,7 +30,8 @@ ContentProvider:PreloadAsync(assets, function()
     sunImage.BackgroundTransparency = 1
     sunImage.AnchorPoint = Vector2.new(.5,.5)
     sunImage.Position = UDim2.new(.5, 0, .5, 0)
-    sunImage.Image = "rbxassetid://4879346736"
+    sunImage.Image = "rbxassetid://4900465789"
+    sunImage.ImageColor3 = Color3.fromRGB(255,114,114)
     sunImage.Parent = screen
 end)
 

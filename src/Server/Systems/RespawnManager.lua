@@ -43,6 +43,9 @@ function RespawnManager:start()
                 Messages:send("DestroyItem", skull)
             end
         end
+        repeat wait() until workspace:FindFirstChild("Altar", true)
+        local altar = workspace:FindFirstChild("Altar", true)
+        character.PrimaryPart.CFrame = altar.PrimaryPart.CFrame * CFrame.new(0,2,0)
     end)
     Messages:hook("PlayerAdded", function(player)
         local Gamemode = import "Server/Systems/Gamemode"

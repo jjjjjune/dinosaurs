@@ -27,6 +27,8 @@ local loadOrder = {
 	"Server/Systems/MapGeneration",
 	"Server/Systems/Storage",
 	"Server/Systems/Ecosystem",
+	"Server/Systems/Invisibility",
+	"Server/Systems/SpawnEffect",
 	
 	"Shared/Systems/Particles",
 	"Shared/Systems/Data",

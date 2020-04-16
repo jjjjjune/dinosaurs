@@ -64,10 +64,12 @@ function Buildings:start()
     Messages:hook("MapDoneGenerating", function(isFirstTime)
         if isFirstTime then
             local folder = game.ServerStorage.StartTileBuildings
-            for _, building in pairs(folder:GetChildren()) do
-                local x = building:Clone()
-                x.Parent = workspace.Buildings
+            local starttile = workspace:FindFirstChild("starttile", true):Clone()
+            folder:SetPrimaryPartCFrame(starttile.PrimaryPart.CFrame)
+            for _, v in pairs(folder:GetChildren()) do
+                v.Parent = workspace 
             end
+            folder:Destroy()
         end
     end)
     spawn(function()

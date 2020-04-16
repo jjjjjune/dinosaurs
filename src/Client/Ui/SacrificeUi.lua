@@ -63,7 +63,7 @@ local function initializeAndHookSeasonUi()
         lastSeasonLength = seasonLength
         lastCurrentSeason = seasonIndex
         local goals = {
-            ImageColor3 = seasonColors[currentSeason].fg
+            ImageColor3 = seasonColors[lastCurrentSeason].fg
         }
         local info = TweenInfo.new(1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
         local tween = TweenService:Create(SacrificeUiInstance.ContainerRealBack, info, goals)
