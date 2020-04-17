@@ -43,7 +43,13 @@ local function initializeAltar(altar)
     end)
 end
 
+local firstSeason = true
+
 local function evaluateSeason()
+    if firstSeason then
+        firstSeason = false
+        return
+    end
     local percent = (current/goal)*100
     local actualCurrentSeason = currentSeason + 1
     if percent <= 33 then

@@ -50,6 +50,7 @@ local function updateWaterAppearance(entityInstance)
 end
 
 local function dryAllWater()
+    print("DRYING ALL WATER")
     for _, freshWater in pairs(CollectionService:GetTagged("FreshWater")) do
         if not CollectionService:HasTag(freshWater, "Building") then
             if freshWater:IsDescendantOf(workspace) then
@@ -90,6 +91,9 @@ function Water:start()
     CollectionService:GetInstanceAddedSignal("FreshWater"):connect(function(freshWater)
         updateWaterAppearance(freshWater)
     end)
+    for _, v in pairs(CollectionService:GetTagged("FreshWater")) do
+        updateWaterAppearance(v)
+    end
 end
 
 return Water

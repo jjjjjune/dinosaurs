@@ -6,7 +6,7 @@ local ServerData = import "Server/Systems/ServerData"
 local FastSpawn = import "Shared/Utils/FastSpawn"
 
 local currentSeason = 1
-local seasonLength = 30
+local seasonLength = 45
 local lastSeasonChange = tick()
 
 local isNight = false
