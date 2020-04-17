@@ -20,6 +20,13 @@ local function backupBuildings()
             info.name = building.Name
             info.position = {x = round(pos.X, .15), y = round(pos.Y, .15), z = round(pos.Z, .15)}
             info.orientation = {x = ox, y = oy, z = oz}
+
+            for _, v in pairs(building:GetChildren()) do
+                if v:IsA("ValueBase") then
+                    info[v.Name] = v.Value
+                end
+            end
+
             table.insert(buildings, info)
         end
     end
@@ -33,6 +40,13 @@ local function backupBuildings()
             info.name = building.Name
             info.position = {x = round(pos.X, .15), y = round(pos.Y, .15), z = round(pos.Z, .15)}
             info.orientation = {x = ox, y = oy, z = oz}
+
+            for _, v in pairs(building:GetChildren()) do
+                if v:IsA("ValueBase") then
+                    info[v.Name] = v.Value
+                end
+            end
+
             table.insert(buildings, info)
         end
     end
@@ -43,17 +57,23 @@ local function loadBuildings()
     local ServerData = import "Server/Systems/ServerData"
     local buildings = ServerData:getValue("buildings")
     if buildings then
-        print("loading serialized buildings")
         for _, building in pairs(buildings) do
             local model = game.ReplicatedStorage.Buildings[building.name]:Clone()
-            model.Parent = workspace.Buildings
             local pos = building.position
             local orientation = building.orientation
-            print(pos, orientation)
-            print(orientation.x, orientation.y, orientation.z)
             local rotCF = CFrame.fromOrientation(orientation.x, orientation.y, orientation.z)
             local posCF = CFrame.new(Vector3.new(pos.x, pos.y, pos.z))
             model:SetPrimaryPartCFrame(posCF*rotCF)
+
+            for propName, value in pairs(building) do
+                if model:FindFirstChild(propName) then
+                    if model[propName]:IsA("ValueBase") then
+                        model[propName].Value = value
+                    end
+                end
+            end
+
+            model.Parent = workspace.Buildings
         end
     end
 end

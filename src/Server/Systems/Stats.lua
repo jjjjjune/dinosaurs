@@ -3,8 +3,8 @@ local Messages = import "Shared/Utils/Messages"
 local RunService = game:GetService("RunService")
 
 local STATS = {
-    {name = "hunger", max = 10, decayRate = 80, decayAmount = -1},
-    {name = "thirst", max = 10, decayRate = 60, decayAmount = -1},
+    {name = "hunger", max = 10, decayRate = 40, decayAmount = -1},
+    {name = "thirst", max = 10, decayRate = 30, decayAmount = -1},
 }
 
 local playerStats = {}
@@ -56,6 +56,16 @@ local function resetAllStats(player)
 end
 
 local Stats = {}
+
+function Stats.getStat(player, statName)
+    local stat
+    for _, v in pairs(playerStats[player]) do
+        if v.name == statName then
+            stat = v
+        end
+    end
+    return stat
+end
 
 function Stats:start()
     Messages:hook("AddStat", function(player, statName, statValue)

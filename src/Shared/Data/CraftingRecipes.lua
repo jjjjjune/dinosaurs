@@ -33,6 +33,12 @@ Recipes.Workbench = {
         default = true,
         building = true,
     },
+    {
+        product = "Campfire",
+        ingredient = "Log",
+        default = true,
+        building = true,
+    },
 }
 
 return Recipes

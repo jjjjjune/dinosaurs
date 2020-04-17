@@ -28,6 +28,14 @@ local function openCrafting(stationType, station)
             f:Destroy()
         end
     end
+    local function getBuildValue(a)
+        local avalue = 1
+        if a.building then
+            avalue = 1000
+        end
+        avalue = avalue * string.len(a.product)
+        return avalue
+    end
     for index, recipe in pairs(typeRecipes) do
         local craftFrame do
             if recipe.building then
@@ -45,7 +53,7 @@ local function openCrafting(stationType, station)
         end
         craftFrame.Parent = frame
         frame.CanvasSize = frame.CanvasSize + UDim2.new(0,0,0,craftFrame.AbsoluteSize.Y + 10)
-        craftFrame.LayoutOrder = string.byte(recipe.product)
+        craftFrame.LayoutOrder = getBuildValue(recipe)
         craftFrame.Visible = true
         if not game.Players.LocalPlayer.Character:FindFirstChild(recipe.ingredient) then
             craftFrame.Craft.ImageColor3 = Color3.fromRGB(200,200,200)

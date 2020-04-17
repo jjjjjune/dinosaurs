@@ -29,6 +29,7 @@ local loadOrder = {
 	"Server/Systems/Ecosystem",
 	"Server/Systems/Invisibility",
 	"Server/Systems/SpawnEffect",
+	"Server/Systems/HeatAreas",
 	
 	"Shared/Systems/Particles",
 	"Shared/Systems/Data",

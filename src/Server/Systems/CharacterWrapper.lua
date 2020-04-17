@@ -12,6 +12,7 @@ function CharacterWrapper:start()
                 Messages:send("PlayerDied", player, character)
                 Messages:sendClient(player, "DiedClient", character)
             end)
+            character:WaitForChild("Health"):Destroy()
         end)
     end)
 end

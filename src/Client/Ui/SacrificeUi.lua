@@ -70,6 +70,7 @@ local function initializeAndHookSeasonUi()
         tween:Play()
         SacrificeUiInstance.ContainerRealBack.SeasonIcon.Image = seasonColors[lastCurrentSeason].icon
     end)
+    
 end
 
 local function step()

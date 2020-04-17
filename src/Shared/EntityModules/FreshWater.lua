@@ -5,7 +5,7 @@ local Entity = {}
 
 function Entity.clientUse(entityInstance)
     local drinkSound = "Drinking"
-    if entityInstance.Water.Transparency == 1 then
+    if entityInstance.Water.Transparency == 1 or entityInstance.Amount.Value == 0 then
         drinkSound = "Fireputout"
     end
     Messages:send("PlaySoundOnClient",{
@@ -14,15 +14,12 @@ function Entity.clientUse(entityInstance)
 end
 
 function Entity.serverUse(player, entityInstance)
-    local drinkSound = "Drinking"
-    if entityInstance.Water.Transparency == 1 then
-        drinkSound = "Fireputout"
+    if entityInstance.Amount.Value > 0 then
+        Messages:send("DrinkWater", player, entityInstance)
     else
-        if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-            Messages:send("AddStat", player, "thirst", 1)
-        end
+        local drinkSound = "Fireputout"
+        Messages:reproOnClients(player, "PlaySound", drinkSound)
     end
-    Messages:reproOnClients(player, "PlaySound", drinkSound)
 end
 
 return Entity

@@ -16,6 +16,8 @@ local function craftItem(player, station, stationType, index)
     Messages:send("PlaySound", "GoodCraft", product.PrimaryPart.Position)
     product:SetPrimaryPartCFrame(station.PrimaryPart.CFrame * CFrame.new(0, station.PrimaryPart.Size.Y/2 + product.PrimaryPart.Size.Y/2, 0))
     Messages:send("PlayParticle", "DeathSmoke",  20, product.PrimaryPart.Position)
+    -- when crafting water buildings be sure to sert their amounts to zero
+    
 end
 
 local Crafting = {}
