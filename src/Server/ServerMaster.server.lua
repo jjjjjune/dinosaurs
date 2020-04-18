@@ -24,10 +24,10 @@ local loadOrder = {
 	"Server/Systems/Crafting",
 	"Server/Systems/Ocean",
 	"Server/Systems/Buildings",
+	"Server/Systems/Biomes",
 	"Server/Systems/MapGeneration",
 	"Server/Systems/Storage",
-	--"Server/Systems/Ecosystem",
-	"Server/Systems/Biomes",
+	--"Server/Systems/Ecosystem"
 	"Server/Systems/Invisibility",
 	"Server/Systems/SpawnEffect",
 	"Server/Systems/HeatAreas",

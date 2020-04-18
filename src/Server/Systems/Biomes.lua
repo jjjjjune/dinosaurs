@@ -31,7 +31,7 @@ local function selectBiomePlant(plants)
     return t[math.random(1, #t)]
 end
 
-local function createPlantForBiome(biome, allBiomeTiles)
+local function createPlantForBiome(biome, allBiomeTiles, isFirstTime)
     local name = "Shared/Data/BiomeData/"..biome
     local data = import(name)
     local tile = allBiomeTiles[math.random(1, #allBiomeTiles)]
@@ -40,14 +40,18 @@ local function createPlantForBiome(biome, allBiomeTiles)
         local pos = GetValidPlantPos(tile, plantName)
         if pos then
             local Plants = import "Server/Systems/Plants"
-            local plant = Plants.createPlant(plantName, pos, 1, false)
+            local phase = 1
+            if isFirstTime then
+                phase = #(game.ServerStorage.PlantPhases[plantName]:GetChildren())
+            end
+            local plant = Plants.createPlant(plantName, pos, phase, false)
             plant.Biome.Value = biome
             table.insert(biomeToPlantsMap[biome], plant)
         end
     end)
 end
 
-local function tickBiome(biome, allBiomeTiles)
+local function tickBiome(biome, allBiomeTiles, isFirstTime)
     if not biomeToPlantsMap[biome] then
         biomeToPlantsMap[biome] = {}
         for _, plant in pairs(CollectionService:GetTagged("Plant")) do
@@ -82,11 +86,11 @@ local function tickBiome(biome, allBiomeTiles)
     local currentPlantsCount = #biomeToPlantsMap[biome]
 
     if currentPlantsCount < plantsAmount then
-        createPlantForBiome(biome, allBiomeTiles)
+        createPlantForBiome(biome, allBiomeTiles, isFirstTime)
     end
 end
 
-local function performBiomeCheck()
+local function performBiomeCheck(isFirstTime)
     local MapGeneration = import "Server/Systems/MapGeneration"
 
     local tileModelsToTileInfoMap = MapGeneration.tileModelsToTileInfoMap
@@ -106,21 +110,28 @@ local function performBiomeCheck()
                 table.insert(allBiomeTiles, tile)
             end
         end
-        tickBiome(biome, allBiomeTiles)
+        tickBiome(biome, allBiomeTiles, isFirstTime)
     end
 end
 
 local function step()
     if tick() - lastBiomeCheck > BIOME_CHECK_TIME then
         lastBiomeCheck = tick()
-        performBiomeCheck()
+        performBiomeCheck(false)
     end
 end
 
 local Biomes = {}
 
 function Biomes:start()
-    RunService.Stepped:connect(step)
+    Messages:hook("MapDoneGenerating", function(isFirstTime)
+        if isFirstTime then
+            for i = 1, 100 do
+                performBiomeCheck(true)
+            end
+        end
+        RunService.Stepped:connect(step)
+    end)
 end
 
 return Biomes
