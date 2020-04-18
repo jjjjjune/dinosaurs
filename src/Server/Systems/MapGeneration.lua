@@ -416,34 +416,16 @@ local function onWaterUpdated()
     end
 end
 
-local function loadFromSerializedMap(map)
-    workspace.Tiles:ClearAllChildren()
-    for _, tileInfo in pairs(map) do
-        local cellName = tileInfo.name
-        if cellName ~= "skyForward" and cellName ~= "skyRight" and cellName ~= "skyBackward" and cellName ~= "skyLeft" then 
-            local rotation = tileNameToRotationMap[cellName] or CFrame.Angles(0,0,0)
-            cellName = string.gsub(cellName, "Forward", "")
-            cellName = string.gsub(cellName, "Backward", "")
-            cellName = string.gsub(cellName, "Left", "")
-            cellName = string.gsub(cellName, "Right", "")
-            local newTile = game.ServerStorage.MapTiles[cellName]:Clone()
-            newTile:SetPrimaryPartCFrame(CFrame.new(tileInfo.x*120,tileInfo.y*120,tileInfo.z*120))
-            newTile:SetPrimaryPartCFrame(newTile.PrimaryPart.CFrame * rotation)
-            table.insert(generatedMapTiles, newTile)
-            --newTile.Parent = workspace.Tiles
-        end
-    end
-end
-
 local function backUpMap(allTiles)
     local ServerData = import "Server/Systems/ServerData"
     local map = {}
     for _, tile in pairs(allTiles) do
         table.insert(map, {
             name = tile.possibilities[1],
-            x = tile.x, 
+            x = tile.x,
             y = tile.y,
-            z = tile.z
+            z = tile.z,
+            biome = "Forest",
         })
     end
     ServerData:setValue("tileMap", map)
@@ -462,7 +444,33 @@ local function setInitialOceanHeight()
     Messages:send("SetOceanHeight", highest - 140)
 end
 
-local function generateInitialMap()
+local MapGeneration = {}
+
+function MapGeneration:loadFromSerializedMap(map)
+    workspace.Tiles:ClearAllChildren()
+    local tileModelsToTileInfoMap = {}
+    for i, tileInfo in pairs(map) do
+        local cellName = tileInfo.name
+        if cellName ~= "skyForward" and cellName ~= "skyRight" and cellName ~= "skyBackward" and cellName ~= "skyLeft" then 
+            local rotation = tileNameToRotationMap[cellName] or CFrame.Angles(0,0,0)
+            cellName = string.gsub(cellName, "Forward", "")
+            cellName = string.gsub(cellName, "Backward", "")
+            cellName = string.gsub(cellName, "Left", "")
+            cellName = string.gsub(cellName, "Right", "")
+            local biome = tileInfo.biome
+            local newTile = game.ServerStorage.MapTiles[biome][cellName]:Clone()
+            newTile:SetPrimaryPartCFrame(CFrame.new(tileInfo.x*120,tileInfo.y*120,tileInfo.z*120))
+            newTile:SetPrimaryPartCFrame(newTile.PrimaryPart.CFrame * rotation)
+            newTile.Name = "X"..tileInfo.x.."Y"..tileInfo.y.."Z"..tileInfo.z..""
+            table.insert(generatedMapTiles, newTile)
+            self.tileModelsToTileInfoMap[newTile] = tileInfo
+            --newTile.Parent = workspace.Tiles
+        end
+    end
+    self.tileModelsToTileInfoMap = tileModelsToTileInfoMap
+end
+
+function MapGeneration:generateInitialMap()
     local xsize = 9
     local ysize = 5
     local zsize = 9
@@ -493,7 +501,7 @@ local function generateInitialMap()
     end
 
     backUpMap(allTiles)
-    loadFromSerializedMap(ServerData:getValue("tileMap")) -- displays the map
+    self:loadFromSerializedMap(ServerData:getValue("tileMap")) -- displays the map
 
     setInitialOceanHeight()
 
@@ -502,17 +510,15 @@ local function generateInitialMap()
     Messages:send("MapDoneGenerating", true)
 end
 
-local MapGeneration = {}
-
 function MapGeneration:start()
     local savedTileMap = ServerData:getValue("tileMap")
     if savedTileMap then
-        loadFromSerializedMap(savedTileMap)
+        self:loadFromSerializedMap(savedTileMap)
         onWaterUpdated()
         Messages:send("MapDoneGenerating", false)
         return
     else
-        generateInitialMap()
+        self:generateInitialMap()
     end
 end
 

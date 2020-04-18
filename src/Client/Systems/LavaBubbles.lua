@@ -48,7 +48,7 @@ local LavaBubbles = {}
 
 function LavaBubbles:start()
     RunService.RenderStepped:connect(function()
-        if workspace.Buildings:FindFirstChild("Altar") then
+        if workspace.Buildings:FindFirstChild("Altar") and workspace.Buildings.Altar:FindFirstChild("Lava") then
             tickLava(workspace.Buildings.Altar.Lava)
         end
     end)

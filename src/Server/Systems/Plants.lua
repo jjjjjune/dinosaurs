@@ -80,7 +80,7 @@ local function growAllPlants()
     end
 end
 
-local function createPlant(plantName, posOrCF, phase)
+local function createPlant(plantName, posOrCF, phase, isUserPlanted)
     local plantModel = PlantPhases[plantName]["1"]:Clone()
     plantModel.PrimaryPart = plantModel.Base
     if typeof(posOrCF) == "CFrame" then
@@ -90,6 +90,9 @@ local function createPlant(plantName, posOrCF, phase)
     end
     plantModel.Parent = workspace
     setPhase(plantModel, phase)
+    if isUserPlanted then
+        plantModel.UserPlanted.Value = true
+    end
     return plantModel
 end
 
@@ -133,13 +136,23 @@ local function backUpPlants()
     ServerData:setValue("plants", plants)
 end
 
+local function preparePlants()
+    for _, plant in pairs(CollectionService:GetTagged("Plant")) do
+        local UserPlanted = Instance.new("BoolValue", plant)
+        UserPlanted.Name = "UserPlanted"
+        local Biome = Instance.new("StringValue", plant)
+        Biome.Name = "Biome"
+    end
+end
+
 local Plants = {}
 
-function Plants.createPlant(plantName, posOrCF, phase)
-    return createPlant(plantName, posOrCF, phase)
+function Plants.createPlant(plantName, posOrCF, phase, isUserPlanted)
+    return createPlant(plantName, posOrCF, phase, isUserPlanted)
 end
 
 function Plants:start()
+    preparePlants()
     Messages:hook("SeasonSetTo",function(newSeason)
         growAllPlants()
         onSeasonChanged(newSeason)

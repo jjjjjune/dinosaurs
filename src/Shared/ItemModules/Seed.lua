@@ -15,7 +15,7 @@ function Item.serverUse(player, item)
         local hit, pos = CastRay(pos, Vector3.new(0,-6,0), {player.Character})
         if hit and hit.Name ~= "Water" then
             if CollectionService:HasTag(hit, "Grass") or hit.BrickColor.Name == "Pine Cone" or CollectionService:HasTag(hit, "Sand") then
-                Messages:send("CreatePlant", item.Plant.Value, pos, 1)
+                Messages:send("CreatePlant", item.Plant.Value, pos, 1, true)
                 Messages:send("PlaySound", "Rustle", pos)
                 Messages:send("PlayParticle", "Leaf", 20, pos)
                 return true
