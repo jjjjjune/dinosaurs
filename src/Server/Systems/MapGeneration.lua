@@ -448,7 +448,7 @@ local MapGeneration = {}
 
 function MapGeneration:loadFromSerializedMap(map)
     workspace.Tiles:ClearAllChildren()
-    local tileModelsToTileInfoMap = {}
+    self.tileModelsToTileInfoMap = {}
     for i, tileInfo in pairs(map) do
         local cellName = tileInfo.name
         if cellName ~= "skyForward" and cellName ~= "skyRight" and cellName ~= "skyBackward" and cellName ~= "skyLeft" then 
@@ -461,13 +461,14 @@ function MapGeneration:loadFromSerializedMap(map)
             local newTile = game.ServerStorage.MapTiles[biome][cellName]:Clone()
             newTile:SetPrimaryPartCFrame(CFrame.new(tileInfo.x*120,tileInfo.y*120,tileInfo.z*120))
             newTile:SetPrimaryPartCFrame(newTile.PrimaryPart.CFrame * rotation)
-            newTile.Name = "X"..tileInfo.x.."Y"..tileInfo.y.."Z"..tileInfo.z..""
+            if newTile.Name ~= "starttile" then
+                newTile.Name = "X"..tileInfo.x.."Y"..tileInfo.y.."Z"..tileInfo.z..""
+            end
             table.insert(generatedMapTiles, newTile)
             self.tileModelsToTileInfoMap[newTile] = tileInfo
             --newTile.Parent = workspace.Tiles
         end
     end
-    self.tileModelsToTileInfoMap = tileModelsToTileInfoMap
 end
 
 function MapGeneration:generateInitialMap()

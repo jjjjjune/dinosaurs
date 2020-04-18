@@ -48,6 +48,7 @@ local function setPhase(plantModel, phaseNumber)
     phase.Name = "Phase"
     phase.Value = phaseNumber
     CollectionService:AddTag(newModel, "Plant")
+    return newModel
 end
 
 local function getMaxPhase(type)
@@ -89,7 +90,7 @@ local function createPlant(plantName, posOrCF, phase, isUserPlanted)
         plantModel:SetPrimaryPartCFrame(CFrame.new(posOrCF) * CFrame.new(0, plantModel.PrimaryPart.Size.Y/2, 0))
     end
     plantModel.Parent = workspace
-    setPhase(plantModel, phase)
+    plantModel = setPhase(plantModel, phase)
     if isUserPlanted then
         plantModel.UserPlanted.Value = true
     end

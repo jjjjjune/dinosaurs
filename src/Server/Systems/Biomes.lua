@@ -2,6 +2,11 @@ local import = require(game.ReplicatedStorage.Shared.Import)
 local Messages = import "Shared/Utils/Messages"
 local RunService = game:GetService("RunService")
 
+local GetValidPlantPos = import "Shared/Utils/GetValidPlantPos"
+local FastSpawn = import "Shared/Utils/FastSpawn"
+
+local CollectionService = game:GetService("CollectionService")
+
 local BIOME_CHECK_TIME = 1
 
 local biomeToPlantsMap = {}
@@ -18,12 +23,28 @@ end
 
 local function selectBiomePlant(plants)
     local t = {}
+    for plantName, amount in pairs(plants) do
+        for i = 1, amount do
+            table.insert(t, plantName)
+        end
+    end
+    return t[math.random(1, #t)]
 end
 
 local function createPlantForBiome(biome, allBiomeTiles)
-    local data = import "Shared/Data/BiomeData/"..biome
+    local name = "Shared/Data/BiomeData/"..biome
+    local data = import(name)
     local tile = allBiomeTiles[math.random(1, #allBiomeTiles)]
     local plantName = selectBiomePlant(data.plants)
+    FastSpawn(function()
+        local pos = GetValidPlantPos(tile, plantName)
+        if pos then
+            local Plants = import "Server/Systems/Plants"
+            local plant = Plants.createPlant(plantName, pos, 1, false)
+            plant.Biome.Value = biome
+            table.insert(biomeToPlantsMap[biome], plant)
+        end
+    end)
 end
 
 local function tickBiome(biome, allBiomeTiles)
@@ -43,7 +64,8 @@ local function tickBiome(biome, allBiomeTiles)
         end
         biomeToPlantsMap[biome] = validPlants
     end
-    local data = import "Shared/Data/BiomeData/"..biome
+    local name = "Shared/Data/BiomeData/"..biome
+    local data = import(name)
 
     local totalseed = 0
 
@@ -60,7 +82,6 @@ local function tickBiome(biome, allBiomeTiles)
     local currentPlantsCount = #biomeToPlantsMap[biome]
 
     if currentPlantsCount < plantsAmount then
-        print("POPULATING PLANT")
         createPlantForBiome(biome, allBiomeTiles)
     end
 end

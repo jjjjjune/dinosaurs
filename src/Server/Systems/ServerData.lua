@@ -4,9 +4,12 @@ local Messages = import "Shared/Utils/Messages"
 local SERVER_DATA_STORE = "ServerDataStore"
 
 local DataStoreService = game:GetService("DataStoreService")
+local RunService = game:GetService("RunService")
+
+local IS_SAVING_IN_STUDIO = false
 
 local function getServerId()
-    return "TestServer48"
+    return "TestServer49"
 end
 
 local ServerData = {}
@@ -20,6 +23,12 @@ function ServerData:getValue(key, value)
 end
 
 function ServerData:saveCache()
+    if RunService:IsStudio() then
+        if IS_SAVING_IN_STUDIO == false then
+            warn(" WE ARE NOT SAVCING DATA IN STGUDIO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+            return
+        end
+    end
     self.dataStore:SetAsync(getServerId(), self.cache)
 end
 
