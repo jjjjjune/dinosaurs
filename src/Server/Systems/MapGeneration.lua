@@ -369,10 +369,44 @@ local function getWfcGridOfSize(xsize, ysize, zsize)
 	local halfx = math.ceil(xsize/2)
 	local halfz = math.ceil(zsize/2)
 	
+	-- start tile
+	
 	local centerTile = tiles[halfx][ysize-1][halfz]
 	centerTile.possibilities = {"groundtoskyForward"}
 	updateTileNeighborsRecursive(centerTile)
 	collapse(centerTile)
+	
+	-- tiles around start tile
+	
+	local tile = tiles[halfx+1][ysize-2][halfz]
+    tile.possibilities = {"slopeBackward"}
+    if math.random(1,2) == 1 then
+        tile.possibilities = {"slopealt1Backward"}
+    end
+	updateTileNeighborsRecursive(tile)
+	
+	local tile = tiles[halfx-1][ysize-2][halfz]
+    tile.possibilities = {"slopeForward"}
+    if math.random(1,2) == 1 then
+        tile.possibilities = {"slopealt1Forward"}
+    end
+	updateTileNeighborsRecursive(tile)
+	
+	local tile = tiles[halfx][ysize-2][halfz-1]
+    tile.possibilities = {"slopeRight"}
+    if math.random(1,2) == 1 then
+        tile.possibilities = {"slopealt1Right"}
+    end
+	updateTileNeighborsRecursive(tile)
+	
+	local tile = tiles[halfx][ysize-2][halfz+1]
+    tile.possibilities = {"slopeLeft"}
+    if math.random(1,2) == 1 then
+        tile.possibilities = {"slopealt1Left"}
+    end
+	updateTileNeighborsRecursive(tile)
+	
+	-- corners
 
 	local tile = tiles[xsize][1][1]
 	tile.possibilities = {"cornerBackward"}
@@ -385,7 +419,6 @@ local function getWfcGridOfSize(xsize, ysize, zsize)
 	local tile = tiles[1][1][1]
 	tile.possibilities = {"cornerRight"}
 	updateTileNeighborsRecursive(tile)
-	collapse(tile)
 
 	local tile = tiles[1][1][zsize]
 	tile.possibilities = {"cornerForward"}
