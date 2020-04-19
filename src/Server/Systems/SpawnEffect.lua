@@ -38,7 +38,6 @@ local function playRespawnEffect(player, character)
             if part:FindFirstChild("Mesh") then
                 part.Mesh.TextureId = ""
                 if part.Mesh:IsA("SpecialMesh") then
-                    print("SPECIAL MESH")
                     part.Mesh.Scale = part.Mesh.Scale * 2
                     part.Mesh.TextureId = ""
                     part.Color = SPECIALMESH_COLOR

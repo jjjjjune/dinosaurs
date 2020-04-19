@@ -85,7 +85,7 @@ local function tickBiome(biome, allBiomeTiles, isFirstTime)
     local minPlantsPerTile = data.minPlantsPerTile
 
     local plantsAmountRandom = Random.new(totalseed)
-    local plantsAmount = plantsAmountRandom:NextInteger(minPlantsPerTile*(#allBiomeTiles), maxPlantsPerTile*(#allBiomeTiles))
+    local plantsAmount = 10*math.floor(#allBiomeTiles/10)--plantsAmountRandom:NextInteger(minPlantsPerTile*(#allBiomeTiles), maxPlantsPerTile*(#allBiomeTiles))
 
     print("BIOKME TILEES AMOUNT IS : ", #allBiomeTiles)
     print("PLANTS AMOUNT IS : ", plantsAmount)
@@ -114,9 +114,11 @@ local function performBiomeCheck(isFirstTime)
 
     for biome, _ in pairs(allBiomes) do
         local allBiomeTiles = {}
-        for tile in pairs(tileModelsToTileInfoMap) do
-            if tile.Parent ~= nil and tile.PrimaryPart.Position.Y  > workspace.Effects.Sand.Position.Y then
+        for tile , info in pairs(tileModelsToTileInfoMap) do
+            if tile.Parent ~= nil and tile.PrimaryPart.Position.Y  > workspace.Effects.Sand.Position.Y - 20 then
+                --if not info.name == "groundForward" and not info.name == "groundBackward" and not info.name then
                 table.insert(allBiomeTiles, tile)
+                --end
             end
         end
         tickBiome(biome, allBiomeTiles, isFirstTime)

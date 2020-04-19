@@ -3,11 +3,20 @@ local Messages = import "Shared/Utils/Messages"
 local CollectionService = game:GetService("CollectionService")
 
 local current = 0
-local goal = 4
+local goal = 12
+local maxGoal = goal
 
 local currentSeason = 1
 
+local tagModifiers = {
+    Food = 2,
+    Ore = 3,
+    Tool = 4,
+    Seed = 2,
+}
+
 local function onSacrificedItem(item, pit)
+
     local itemName = item.Name
     local sacrificePoints = 1
 
@@ -15,6 +24,12 @@ local function onSacrificedItem(item, pit)
 
     Messages:send("PlaySound", "Smoke", lavaPos)
     Messages:send("PlayParticle", "DeathSmoke",  10, lavaPos)
+
+    for tag, modifier in pairs(tagModifiers) do
+        if CollectionService:HasTag(item, tag) then
+            sacrificePoints = sacrificePoints + modifier
+        end
+    end
 
     if itemName == "PlayerSkull" then
         local player = item:FindFirstChild("Player")
@@ -52,19 +67,24 @@ local function evaluateSeason()
     end
     local percent = (current/goal)*100
     local actualCurrentSeason = currentSeason + 1
+    local seasonIcons = {
+        "FLOWER",
+        "SUN",
+        "LEAF",
+        "SNOWFLAKE",
+    }
     if percent <= 33 then
         Messages:send("DryAllWater")
+        Messages:sendAllClients("Notify", "HUNGER_COLOR", "ANGRY", "THE GODS DISPLEASED. ALL WATER RECEDED TO DUST.")
         if actualCurrentSeason == 4 then
             Messages:send("CreateWeather", "Snow", 30)
         end
     elseif percent > 33 and percent <= 66 then
-        if math.random(1,2) == 1 then
-            Messages:send("DryAllWater")
-        end
         if actualCurrentSeason == 4 then
             Messages:send("CreateWeather", "Snow", 30)
         end
         Messages:send("LowerOcean")
+        Messages:sendAllClients("Notify", "HUNGER_COLOR", seasonIcons[currentSeason], "ANOTHER SEASON COMES.")
     elseif percent <= 95 then
         Messages:send("WetAllWater")
         if actualCurrentSeason ~= 4 then
@@ -72,6 +92,7 @@ local function evaluateSeason()
         else
             Messages:send("CreateWeather", "Snow", 30)
         end
+        Messages:sendAllClients("Notify", "HUNGER_COLOR", seasonIcons[currentSeason], "THE WINDS BRING GOOD WEATHER.")
         Messages:send("LowerOcean")
     else
         Messages:send("WetAllWater")
@@ -80,6 +101,7 @@ local function evaluateSeason()
         else
             Messages:send("CreateWeather", "Snow", 30)
         end
+        Messages:sendAllClients("Notify", "HUNGER_COLOR", seasonIcons[currentSeason], "THE GODS AKNOWLEDGE THE BLESSINGS.")
         Messages:send("GrowAllPlants")
         Messages:send("LowerOcean")
     end
@@ -98,7 +120,7 @@ function Sacrifices:start()
         evaluateSeason()
         currentSeason = newSeason
         current = 0
-        goal = 4
+        goal = maxGoal
         Messages:sendAllClients("UpdateSacrificePercent", current/goal)
     end)
     Messages:hook("PlayerAdded", function(player)

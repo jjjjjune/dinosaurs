@@ -26,7 +26,7 @@ local function getItemModule(itemInstance)
     return itemModule
 end
 
-local function unequipCarryItem()
+local function unequipCarryItem(context)
     local holdAnimation = "Carry"
     if carryItemInstance:FindFirstChild("HoldAnimation") then
         holdAnimation = carryItemInstance.HoldAnimation.Value
@@ -94,7 +94,6 @@ local function attemptThrowItem() -- the fact that this is for both normal items
             Messages:send("StopAnimationClient", holdAnimation)
             if CollectionService:HasTag(possibleItem, "Building") then
                 local Building = import "Client/Systems/Building"
-                print("placed building")
                 possibleItem:SetPrimaryPartCFrame(Building.placementCF)
                 Messages:sendServer("Throw", possibleItem, Building.placementCF, Building.placementTarget)
             else
@@ -154,7 +153,7 @@ local function equipCarryItem(itemInstance)
     if CollectionService:HasTag(itemInstance, "Tool") then
 
         Messages:send("CreateContextualBind", "STORE", function()
-            unequipCarryItem()
+            unequipCarryItem("STORE BIND")
             Messages:send("StoreTool", carryItemInstance)
             bindCarry()
             -- the server will tell us what to do with respect to equipping/unequipping
@@ -172,7 +171,7 @@ function Items:start()
          end
     end)
     Messages:hook("Unequip", function()
-        unequipCarryItem()
+        unequipCarryItem("UN EQUIP")
         bindCarry()
     end)
     Messages:hook("ForceThrowItems", function()
@@ -180,12 +179,12 @@ function Items:start()
         bindCarry()
     end)
     Messages:hook("Throw", function()
-        unequipCarryItem()
+        unequipCarryItem(" THROW ")
         attemptThrowItem()
         bindCarry()
     end)
     Messages:hook("SetCarryItem", function(carryItemInstance)
-        if carryItemInstance then 
+        if carryItemInstance then
             if carryItemInstance:FindFirstChild("TemporaryInstantWeld") then
                 carryItemInstance.TemporaryInstantWeld:Destroy()
             end
@@ -198,7 +197,7 @@ function Items:start()
         character:WaitForChild("Humanoid").Died:connect(function()
             unbindCarry()
             if carryItemInstance then
-                unequipCarryItem()
+                unequipCarryItem(" DEATH ")
             end
         end)
     end)

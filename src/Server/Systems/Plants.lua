@@ -155,7 +155,7 @@ end
 function Plants:start()
     preparePlants()
     Messages:hook("SeasonSetTo",function(newSeason)
-        growAllPlants()
+        
         onSeasonChanged(newSeason)
     end)
     loadSavedPlants()
@@ -164,6 +164,11 @@ function Plants:start()
     spawn(function()
         while wait(5) do
             backUpPlants()
+        end
+    end)
+    spawn(function()
+        while wait(60) do
+            growAllPlants()
         end
     end)
 end

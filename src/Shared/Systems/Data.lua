@@ -51,7 +51,7 @@ local yieldCache = {}
 
 
 local function yieldUntilDataReady(player)
-    if dataReady[player.UserId] then
+    --[[if dataReady[player.UserId] then
         return
 	end
 	yieldCache[player.UserId] = tick()
@@ -60,7 +60,7 @@ local function yieldUntilDataReady(player)
 			 return
 		end
 	until
-		(dataReady[player.UserId] ~= nil) or player == nil or player.Parent == nil
+		(dataReady[player.UserId] ~= nil) or player == nil or player.Parent == nil--]]
 end
 
 function data:onDataChanged(player)
@@ -242,12 +242,16 @@ function data:start()
 		end
 	end)
 
-    Messages:hook("DataReadySignal", function(player)
+	Messages:hook("DataReadySignal", function(player)
+		--print("WE GOT DATA READY SIGNAL FOR ", player)
+		self:onDataChanged(player)
+		warn("i made data changes last night that do this, data no longer yields until someone is ready to receive msgs, but rather works normally and then replicates it to them if they send data ready")
         dataReady[player.UserId] = true
 	end)
 
-	if IsStudio then return end --because of the cool bug that makes shutdowns take 30s
-	game:BindToClose(function() self:saveCache() end)
+	if not IsStudio then
+		game:BindToClose(function() self:saveCache() end)
+	end --because of the cool bug that makes shutdowns take 30s
 end
 
 return data

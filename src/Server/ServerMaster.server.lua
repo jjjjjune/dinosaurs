@@ -1,6 +1,10 @@
 local import = require(game.ReplicatedStorage.Shared.Import)
 
 local loadOrder = {
+	"Shared/Systems/Particles",
+	"Shared/Systems/Data",
+	"Shared/Systems/Sounds",
+	
 	"Server/Systems/CharacterWrapper",
 	"Server/Systems/PlayerWrapper",
 	"Server/Systems/ServerData",
@@ -31,10 +35,6 @@ local loadOrder = {
 	"Server/Systems/Invisibility",
 	"Server/Systems/SpawnEffect",
 	"Server/Systems/HeatAreas",
-	
-	"Shared/Systems/Particles",
-	"Shared/Systems/Data",
-	"Shared/Systems/Sounds",
 }
 
 for _, path in ipairs(loadOrder) do

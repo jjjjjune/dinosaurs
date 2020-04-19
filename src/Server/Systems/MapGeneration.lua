@@ -376,34 +376,32 @@ local function getWfcGridOfSize(xsize, ysize, zsize)
 	updateTileNeighborsRecursive(centerTile)
 	collapse(centerTile)
 	
-	-- tiles around start tile
+    -- tiles around start tile
+    
+    local slopeTypes = {"slope", "slopealt1", "slopealt2"}
 	
 	local tile = tiles[halfx+1][ysize-2][halfz]
-    tile.possibilities = {"slopeBackward"}
-    if math.random(1,2) == 1 then
-        tile.possibilities = {"slopealt1Backward"}
-    end
+    local slopeString = slopeTypes[math.random(1, #slopeTypes)]
+    local poss = slopeString.."Backward"
+    tile.possibilities = {poss}
 	updateTileNeighborsRecursive(tile)
 	
 	local tile = tiles[halfx-1][ysize-2][halfz]
-    tile.possibilities = {"slopeForward"}
-    if math.random(1,2) == 1 then
-        tile.possibilities = {"slopealt1Forward"}
-    end
+    local slopeString = slopeTypes[math.random(1, #slopeTypes)]
+    local poss = slopeString.."Forward"
+    tile.possibilities = {poss}
 	updateTileNeighborsRecursive(tile)
 	
 	local tile = tiles[halfx][ysize-2][halfz-1]
-    tile.possibilities = {"slopeRight"}
-    if math.random(1,2) == 1 then
-        tile.possibilities = {"slopealt1Right"}
-    end
+    local slopeString = slopeTypes[math.random(1, #slopeTypes)]
+    local poss = slopeString.."Right"
+    tile.possibilities = {poss}
 	updateTileNeighborsRecursive(tile)
 	
 	local tile = tiles[halfx][ysize-2][halfz+1]
-    tile.possibilities = {"slopeLeft"}
-    if math.random(1,2) == 1 then
-        tile.possibilities = {"slopealt1Left"}
-    end
+    local slopeString = slopeTypes[math.random(1, #slopeTypes)]
+    local poss = slopeString.."Left"
+    tile.possibilities = {poss}
 	updateTileNeighborsRecursive(tile)
 	
 	-- corners
@@ -526,7 +524,6 @@ function MapGeneration:generateInitialMap()
 
     for _, v in pairs(allTiles) do
         if v.x == halfx and v.y == centerY and v.z == halfz then
-            print("OK SETTIN TILEEE")
             v.possibilities[1] = "starttile"
             break
         end

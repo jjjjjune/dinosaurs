@@ -38,7 +38,6 @@ local function refreshTools()
 end
 
 local function onPlayerDataSet(data)
-    
     for toolName, toolData in pairs(data.storedTools) do
         skin(ToolsUi.Frame[toolName])
     end

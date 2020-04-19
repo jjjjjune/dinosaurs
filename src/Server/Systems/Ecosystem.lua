@@ -144,7 +144,6 @@ local function populateCaves()
                 local plant = BiomeCavePlants[biome][math.random(1, #BiomeCavePlants[biome])]
                 plant = Plants.createPlant(plant,CFrame.new(pos, pos + normal) * CFrame.Angles(-math.pi/2,0,0), math.random(1, 3))
                 local val = Instance.new("ObjectValue", cave)
-                print("PLANT IS: ", plant)
                 val.Value = plant
             end
         end

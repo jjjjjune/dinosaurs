@@ -62,7 +62,6 @@ end
 local Rocks = {}
 
 function Rocks:start()
-    print("ROCKS START")
     Messages:hook("DamageRock", damageRock)
 end
 

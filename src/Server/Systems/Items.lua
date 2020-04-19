@@ -188,10 +188,7 @@ function Items:start()
     end)
     Messages:hook("Throw", function(player, item, desiredCF, target)
         if item.Parent == player.Character then
-            print("throwing!")
             throw(player, item, desiredCF)
-        else
-            print("not in character")
         end
         Messages:send("OnItemThrown", item)
     end)

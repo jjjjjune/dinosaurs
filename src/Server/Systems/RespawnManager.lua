@@ -21,6 +21,9 @@ function RespawnManager:start()
                     part:Destroy()
                 end
             end
+            if #game.Players:GetPlayers() == 1 then
+                player:LoadCharacter()
+            end
         else
             -- fell off map or something?
             player:LoadCharacter()
@@ -46,18 +49,17 @@ function RespawnManager:start()
         repeat wait() until workspace:FindFirstChild("Altar", true)
         local altar = workspace:FindFirstChild("Altar", true)
         character.PrimaryPart.CFrame = altar.PrimaryPart.CFrame * CFrame.new(0,2,0)
+        Messages:send("CreateItem", "Pickaxe", (altar.PrimaryPart.CFrame * CFrame.new(20,20,0)).p)
     end)
     Messages:hook("PlayerAdded", function(player)
         local Gamemode = import "Server/Systems/Gamemode"
         if Gamemode.loaded then
-            print("loading char situation 1")
             player:LoadCharacter()
         end
     end)
     Messages:hook("SeasonSetTo", function(currentSeason)
         for _, p in pairs(game.Players:GetPlayers()) do
             if (not p.Character) or (p.Character and p.Character:FindFirstChild("Humanoid") and p.Character.Humanoid.Health <= 0) then
-                print("loading char situation 3")
                 p:LoadCharacter()
             end
         end
