@@ -31,7 +31,7 @@ local function selectBiomePlant(plants)
     return t[math.random(1, #t)]
 end
 
-local function createPlantForBiome(biome, allBiomeTiles, isFirstTime)
+local function createPlantForBiome(biome, allBiomeTiles, isFirstTime, maxPlantsAmount)
     local name = "Shared/Data/BiomeData/"..biome
     local data = import(name)
     local tile = allBiomeTiles[math.random(1, #allBiomeTiles)]
@@ -39,14 +39,18 @@ local function createPlantForBiome(biome, allBiomeTiles, isFirstTime)
     FastSpawn(function()
         local pos = GetValidPlantPos(tile, plantName)
         if pos then
-            local Plants = import "Server/Systems/Plants"
-            local phase = 1
-            if isFirstTime then
-                phase = #(game.ServerStorage.PlantPhases[plantName]:GetChildren())
+            local count = #biomeToPlantsMap[biome]
+            if count < maxPlantsAmount then
+                -- do this check again because the get position method is asynchronous
+                local Plants = import "Server/Systems/Plants"
+                local phase = 1
+                if isFirstTime then
+                    phase = #(game.ServerStorage.PlantPhases[plantName]:GetChildren())
+                end
+                local plant = Plants.createPlant(plantName, pos, phase, false)
+                plant.Biome.Value = biome
+                table.insert(biomeToPlantsMap[biome], plant)
             end
-            local plant = Plants.createPlant(plantName, pos, phase, false)
-            plant.Biome.Value = biome
-            table.insert(biomeToPlantsMap[biome], plant)
         end
     end)
 end
@@ -82,11 +86,16 @@ local function tickBiome(biome, allBiomeTiles, isFirstTime)
 
     local plantsAmountRandom = Random.new(totalseed)
     local plantsAmount = plantsAmountRandom:NextInteger(minPlantsPerTile*(#allBiomeTiles), maxPlantsPerTile*(#allBiomeTiles))
+
+    print("BIOKME TILEES AMOUNT IS : ", #allBiomeTiles)
+    print("PLANTS AMOUNT IS : ", plantsAmount)
     
     local currentPlantsCount = #biomeToPlantsMap[biome]
 
     if currentPlantsCount < plantsAmount then
-        createPlantForBiome(biome, allBiomeTiles, isFirstTime)
+        for i = 1, (plantsAmount - currentPlantsCount) do
+            createPlantForBiome(biome, allBiomeTiles, isFirstTime, plantsAmount)
+        end
     end
 end
 
@@ -106,18 +115,11 @@ local function performBiomeCheck(isFirstTime)
     for biome, _ in pairs(allBiomes) do
         local allBiomeTiles = {}
         for tile in pairs(tileModelsToTileInfoMap) do
-            if tile.Parent ~= nil then
+            if tile.Parent ~= nil and tile.PrimaryPart.Position.Y  > workspace.Effects.Sand.Position.Y then
                 table.insert(allBiomeTiles, tile)
             end
         end
         tickBiome(biome, allBiomeTiles, isFirstTime)
-    end
-end
-
-local function step()
-    if tick() - lastBiomeCheck > BIOME_CHECK_TIME then
-        lastBiomeCheck = tick()
-        performBiomeCheck(false)
     end
 end
 
@@ -126,11 +128,13 @@ local Biomes = {}
 function Biomes:start()
     Messages:hook("MapDoneGenerating", function(isFirstTime)
         if isFirstTime then
-            for i = 1, 100 do
-                performBiomeCheck(true)
-            end
+            performBiomeCheck(true)
         end
-        RunService.Stepped:connect(step)
+    end)
+    Messages:hook("WeatherSetTo", function(weather)
+        if weather == "Rain" then
+            performBiomeCheck(false)
+        end
     end)
 end
 

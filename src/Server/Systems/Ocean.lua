@@ -8,7 +8,7 @@ local OCEAN_LOWER_AMOUNT = 5
 --600, 419.5, 600
 
 local function lowerOcean()
-    local oceanHeight = ServerData:getValue("oceanHeight") or 400
+    local oceanHeight = ServerData:getValue("oceanHeight") or 500
     
     oceanHeight = oceanHeight - OCEAN_LOWER_AMOUNT
 

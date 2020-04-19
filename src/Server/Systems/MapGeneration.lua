@@ -410,7 +410,7 @@ local function onWaterUpdated()
             folder.Name = i..""
         end
         local folder = workspace.Tiles:FindFirstChild(i.."")
-        if tile.PrimaryPart and tile.PrimaryPart.Position.Y >= yPos - 120 then
+        if tile.PrimaryPart and tile.PrimaryPart.Position.Y >= yPos then
             tile.Parent = folder
         end
     end
@@ -432,16 +432,14 @@ local function backUpMap(allTiles)
 end
 
 local function setInitialOceanHeight()
-    local highestTile
     local highest = -1000
     for _, t in pairs(generatedMapTiles) do
         if t.PrimaryPart.Position.Y > highest then
-            highestTile = t
             highest = t.PrimaryPart.Position.Y
         end
     end
 
-    Messages:send("SetOceanHeight", highest - 140)
+    Messages:send("SetOceanHeight", highest - 100)
 end
 
 local MapGeneration = {}

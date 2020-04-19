@@ -6,7 +6,7 @@ Biome.plants = {
     ["Wood Tree"] = 20
 }
 
-Biome.maxPlantsPerTile = 20
-Biome.minPlantsPerTile = 10
+Biome.maxPlantsPerTile = 8
+Biome.minPlantsPerTile = 2
 
 return Biome

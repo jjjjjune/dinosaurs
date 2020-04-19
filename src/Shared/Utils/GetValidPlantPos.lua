@@ -110,6 +110,7 @@ return function(tile, plantName)
     local numChildren = #plantFolder:GetChildren()
     local model = plantFolder[numChildren..""]
     local size = (model).PrimaryPart.Size.X
+    local ysize = model:GetModelSize().Y
     -- roughly the base size of dis
 
     local grass = grasses[math.random(1, #grasses)]
@@ -118,7 +119,7 @@ return function(tile, plantName)
     local hit, pos, normal
     local dot
     repeat
-        hit, pos, normal = CastRay(rayStartPos + Vector3.new(0,100,0), Vector3.new(0,-200,0))
+        hit, pos, normal = CastRay(rayStartPos + Vector3.new(0,ysize,0), Vector3.new(0,(-ysize) - 4,0))
         dot = Vector3.new(0,1,0):Dot(normal)
         tries = tries + 1
         if (not hit) or (hit and not canPlantGoOn(hit, tile)) or (not isDotValid(dot)) then
@@ -133,7 +134,7 @@ return function(tile, plantName)
     end
 
     if dot ~= 1 then
-        if size > 8 then
+        if size > 10 then
             pos = pos - Vector3.new(0,8,0) -- this is just a visual thing for larger trees spawning inside funny wedges
         end
     end

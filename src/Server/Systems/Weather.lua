@@ -8,6 +8,7 @@ local function createWeather(weatherType, length)
     currentWeather = weatherType
     weatherEnd = tick() + length
     Messages:sendAllClients("WeatherSetTo", weatherType)
+    Messages:send("WeatherSetTo", weatherType)
     delay(length, function()
         Messages:sendAllClients("WeatherSetTo", nil)
     end)
