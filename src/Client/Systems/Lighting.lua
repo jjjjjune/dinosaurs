@@ -50,13 +50,22 @@ local function weatherStep()
             if WeatherParticles:FindFirstChild(currentWeather) then
                 local effect = WeatherParticles:FindFirstChild(currentWeather):Clone()
                 effect.Parent = WeatherEffectsFolder
+                for _, s in pairs(effect:GetChildren()) do
+                    if s:IsA("Sound") then
+                        s:Play()
+                    end
+                end
             end
         end
         local effect = WeatherEffectsFolder:FindFirstChild(currentWeather)
         local pos = GetCharacterPosition()
         if pos then
-            local hit, hitPos = CastRay(pos, Vector3.new(0,100,0), {workspace})
-            effect.CFrame = CFrame.new(hitPos)
+            if not effect:FindFirstChild("LockToPlayer") then 
+                local hit, hitPos = CastRay(pos, Vector3.new(0,100,0), {workspace})
+                effect.CFrame = CFrame.new(hitPos)
+            else
+                effect.CFrame = CFrame.new(pos)
+            end
         end
     else
         WeatherEffectsFolder:ClearAllChildren()

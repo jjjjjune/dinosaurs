@@ -2,8 +2,10 @@ local import = require(game.ReplicatedStorage.Shared.Import)
 local Messages = import "Shared/Utils/Messages"
 local CollectionService = game:GetService("CollectionService")
 
+local GameConstants = import "Shared/Data/GameConstants"
+
 local current = 0
-local goal = 12
+local goal = GameConstants.SACRIFICE_GOAL
 local maxGoal = goal
 
 local currentSeason = 1
@@ -13,6 +15,13 @@ local tagModifiers = {
     Ore = 3,
     Tool = 4,
     Seed = 2,
+}
+
+local seasonIcons = {
+    "FLOWER",
+    "SUN",
+    "LEAF",
+    "SNOWFLAKE",
 }
 
 local function onSacrificedItem(item, pit)
@@ -58,6 +67,40 @@ local function initializeAltar(altar)
     end)
 end
 
+local function performStandardSeasonWeather(actualCurrentSeason)
+    if actualCurrentSeason == 4 then
+        Messages:send("CreateWeather", "Snow", 30)
+    elseif actualCurrentSeason == 1 then
+        Messages:send("CreateWeather", "Rain", 30)
+    end
+end
+
+local function reactToSeason(category, actualCurrentSeason)
+    local shouldLower = false
+    if category == 1 then
+        Messages:send("CreateDisaster", actualCurrentSeason)
+    end
+    if category == 2 then
+        Messages:sendAllClients("Notify", "HUNGER_COLOR_DARK", seasonIcons[currentSeason], "ANOTHER SEASON COMES.")
+        performStandardSeasonWeather(actualCurrentSeason)
+        shouldLower = true
+    end
+    if category == 3 then
+        Messages:send("CreateWeather", "Rain", 30)
+        Messages:sendAllClients("Notify", "HUNGER_COLOR", seasonIcons[currentSeason], "THE WINDS BRING GOOD WEATHER.")
+        shouldLower = true
+    end
+    if category == 4 then
+        Messages:send("CreateWeather", "Rain", 30)
+        Messages:sendAllClients("Notify", "HEALTH_COLOR", seasonIcons[currentSeason], "BLESSINGS RAIN DOWN ON THE RIGHTEOUS.")
+        Messages:send("GrowAllPlants")
+        shouldLower = true
+    end
+    if shouldLower then
+        Messages:send("LowerOcean")
+    end
+end
+
 local firstSeason = true
 
 local function evaluateSeason()
@@ -67,44 +110,20 @@ local function evaluateSeason()
     end
     local percent = (current/goal)*100
     local actualCurrentSeason = currentSeason + 1
-    local seasonIcons = {
-        "FLOWER",
-        "SUN",
-        "LEAF",
-        "SNOWFLAKE",
-    }
-    if percent <= 33 then
-        Messages:send("DryAllWater")
-        Messages:sendAllClients("Notify", "HUNGER_COLOR", "ANGRY", "THE GODS DISPLEASED. ALL WATER RECEDED TO DUST.")
-        if actualCurrentSeason == 4 then
-            Messages:send("CreateWeather", "Snow", 30)
-        end
-    elseif percent > 33 and percent <= 66 then
-        if actualCurrentSeason == 4 then
-            Messages:send("CreateWeather", "Snow", 30)
-        end
-        Messages:send("LowerOcean")
-        Messages:sendAllClients("Notify", "HUNGER_COLOR", seasonIcons[currentSeason], "ANOTHER SEASON COMES.")
-    elseif percent <= 95 then
-        Messages:send("WetAllWater")
-        if actualCurrentSeason ~= 4 then
-            Messages:send("CreateWeather", "Rain", 30)
-        else
-            Messages:send("CreateWeather", "Snow", 30)
-        end
-        Messages:sendAllClients("Notify", "HUNGER_COLOR", seasonIcons[currentSeason], "THE WINDS BRING GOOD WEATHER.")
-        Messages:send("LowerOcean")
-    else
-        Messages:send("WetAllWater")
-        if actualCurrentSeason ~= 4 then
-            Messages:send("CreateWeather", "Rain", 30)
-        else
-            Messages:send("CreateWeather", "Snow", 30)
-        end
-        Messages:sendAllClients("Notify", "HUNGER_COLOR", seasonIcons[currentSeason], "THE GODS AKNOWLEDGE THE BLESSINGS.")
-        Messages:send("GrowAllPlants")
-        Messages:send("LowerOcean")
+    if actualCurrentSeason > 4 then
+        actualCurrentSeason = 1
     end
+    local category
+    if percent <= 33 then
+        category = 1
+    elseif percent > 33 and percent <= 66 then
+        category = 2
+    elseif percent <= 95 then
+        category = 3
+    else
+        category = 4
+    end
+    reactToSeason(category, actualCurrentSeason)
 end
 
 local Sacrifices = {}

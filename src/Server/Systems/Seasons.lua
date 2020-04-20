@@ -4,9 +4,10 @@ local SeasonsData = import "Shared/Data/SeasonsData"
 local RunService = game:GetService("RunService")
 local ServerData = import "Server/Systems/ServerData"
 local FastSpawn = import "Shared/Utils/FastSpawn"
+local GameConstants = import "Shared/Data/GameConstants"
 
 local currentSeason = 1
-local seasonLength = 300
+local seasonLength = GameConstants.SEASON_LENGTH
 local lastSeasonChange = tick()
 
 local isNight = false

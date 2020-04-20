@@ -6,6 +6,11 @@ local RespawnManager = {}
 
 function RespawnManager:start()
     Messages:hook("PlayerDied", function(player, characterThatDied)
+        if #game.Players:GetPlayers() == 1 then
+            warn("auto loading character cause server")
+            player:LoadCharacter()
+            return
+        end
         if characterThatDied.PrimaryPart then
             local items = import "Server/Systems/Items"
             local skull = items.createItem("Skull", characterThatDied.PrimaryPart.Position)
@@ -20,9 +25,6 @@ function RespawnManager:start()
                 if part:IsA("BasePart") then
                     part:Destroy()
                 end
-            end
-            if #game.Players:GetPlayers() == 1 then
-                player:LoadCharacter()
             end
         else
             -- fell off map or something?
@@ -49,7 +51,7 @@ function RespawnManager:start()
         repeat wait() until workspace:FindFirstChild("Altar", true)
         local altar = workspace:FindFirstChild("Altar", true)
         character.PrimaryPart.CFrame = altar.PrimaryPart.CFrame * CFrame.new(0,2,0)
-        Messages:send("CreateItem", "Pickaxe", (altar.PrimaryPart.CFrame * CFrame.new(20,20,0)).p)
+        --Messages:send("CreateItem", "Pickaxe", (altar.PrimaryPart.CFrame * CFrame.new(20,20,0)).p)
     end)
     Messages:hook("PlayerAdded", function(player)
         local Gamemode = import "Server/Systems/Gamemode"

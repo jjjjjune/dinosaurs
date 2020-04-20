@@ -84,10 +84,12 @@ end
 local function createPlant(plantName, posOrCF, phase, isUserPlanted)
     local plantModel = PlantPhases[plantName]["1"]:Clone()
     plantModel.PrimaryPart = plantModel.Base
+    local ang = math.random(1, 360)
+    ang = CFrame.Angles(0, math.rad(ang),0)
     if typeof(posOrCF) == "CFrame" then
-        plantModel:SetPrimaryPartCFrame(posOrCF * CFrame.new(0, plantModel.PrimaryPart.Size.Y/2, 0))
+        plantModel:SetPrimaryPartCFrame(posOrCF * CFrame.new(0, plantModel.PrimaryPart.Size.Y/2, 0) * ang)
     else
-        plantModel:SetPrimaryPartCFrame(CFrame.new(posOrCF) * CFrame.new(0, plantModel.PrimaryPart.Size.Y/2, 0))
+        plantModel:SetPrimaryPartCFrame(CFrame.new(posOrCF) * CFrame.new(0, plantModel.PrimaryPart.Size.Y/2, 0) * ang)
     end
     plantModel.Parent = workspace
     plantModel = setPhase(plantModel, phase)

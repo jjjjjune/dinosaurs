@@ -153,9 +153,7 @@ local function equipCarryItem(itemInstance)
     if CollectionService:HasTag(itemInstance, "Tool") then
 
         Messages:send("CreateContextualBind", "STORE", function()
-            unequipCarryItem("STORE BIND")
-            Messages:send("StoreTool", carryItemInstance)
-            bindCarry()
+            Messages:send("OnStoreAction")
             -- the server will tell us what to do with respect to equipping/unequipping
         end, "STORE")
 
@@ -177,6 +175,13 @@ function Items:start()
     Messages:hook("ForceThrowItems", function()
         attemptThrowItem()
         bindCarry()
+    end)
+    Messages:hook("OnStoreAction", function()
+        if carryItemInstance then
+            unequipCarryItem("STORE BIND")
+            Messages:send("StoreTool", carryItemInstance)
+            bindCarry()
+        end
     end)
     Messages:hook("Throw", function()
         unequipCarryItem(" THROW ")

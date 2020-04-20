@@ -4,6 +4,21 @@ local ToolsUi = game.Players.LocalPlayer.PlayerGui:WaitForChild("Tools")
 
 local currentInventory = _G.Data.storedTools
 
+local order = {
+    "Weapon",
+    "RangedWeapon",
+    "Pickaxe",
+    "Utility",
+}
+
+local function getOrder(inventorySlot)
+    for i, v in pairs(order) do
+        if v == inventorySlot then
+            return i
+        end
+    end
+end
+
 local function skin(inventorySlot)
     local data = currentInventory[inventorySlot.Name]
     local newFrame = inventorySlot:Clone()
@@ -12,8 +27,10 @@ local function skin(inventorySlot)
     local newCam = Instance.new("Camera")
     newCam.Parent = newFrame.ViewportFrame
     newCam.FieldOfView = 30
+    newFrame.LayoutOrder = getOrder(inventorySlot.Name)
     newFrame.Shadow.CurrentCamera = newCam
     newFrame.ViewportFrame.CurrentCamera = newCam
+    newFrame.NumberLabel.Text = getOrder(inventorySlot.Name)..""
     newFrame.Button.Activated:connect(function()
         Messages:sendServer("EquipStoredTool", inventorySlot.Name)
     end)
@@ -45,11 +62,35 @@ local function onPlayerDataSet(data)
     refreshTools()
 end
 
+local function onHotkeyPressedForCategory(itemCategory)
+    local data = currentInventory[itemCategory]
+    if data and data.item ~= nil then
+        print("doing equip storedf tool")
+        Messages:sendServer("EquipStoredTool", itemCategory)
+    else
+        print("STORE ACTION!!")
+        Messages:send("OnStoreAction")
+    end
+end
+
 local Tools = {}
 
 function Tools:start()
     refreshTools()
     Messages:hook("PlayerDataSet", onPlayerDataSet)
+    local keys = {
+        [Enum.KeyCode.One] = "Weapon",
+        [Enum.KeyCode.Two] = "RangedWeapon",
+        [Enum.KeyCode.Three] = "Pickaxe",
+        [Enum.KeyCode.Four] = "Utility"
+    }
+    game:GetService("UserInputService").InputBegan:connect(function(inputObject, gameProcessed)
+        if not gameProcessed then
+            if keys[inputObject.KeyCode] then
+                onHotkeyPressedForCategory(keys[inputObject.KeyCode])
+            end
+        end
+    end)
 end
 
 return Tools

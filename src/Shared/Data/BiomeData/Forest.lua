@@ -1,8 +1,8 @@
 local Biome = {}
 
 Biome.plants = {
-    ["Pine"] = 10,
-    ["Tall Tree"] = 70,
+    ["Pine"] = 20,
+    ["Tall Tree"] = 60,
     ["Wood Tree"] = 20
 }
 

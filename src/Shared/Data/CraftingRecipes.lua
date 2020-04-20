@@ -39,6 +39,12 @@ Recipes.Workbench = {
         default = true,
         building = true,
     },
+    {
+        product = "Cistern",
+        ingredient = "Clay Brick",
+        default = true,
+        building = true,
+    },
 }
 
 return Recipes

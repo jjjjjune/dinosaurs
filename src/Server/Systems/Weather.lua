@@ -9,25 +9,29 @@ local function createWeather(weatherType, length)
     weatherEnd = tick() + length
     Messages:sendAllClients("WeatherSetTo", weatherType)
     Messages:send("WeatherSetTo", weatherType)
-    delay(length, function()
-        Messages:sendAllClients("WeatherSetTo", nil)
-    end)
 end
 
 local Weather = {}
 
 function Weather:start()
-    --[[Messages:hook("SeasonSetTo", function(currentSeason)
-        if currentSeason == 1 then
-            Messages:send("WetAllWater")
-        elseif currentSeason == 2 then
-            Messages:send("DryAllWater")
-        elseif currentSeason == 4 then
-
+    spawn(function()
+        while wait() do
+            if tick() > weatherEnd and currentWeather then
+                Messages:sendAllClients("WeatherSetTo", nil)
+                currentWeather = nil
+            end
         end
-    end)--]]
+    end)
     Messages:hook("CreateWeather", function(weatherType, duration)
+        if currentWeather then
+            Messages:sendAllClients("WeatherSetTo", nil)
+            currentWeather = nil
+        end
+        if weatherType == "Rain" then
+            Messages:send("WetAllWater")
+        end
         createWeather(weatherType, duration)
+        weatherEnd = tick() + duration
     end)
     Messages:hook("PlayerAdded", function(player)
         if tick() < weatherEnd then

@@ -7,11 +7,24 @@ local Debris = game:GetService("Debris")
 local NotificationsUi = game.Players.LocalPlayer.PlayerGui:WaitForChild("Notifications")
 local Holder = NotificationsUi.Frame
 
+local RunService = game:GetService("RunService")
+
 local DISPLAY_TIME = 10
 
-local function newNotification(color, image, text)
+local effects = {
+    VIBRATE = function(frame)
+        frame.Container.Position = UDim2.new(0, math.random(-1,1), 0, math.random(-1,1))
+    end
+}
+local effectPools = {
+    VIBRATE = {}
+}
+
+local function newNotification(color, image, text, effect)
     local frame do
-        if string.len(text) > 12 then
+        if string.len(text) > 24 then
+            frame = Holder.HugeFrame:Clone()
+        elseif string.len(text) > 14 then
             frame = Holder.BigFrame:Clone()
         else
             frame = Holder.SmollFrame:Clone()
@@ -33,12 +46,29 @@ local function newNotification(color, image, text)
         wait(.3)
         frame:Destroy()
     end)
+    if effect then
+        table.insert(effectPools[effect], frame)
+    end
+end
+
+local function runEffects()
+    for effectName, func in pairs(effects) do
+        local newEffectFrameTable = {}
+        for _, effectFrame in pairs(effectPools[effectName]) do
+            if effectFrame.Parent ~= nil then
+                table.insert(newEffectFrameTable, effectFrame)
+                func(effectFrame)
+            end
+        end
+        effectPools[effectName] = newEffectFrameTable
+    end
 end
 
 local Notifications = {}
 
 function Notifications:start()
     Messages:hook("Notify", newNotification)
+    RunService.Heartbeat:connect(runEffects)
 end
 
 return Notifications
