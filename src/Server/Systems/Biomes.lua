@@ -55,6 +55,16 @@ local function createPlantForBiome(biome, allBiomeTiles, isFirstTime, maxPlantsA
     end)
 end
 
+local function getBiomePlants(biomeName)
+    local count = 0
+    for _, plant in pairs(CollectionService:GetTagged("Plant")) do
+        if plant.Biome.Value == biomeName then
+            count = count + 1
+        end
+    end
+    return count
+end
+
 local function tickBiome(biome, allBiomeTiles, isFirstTime)
     if not biomeToPlantsMap[biome] then
         biomeToPlantsMap[biome] = {}
@@ -86,11 +96,8 @@ local function tickBiome(biome, allBiomeTiles, isFirstTime)
 
     local plantsAmountRandom = Random.new(totalseed)
     local plantsAmount = 10*math.floor(#allBiomeTiles/10)--plantsAmountRandom:NextInteger(minPlantsPerTile*(#allBiomeTiles), maxPlantsPerTile*(#allBiomeTiles))
-
-    print("BIOKME TILEES AMOUNT IS : ", #allBiomeTiles)
-    print("PLANTS AMOUNT IS : ", plantsAmount)
     
-    local currentPlantsCount = #biomeToPlantsMap[biome]
+    local currentPlantsCount = getBiomePlants(biome)
 
     if currentPlantsCount < plantsAmount then
         for i = 1, (plantsAmount - currentPlantsCount) do

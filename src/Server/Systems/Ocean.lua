@@ -3,7 +3,7 @@ local Messages = import "Shared/Utils/Messages"
 local ServerData = import "Server/Systems/ServerData"
 local TweenService = game:GetService("TweenService")
 
-local OCEAN_LOWER_AMOUNT = 5
+local OCEAN_LOWER_AMOUNT = 15
 
 --600, 419.5, 600
 
@@ -22,7 +22,7 @@ local function lowerOcean()
     local sandGoals = {
         Position = newPos - Vector3.new(0,3,0)
     }
-    local tweenInfo = TweenInfo.new(1, Enum.EasingStyle.Quad,Enum.EasingDirection.Out)
+    local tweenInfo = TweenInfo.new(6, Enum.EasingStyle.Quad,Enum.EasingDirection.Out)
     TweenService:Create(workspace.Effects.Water, tweenInfo, goals):Play()
     TweenService:Create(workspace.Effects.Sand, tweenInfo, sandGoals):Play()
 

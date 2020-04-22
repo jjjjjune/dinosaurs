@@ -20,73 +20,34 @@ local function isDotValid(dot)
     return true
 end
 
-local function isAreaGood(position, size)
+local function isAreaGood(position, size, ysize)
     -- in every corner of this direction, we check if a downwards ray will hit a valid point
     local isGood = true
     size = size/2
-    local start1 = position + Vector3.new(size,0,size)
-    local start2 = position + Vector3.new(-size, 0, size)
-    local start3 = position + Vector3.new(-size, 0, -size)
-    local start4 = position + Vector3.new(size, 0,- size)
+    local start1 = position + Vector3.new(size, ysize,size)
+    local start2 = position + Vector3.new(-size, ysize, size)
+    local start3 = position + Vector3.new(-size, ysize, -size)
+    local start4 = position + Vector3.new(size, ysize,- size)
 
-    local dir = Vector3.new(0,-1,0)
+    local dir = Vector3.new(0,-(ysize+2),0)
 
-    local hit, pos, normal = CastRay(start1, dir)
-    local dot = Vector3.new(0,1,0):Dot(normal)
+    local posses = {start1,start2,start3,start4}
+    for index, startPos in pairs(posses) do
+        local hit, pos, normal = CastRay(startPos, dir)
+        local dot = Vector3.new(0,1,0):Dot(normal)
 
-    if not hit then
-        isGood = false
-    else
-        if not isDotValid(dot) then
+        if not hit then
             isGood = false
+            print("hit nothing")
         else
-            if not canPlantGoOn(hit) then
+            if not isDotValid(dot) then
                 isGood = false
-            end
-        end
-    end
-
-    hit, pos, normal = CastRay(start2, dir)
-    dot = Vector3.new(0,1,0):Dot(normal)
-
-    if not hit then
-        isGood = false
-    else
-        if not isDotValid(dot) then
-            isGood = false
-        else
-            if not canPlantGoOn(hit) then
-                isGood = false
-            end
-        end
-    end
-
-    hit, pos, normal = CastRay(start3, dir)
-    dot = Vector3.new(0,1,0):Dot(normal)
-
-    if not hit then
-        isGood = false
-    else
-        if not isDotValid(dot)then
-            isGood = false
-        else
-            if not canPlantGoOn(hit) then
-                isGood = false
-            end
-        end
-    end
-
-    hit, pos, normal = CastRay(start4, dir)
-    dot = Vector3.new(0,1,0):Dot(normal)
-
-    if not hit then
-        isGood = false
-    else
-        if not isDotValid(dot) then
-            isGood = false
-        else
-            if not canPlantGoOn(hit) then
-                isGood = false
+                print("invalid dot")
+            else
+                if not canPlantGoOn(hit) then
+                    print("hit cannot go on ", index, hit and hit.Name)
+                    isGood = false
+                end
             end
         end
     end
@@ -123,20 +84,22 @@ return function(tile, plantName)
         hit, pos, normal = CastRay(rayStartPos + Vector3.new(0,ysize,0), Vector3.new(0,(-ysize) - 4,0))
         dot = Vector3.new(0,1,0):Dot(normal)
         tries = tries + 1
-        if (not hit) or (hit and not canPlantGoOn(hit, tile)) or (not isDotValid(dot)) then
+        if (not hit) or (hit and not canPlantGoOn(hit, tile)) or (not isDotValid(dot)) or (not isAreaGood(pos, size, ysize)) then
             grass = grasses[math.random(1, #grasses)]
             rayStartPos = randomPointOnPartSurface(grass)
             hit = nil
         end
-    until 
-        tries > 20 or (hit)
-    if tries > 20 then
+    until
+        tries > 40 or (hit)
+    if tries > 40 then
+        print("timed out!")
         return
     end
 
     if dot ~= 1 then
         if size > 10 then
-            pos = pos - Vector3.new(0,8,0) -- this is just a visual thing for larger trees spawning inside funny wedges
+            local amount = math.min(8, math.abs(size - 10))
+            pos = pos - Vector3.new(0,amount,0) -- this is just a visual thing for larger trees spawning inside funny wedges
         end
     end
 

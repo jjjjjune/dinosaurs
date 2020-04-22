@@ -6,6 +6,11 @@ local CameraShaker = import "Shared/Utils/Camera/CameraShaker"
 
 --tyler wrote this!! thank you tyler
 
+local function oceanEffect()
+	workspace.Effects.Water.Mesh.Offset = Vector3.new(math.sin(tick()), math.sin(tick()*.75)/2, 0)
+	--workspace.Effects.Water.Mesh.Scale = Vector3.new(5+(math.sin((tick()+5)*2))/1000, 1, 5+(math.cos((tick()+2)*2))/1000)
+end
+
 local ClientEffects = {}
 
 function ClientEffects:shake(amp, amount) -- how much in degrees, how long in frames
@@ -36,6 +41,8 @@ function ClientEffects:start()
 			camShake:Shake(CameraShaker.Presets[preset])
 		end)
 	end)
+
+	game:GetService("RunService").RenderStepped:connect(oceanEffect)
 end
 
 return ClientEffects
