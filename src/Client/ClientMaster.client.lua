@@ -16,6 +16,7 @@ local loadOrder = {
 	"Client/Systems/Building",
 	"Client/Systems/DamageEffects",
 
+	"Client/Systems/ClientEffects",
 	"Client/Systems/LavaBubbles",
 	--"Client/Systems/Data"
 

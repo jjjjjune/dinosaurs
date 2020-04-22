@@ -11,18 +11,19 @@ local function randomPointOnPartSurface(part)
 end
 
 local function canPlantGoOn(hit, tile)
-    return (CollectionService:HasTag(hit, "Grass") and hit.Transparency == 0 and hit.Anchored) or CollectionService:HasTag(hit, "Sand") and hit:IsDescendantOf(tile)
+    return (CollectionService:HasTag(hit, "Grass") and hit.Transparency == 0 and hit.Anchored) or CollectionService:HasTag(hit, "Sand") and hit:IsDescendantOf(tile) and tile.Transparency == 0
 end
 
 local function isDotValid(dot)
-    print(dot)
-    return dot > .5 and dot < 1.5
+   -- print(dot)
+    --return dot > 0 and dot < 2
+    return true
 end
 
 local function isAreaGood(position, size)
     -- in every corner of this direction, we check if a downwards ray will hit a valid point
     local isGood = true
-
+    size = size/2
     local start1 = position + Vector3.new(size,0,size)
     local start2 = position + Vector3.new(-size, 0, size)
     local start3 = position + Vector3.new(-size, 0, -size)
@@ -36,7 +37,7 @@ local function isAreaGood(position, size)
     if not hit then
         isGood = false
     else
-        if isDotValid(dot) then
+        if not isDotValid(dot) then
             isGood = false
         else
             if not canPlantGoOn(hit) then
@@ -51,7 +52,7 @@ local function isAreaGood(position, size)
     if not hit then
         isGood = false
     else
-        if isDotValid(dot) then
+        if not isDotValid(dot) then
             isGood = false
         else
             if not canPlantGoOn(hit) then
@@ -66,7 +67,7 @@ local function isAreaGood(position, size)
     if not hit then
         isGood = false
     else
-        if isDotValid(dot)then
+        if not isDotValid(dot)then
             isGood = false
         else
             if not canPlantGoOn(hit) then
@@ -81,7 +82,7 @@ local function isAreaGood(position, size)
     if not hit then
         isGood = false
     else
-        if isDotValid(dot) then
+        if not isDotValid(dot) then
             isGood = false
         else
             if not canPlantGoOn(hit) then

@@ -21,6 +21,9 @@ end
 
 local function updateWaterAppearance(entityInstance)
     local amount = entityInstance.Amount.Value
+    if amount == entityInstance.Amount.MaxValue and not originalHeights[entityInstance] then -- spawning for the first time
+        return
+    end
     if CollectionService:HasTag(entityInstance, "Building") then
         if not originalBaseOffsets[entityInstance] then
             originalBaseOffsets[entityInstance] = entityInstance.Water.CFrame:toObjectSpace(entityInstance.PrimaryPart.CFrame)

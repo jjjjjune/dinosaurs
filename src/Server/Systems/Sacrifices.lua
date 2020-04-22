@@ -97,6 +97,10 @@ local function reactToSeason(category, actualCurrentSeason)
         shouldLower = true
     end
     if shouldLower then
+        Messages:sendAllClients("PlaySoundOnClient",{
+            instance = game.ReplicatedStorage.Sounds.Rumble
+        })
+        Messages:sendAllClients("ShakeCamera","Earthquake")
         Messages:send("LowerOcean")
     end
 end

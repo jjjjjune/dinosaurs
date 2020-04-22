@@ -6,6 +6,8 @@ local SacrificeUiInstance = game.Players.LocalPlayer.PlayerGui:WaitForChild("Sac
 local FastSpawn = import "Shared/Utils/FastSpawn"
 local SeasonsData = import "Shared/Data/SeasonsData"
 
+local ColorConstants = import "Shared/Data/ColorConstants"
+
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 
@@ -17,7 +19,7 @@ local lastCurrentSeason = 1
 local seasonColors = {-- spring summer fall winter
     {
         bg = Color3.fromRGB(107,194,136),
-        fg = Color3.fromRGB(211,249,105),
+        fg = Color3.fromRGB(143,225,0),
         icon = "rbxassetid://4898590164",
         name = "spring",
     },
@@ -34,7 +36,7 @@ local seasonColors = {-- spring summer fall winter
         name = "fall",
     },
     {
-        bg = Color3.fromRGB(82,179,159),
+        bg = Color3.fromRGB(109,201,198),
         fg = Color3.fromRGB(136,255,204),
         icon = "rbxassetid://4898590596",
         name = "winter",
