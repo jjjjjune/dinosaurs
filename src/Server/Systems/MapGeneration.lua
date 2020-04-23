@@ -441,7 +441,7 @@ local function onWaterUpdated()
             folder.Name = i..""
         end
         local folder = workspace.Tiles:FindFirstChild(i.."")
-        if tile.PrimaryPart and tile.PrimaryPart.Position.Y >= yPos then
+        if tile.PrimaryPart and tile.PrimaryPart.Position.Y >= yPos - 70 then
             tile.Parent = folder
         end
     end

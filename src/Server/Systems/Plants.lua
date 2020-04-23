@@ -6,12 +6,20 @@ local TweenService = game:GetService("TweenService")
 local PlantPhases = import "ServerStorage/PlantPhases"
 local ServerData = import "Server/Systems/ServerData"
 
+local lastSeason = 1
+
 local function random(min, max)
     local randomObj = Random.new()
     return randomObj:NextInteger(min, max)
 end
 
+local function colorGrass(grass)
+    local seasonData = SeasonsData[lastSeason]
+    grass.Color = seasonData.grassColor
+end
+
 local function onSeasonChanged(newSeason)
+    lastSeason = newSeason
     local seasonData = SeasonsData[newSeason]
     for _, grass in pairs(CollectionService:GetTagged("Grass")) do
         local color = seasonData.grassColor
@@ -157,9 +165,9 @@ end
 function Plants:start()
     preparePlants()
     Messages:hook("SeasonSetTo",function(newSeason)
-        
         onSeasonChanged(newSeason)
     end)
+    CollectionService:GetInstanceAddedSignal("Grass"):connect(colorGrass)
     loadSavedPlants()
     Messages:hook("GrowAllPlants", growAllPlants)
     Messages:hook("CreatePlant", createPlant)

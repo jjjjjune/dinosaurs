@@ -3,7 +3,7 @@ local Messages = import "Shared/Utils/Messages"
 local ServerData = import "Server/Systems/ServerData"
 local TweenService = game:GetService("TweenService")
 
-local OCEAN_LOWER_AMOUNT = 15
+local OCEAN_LOWER_AMOUNT = 200
 
 --600, 419.5, 600
 
