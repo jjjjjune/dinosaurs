@@ -36,23 +36,21 @@ local function createPlantForBiome(biome, allBiomeTiles, isFirstTime, maxPlantsA
     local data = import(name)
     local tile = allBiomeTiles[math.random(1, #allBiomeTiles)]
     local plantName = selectBiomePlant(data.plants)
-    FastSpawn(function()
-        local pos = GetValidPlantPos(tile, plantName)
-        if pos then
-            local count = #biomeToPlantsMap[biome]
-            if count < maxPlantsAmount then
-                -- do this check again because the get position method is asynchronous
-                local Plants = import "Server/Systems/Plants"
-                local phase = 1
-                if isFirstTime then
-                    phase = #(game.ServerStorage.PlantPhases[plantName]:GetChildren())
-                end
-                local plant = Plants.createPlant(plantName, pos, phase, false)
-                plant.Biome.Value = biome
-                table.insert(biomeToPlantsMap[biome], plant)
+    local pos = GetValidPlantPos(tile, plantName)
+    if pos then
+        local count = #biomeToPlantsMap[biome]
+        if count < maxPlantsAmount then
+            -- do this check again because the get position method is asynchronous
+            local Plants = import "Server/Systems/Plants"
+            local phase = 1
+            if isFirstTime then
+                phase = #(game.ServerStorage.PlantPhases[plantName]:GetChildren())
             end
+            local plant = Plants.createPlant(plantName, pos, phase, false)
+            plant.Biome.Value = biome
+            table.insert(biomeToPlantsMap[biome], plant)
         end
-    end)
+    end
 end
 
 local function getBiomePlants(biomeName)
@@ -95,15 +93,19 @@ local function tickBiome(biome, allBiomeTiles, isFirstTime)
     local minPlantsPerTile = data.minPlantsPerTile
 
     local plantsAmountRandom = Random.new(totalseed)
-    local plantsAmount = 10*math.floor(#allBiomeTiles/10)--plantsAmountRandom:NextInteger(minPlantsPerTile*(#allBiomeTiles), maxPlantsPerTile*(#allBiomeTiles))
+    local plantsAmount = plantsAmountRandom:NextInteger(minPlantsPerTile*(#allBiomeTiles), maxPlantsPerTile*(#allBiomeTiles))
     
+    --print("plants amount is: ", plantsAmount)
+
     local currentPlantsCount = getBiomePlants(biome)
 
-    if currentPlantsCount < plantsAmount then
-        for i = 1, (plantsAmount - currentPlantsCount) do
-            createPlantForBiome(biome, allBiomeTiles, isFirstTime, plantsAmount)
+    FastSpawn(function()
+        if currentPlantsCount < plantsAmount then
+            for i = 1, (plantsAmount - currentPlantsCount) do
+                createPlantForBiome(biome, allBiomeTiles, isFirstTime, plantsAmount)
+            end
         end
-    end
+    end)
 end
 
 local function performBiomeCheck(isFirstTime)
@@ -121,11 +123,15 @@ local function performBiomeCheck(isFirstTime)
 
     for biome, _ in pairs(allBiomes) do
         local allBiomeTiles = {}
-        for tile , info in pairs(tileModelsToTileInfoMap) do
-            if tile.Parent ~= nil and tile.PrimaryPart.Position.Y  > workspace.Effects.Sand.Position.Y - 20 then
-                --if not info.name == "groundForward" and not info.name == "groundBackward" and not info.name then
-                table.insert(allBiomeTiles, tile)
-                --end
+        for i, tileFolder in pairs(workspace.Tiles:GetChildren()) do
+            for _, tile in pairs(tileFolder:GetChildren()) do
+                if tile.Biome.Value == biome then 
+                --if tile.Parent ~= nil and tile.PrimaryPart.Position.Y  > workspace.Effects.Sand.Position.Y - 20 then
+                    --if not info.name == "groundForward" and not info.name == "groundBackward" and not info.name then
+                    table.insert(allBiomeTiles, tile)
+                    --end
+               -- end
+                end
             end
         end
         tickBiome(biome, allBiomeTiles, isFirstTime)
@@ -142,7 +148,12 @@ function Biomes:start()
     end)
     Messages:hook("WeatherSetTo", function(weather)
         if weather == "Rain" then
-            performBiomeCheck(false)
+            print("performing biome check yeeeeee")
+            delay(2, function()
+                performBiomeCheck(false)
+            end)
+        else
+            print("weather not  rain i g")
         end
     end)
 end

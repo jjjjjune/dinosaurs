@@ -11,7 +11,9 @@ local function randomPointOnPartSurface(part)
 end
 
 local function canPlantGoOn(hit, tile)
-    return (CollectionService:HasTag(hit, "Grass") and hit.Transparency == 0 and hit.Anchored) or CollectionService:HasTag(hit, "Sand") and hit:IsDescendantOf(tile) and tile.Transparency == 0
+    local basicCheck1 = hit and (CollectionService:HasTag(hit, "Grass") and hit.Transparency == 0 and hit.Anchored) or CollectionService:HasTag(hit, "Sand") and hit:IsDescendantOf(tile) and hit.Transparency == 0
+    local basicCheck2 = basicCheck1 and (not CollectionService:HasTag(hit, "EffectSand"))
+    return basicCheck2
 end
 
 local function isDotValid(dot)
@@ -38,14 +40,14 @@ local function isAreaGood(position, size, ysize)
 
         if not hit then
             isGood = false
-            print("hit nothing")
+            --print("hit nothing")
         else
             if not isDotValid(dot) then
                 isGood = false
-                print("invalid dot")
+                --print("invalid dot")
             else
                 if not canPlantGoOn(hit) then
-                    print("hit cannot go on ", index, hit and hit.Name)
+                    --print("hit cannot go on ", index, hit and hit.Name)
                     isGood = false
                 end
             end
@@ -88,6 +90,9 @@ return function(tile, plantName)
             grass = grasses[math.random(1, #grasses)]
             rayStartPos = randomPointOnPartSurface(grass)
             hit = nil
+        end
+        if tries%5 == 0 then
+            wait()
         end
     until
         tries > 40 or (hit)

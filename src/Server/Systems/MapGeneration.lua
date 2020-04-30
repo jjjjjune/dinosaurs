@@ -488,6 +488,9 @@ function MapGeneration:loadFromSerializedMap(map)
             cellName = string.gsub(cellName, "Right", "")
             local biome = tileInfo.biome
             local newTile = game.ServerStorage.MapTiles[biome][cellName]:Clone()
+            local biomeValue = Instance.new("StringValue", newTile)
+            biomeValue.Name = "Biome"
+            biomeValue.Value = biome
             newTile:SetPrimaryPartCFrame(CFrame.new(tileInfo.x*120,tileInfo.y*120,tileInfo.z*120))
             newTile:SetPrimaryPartCFrame(newTile.PrimaryPart.CFrame * rotation)
             if newTile.Name ~= "starttile" then

@@ -1,13 +1,18 @@
 local import = require(game.ReplicatedStorage.Shared.Import)
 local Messages = import 'Shared/Utils/Messages'
 
+local CollectionService = game:GetService("CollectionService")
+
 local FastSpawn = import "Shared/Utils/FastSpawn"
 local CameraShaker = import "Shared/Utils/Camera/CameraShaker"
 
 --tyler wrote this!! thank you tyler
 
 local function oceanEffect()
-	workspace.Effects.Water.Mesh.Offset = Vector3.new(math.sin(tick()), math.sin(tick()*.75)/2, 0)
+	workspace.Effects.Water.Mesh.Offset = Vector3.new(math.sin(tick()), math.sin(tick()*.5)/15, 0)
+	for _, v in pairs(CollectionService:GetTagged("SkirtMesh")) do
+		v.Offset = Vector3.new(0, workspace.Effects.Water.Mesh.Offset.Y/2, 0)
+	end
 	--workspace.Effects.Water.Mesh.Scale = Vector3.new(5+(math.sin((tick()+5)*2))/1000, 1, 5+(math.cos((tick()+2)*2))/1000)
 end
 
