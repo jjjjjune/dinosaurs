@@ -45,7 +45,7 @@ local seasonColors = {-- spring summer fall winter
 
 local function updateSacrificePercent(newPercent)
     newPercent = math.min(1, newPercent)
-    SacrificeUiInstance.ContainerRealBack.Background.Holder.Progress:TweenPosition(UDim2.new((1-newPercent)*-1,0,0,0), "Out", "Quad", .3)
+    SacrificeUiInstance.Frame.ContainerRealBack.Background.Holder.Progress:TweenPosition(UDim2.new((1-newPercent)*-1,0,0,0), "Out", "Quad", .3)
     --SacrificeUiInstance.Background.Holder.Progress.FG:TweenPosition(UDim2.new(1+(newPercent),0,1,0), "Out", "Quad", .3)
 end
 
@@ -56,8 +56,8 @@ local function initializeAndHookSeasonUi()
     nextSeasonChange = tick() + (seasonLength - timeProgressed)
     lastSeasonLength = seasonLength
     lastCurrentSeason = currentSeason
-    SacrificeUiInstance.ContainerRealBack.SeasonIcon.Image = seasonColors[lastCurrentSeason].icon
-    SacrificeUiInstance.ContainerRealBack.ImageColor3 = seasonColors[lastCurrentSeason].fg
+    SacrificeUiInstance.Frame.ContainerRealBack.SeasonIcon.Image = seasonColors[lastCurrentSeason].icon
+    SacrificeUiInstance.Frame.ContainerRealBack.ImageColor3 = seasonColors[lastCurrentSeason].fg
 
     Messages:hook("SeasonSetTo",function(seasonIndex, seasonLength)
         lastSeasonChange = tick()
@@ -68,11 +68,10 @@ local function initializeAndHookSeasonUi()
             ImageColor3 = seasonColors[lastCurrentSeason].fg
         }
         local info = TweenInfo.new(1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-        local tween = TweenService:Create(SacrificeUiInstance.ContainerRealBack, info, goals)
+        local tween = TweenService:Create(SacrificeUiInstance.Frame.ContainerRealBack, info, goals)
         tween:Play()
-        SacrificeUiInstance.ContainerRealBack.SeasonIcon.Image = seasonColors[lastCurrentSeason].icon
+        SacrificeUiInstance.Frame.ContainerRealBack.SeasonIcon.Image = seasonColors[lastCurrentSeason].icon
     end)
-    
 end
 
 local function step()
@@ -80,7 +79,7 @@ local function step()
     local timeRemaining = nextSeasonChange - tick()
     local alpha = 1 - (timeRemaining/lastSeasonLength)
 
-    Messages:send("SetRadialProgressButtonAmount", SacrificeUiInstance.ContainerRealBack.SeasonProgress, alpha, seasonColors[lastCurrentSeason].bg, seasonColors[lastCurrentSeason].fg)
+    Messages:send("SetRadialProgressButtonAmount", SacrificeUiInstance.Frame.ContainerRealBack.SeasonProgress, alpha, seasonColors[lastCurrentSeason].bg, seasonColors[lastCurrentSeason].fg)
 
 end
 

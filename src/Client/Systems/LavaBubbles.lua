@@ -4,6 +4,31 @@ local CollectionService = game:GetService("CollectionService")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
 
+local lastBlinks = {}
+
+local blinkTime = math.random(25, 40)/10
+
+local function blink(lavaPart)
+    local model = lavaPart.Parent
+    local eyes = {}
+    for _, v in pairs(model:GetChildren()) do
+        if v.Name == "Eye2" then
+            table.insert(eyes, v)
+        end
+    end
+    local eye = eyes[math.random(1, #eyes)]
+    if not eye:FindFirstChild("GodEyeBlink") then
+        print("blinking")
+        local anim = game.ReplicatedStorage.Animations.GodEyeBlink:Clone()
+        anim.Parent = eye
+        local track = eye.AnimationController:LoadAnimation(anim)
+        track:Play()
+    else
+        local track = eye.AnimationController:LoadAnimation(eye.GodEyeBlink)
+        track:Play()
+    end
+end
+
 local function tickLava(lavaPart)
     local limitForPart = lavaPart.Size.magnitude * 1
     local lavaDist = lavaPart.Size.X/3
@@ -41,6 +66,17 @@ local function tickLava(lavaPart)
         end)
         sizeTween:Play()
 
+    end
+
+    if not lastBlinks[lavaPart] then
+        lastBlinks[lavaPart] = time()
+        blink(lavaPart)
+    else
+        if time() - lastBlinks[lavaPart] > blinkTime then
+            blinkTime = math.random(25, 40)/10
+            blink(lavaPart)
+            lastBlinks[lavaPart] = time()
+        end
     end
 end
 

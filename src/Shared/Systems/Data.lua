@@ -245,7 +245,6 @@ function data:start()
 	Messages:hook("DataReadySignal", function(player)
 		--print("WE GOT DATA READY SIGNAL FOR ", player)
 		self:onDataChanged(player)
-		warn("i made data changes last night that do this, data no longer yields until someone is ready to receive msgs, but rather works normally and then replicates it to them if they send data ready")
         dataReady[player.UserId] = true
 	end)
 

@@ -87,7 +87,7 @@ function Buildings:start()
             local starttile = workspace:FindFirstChild("starttile", true):Clone()
             folder:SetPrimaryPartCFrame(starttile.PrimaryPart.CFrame)
             for _, v in pairs(folder:GetChildren()) do
-                v.Parent = workspace 
+                v.Parent = workspace.Buildings
             end
             folder:Destroy()
         end

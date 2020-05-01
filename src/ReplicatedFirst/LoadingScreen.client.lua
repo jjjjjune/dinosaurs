@@ -11,7 +11,7 @@ local assets = {"rbxassetid://4879346736"}
 
 
 local PlayerGui = game.Players.LocalPlayer:WaitForChild("PlayerGui")
---PlayerGui:SetTopbarTransparency(0)
+PlayerGui:SetTopbarTransparency(1)
  
 local screen = Instance.new("ScreenGui")
 screen.Parent = PlayerGui
