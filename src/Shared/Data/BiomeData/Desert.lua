@@ -1,7 +1,8 @@
 local Biome = {}
 
 Biome.plants = {
-    ["Yucca"] = 100
+    ["Yucca"] = 80,
+    ["Cactus"] = 20,
 }
 
 Biome.maxPlantsPerTile = 4

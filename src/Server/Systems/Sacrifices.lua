@@ -86,13 +86,13 @@ local function reactToSeason(category, actualCurrentSeason)
         shouldLower = true
     end
     if category == 3 then
-        Messages:send("CreateWeather", "Rain", 30)
-        Messages:sendAllClients("Notify", "HUNGER_COLOR", seasonIcons[currentSeason], "THE WINDS BRING GOOD WEATHER.")
+        --Messages:send("CreateWeather", "Rain", 30)
+        Messages:sendAllClients("Notify", "HUNGER_COLOR", seasonIcons[currentSeason], "SOMETHING GOOD HAPPENS.")
         shouldLower = true
     end
     if category == 4 then
-        Messages:send("CreateWeather", "Rain", 30)
-        Messages:sendAllClients("Notify", "HEALTH_COLOR", seasonIcons[currentSeason], "BLESSINGS RAIN DOWN ON THE RIGHTEOUS.")
+        --Messages:send("CreateWeather", "Rain", 30)
+        Messages:sendAllClients("Notify", "HEALTH_COLOR", seasonIcons[currentSeason], "THE PLANTS GROW.")
         Messages:send("GrowAllPlants")
         shouldLower = true
     end
