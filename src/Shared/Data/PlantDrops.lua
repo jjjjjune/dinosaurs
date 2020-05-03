@@ -22,4 +22,9 @@ PlantDrops["Banana Tree"] = {
     {name = "Banana Seed", min = 0, max = 1, chance = 55},
 }
 
+PlantDrops["Yucca"] = {
+    {name = "Log",min = 1, max = 2, chance = 45},
+    {name = "Yucca Seed", min = 1, max = 2, chance = 25},
+}
+
 return PlantDrops

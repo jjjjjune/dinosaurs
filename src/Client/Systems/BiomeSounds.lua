@@ -15,7 +15,8 @@ local sounds = {
 
 local maxVolumes = {
     ["Rainforest"] = .01,
-    ["Ocean"] = .01,
+    ["Ocean"] = .03,
+    ["Desert"] = .05,
 }
 
 local soundInstances = {}
@@ -35,7 +36,7 @@ local function playSound(channel, sound)
         local tween
 
         if sound ~= nil then
-            print("we are playing: ", sound)
+            --print("we are playing: ", sound)
             tween = TweenService:Create(soundInstances[sound], info, goals)
             tween:Play()
         end
@@ -73,12 +74,10 @@ end
 local function biomeSoundStep()
     local pos = workspace.CurrentCamera.CFrame.p
     local biome = nil
-    local foundTile
     for _, v in pairs(workspace.Tiles:GetChildren()) do
         for _, tile in pairs(v:GetChildren()) do
             if tile.PrimaryPart and isWithin(pos, tile.PrimaryPart) and tile.PrimaryPart.Position.Y >= workspace.Effects.Sand.Position.Y - 100 then
                 biome = tile.Biome.Value
-                foundTile = tile
             end
         end
     end

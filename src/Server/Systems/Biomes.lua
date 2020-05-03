@@ -36,7 +36,7 @@ local function createPlantForBiome(biome, allBiomeTiles, isFirstTime, maxPlantsA
     local data = import(name)
     local tile = allBiomeTiles[math.random(1, #allBiomeTiles)]
     local plantName = selectBiomePlant(data.plants)
-    local pos = GetValidPlantPos(tile, plantName)
+    local pos = GetValidPlantPos(tile, plantName, biome)
     if pos then
         local count = #biomeToPlantsMap[biome]
         if count < maxPlantsAmount then
@@ -44,7 +44,7 @@ local function createPlantForBiome(biome, allBiomeTiles, isFirstTime, maxPlantsA
             local Plants = import "Server/Systems/Plants"
             local phase = 1
             if isFirstTime then
-                phase = #(game.ServerStorage.PlantPhases[plantName]:GetChildren())
+                phase = math.random(1, #(game.ServerStorage.PlantPhases[plantName]:GetChildren()))
             end
             local plant = Plants.createPlant(plantName, pos, phase, false)
             plant.Biome.Value = biome

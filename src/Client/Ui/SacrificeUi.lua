@@ -87,7 +87,7 @@ local SacrificeUi = {}
 
 function SacrificeUi:start(playerGui)
     Messages:hook("UpdateSacrificePercent",updateSacrificePercent)
-    SacrificeUiInstance:WaitForChild("ContainerRealBack")
+    SacrificeUiInstance:WaitForChild("Frame"):WaitForChild("ContainerRealBack")
     initializeAndHookSeasonUi()
     RunService.RenderStepped:connect(step)
 end

@@ -1,6 +1,7 @@
 local import = require(game.ReplicatedStorage.Shared.Import)
 local Messages = import "Shared/Utils/Messages"
 
+local Perlin = import "Shared/Utils/Perlin"
 local ServerData = import "Server/Systems/ServerData"
 
 local tileNameToRotationMap = {}
@@ -451,12 +452,13 @@ local function backUpMap(allTiles)
     local ServerData = import "Server/Systems/ServerData"
     local map = {}
     for _, tile in pairs(allTiles) do
+        local noise = Perlin(tile.x/9,tile.z/9)
         table.insert(map, {
             name = tile.possibilities[1],
             x = tile.x,
             y = tile.y,
             z = tile.z,
-            biome = "Rainforest",
+            biome = (noise > .55 and  "Desert") or "Rainforest",
         })
     end
     ServerData:setValue("tileMap", map)

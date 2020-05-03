@@ -148,6 +148,14 @@ local function backUpPlants()
 end
 
 local function preparePlants()
+    local plantPhases = game.ServerStorage.PlantPhases
+    for _, plantFolder in pairs(plantPhases:GetChildren()) do
+        for _, phaseModel in pairs(plantFolder:GetChildren()) do
+            local typeValue = Instance.new("StringValue", phaseModel)
+            typeValue.Name = "Type"
+            typeValue.Value = plantFolder.Name
+        end
+    end
     for _, plant in pairs(CollectionService:GetTagged("Plant")) do
         local UserPlanted = Instance.new("BoolValue", plant)
         UserPlanted.Name = "UserPlanted"

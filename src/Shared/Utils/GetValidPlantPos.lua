@@ -3,6 +3,15 @@ local import = require(game.ReplicatedStorage.Shared.Import)
 local CollectionService = game:GetService("CollectionService")
 local CastRay = import "Shared/Utils/CastRay"
 
+local biomeChecks = {
+    ["Rainforest"] = function(hit)
+        return CollectionService:HasTag(hit, "Grass")
+    end,
+    ["Desert"] = function(hit)
+        return CollectionService:HasTag(hit, "Sand") or CollectionService:HasTag(hit, "Grass")
+    end,
+}
+
 local function randomPointOnPartSurface(part)
     local start = part.CFrame  * CFrame.new(0, part.Size.Y/2, 0)
     local xDist = math.random(-part.Size.X/2, part.Size.X/2)
@@ -10,10 +19,14 @@ local function randomPointOnPartSurface(part)
     return (start * CFrame.new(xDist, 0, zDist)).p
 end
 
-local function canPlantGoOn(hit, tile)
-    local basicCheck1 = hit and (CollectionService:HasTag(hit, "Grass") and hit.Transparency == 0 and hit.Anchored) or CollectionService:HasTag(hit, "Sand") and hit:IsDescendantOf(tile) and hit.Transparency == 0
+local function canPlantGoOn(hit, tile, biome)
+    local basicCheck1 = hit and hit.Transparency == 0 and hit.Anchored
+    if tile and not hit:IsDescendantOf(tile) then
+        basicCheck1 = false
+    end
     local basicCheck2 = basicCheck1 and (not CollectionService:HasTag(hit, "EffectSand"))
-    return basicCheck2
+    local basicCheck3 = basicCheck2 and biomeChecks[biome](hit)
+    return basicCheck3
 end
 
 local function isDotValid(dot)
@@ -22,7 +35,7 @@ local function isDotValid(dot)
     return true
 end
 
-local function isAreaGood(position, size, ysize)
+local function isAreaGood(position, size, ysize, biome, tile)
     -- in every corner of this direction, we check if a downwards ray will hit a valid point
     local isGood = true
     size = size/2
@@ -46,7 +59,7 @@ local function isAreaGood(position, size, ysize)
                 isGood = false
                 --print("invalid dot")
             else
-                if not canPlantGoOn(hit) then
+                if not canPlantGoOn(hit, nil, biome) then
                     --print("hit cannot go on ", index, hit and hit.Name)
                     isGood = false
                 end
@@ -57,9 +70,24 @@ local function isAreaGood(position, size, ysize)
     return isGood
 end
 
-return function(tile, plantName)
+local function merge(t1, t2)
+    for i, v in pairs(t2) do
+        table.insert(t1, v)
+    end
+    return t1
+end
+
+local function getBiomeCollection(biome)
+    if biome == "Rainforest" then
+        return CollectionService:GetTagged("Grass")
+    elseif biome == "Desert" then
+        return merge(CollectionService:GetTagged("Grass"), CollectionService:GetTagged("Sand"))
+    end
+end
+
+return function(tile, plantName, biome)
     local grasses = {}
-    local collection = CollectionService:GetTagged("Grass")
+    local collection = getBiomeCollection(biome)
 
     for _, grass in pairs(collection) do
         if grass.Position.Y >= workspace.Effects.Water.Position.Y - 8 then
@@ -86,7 +114,7 @@ return function(tile, plantName)
         hit, pos, normal = CastRay(rayStartPos + Vector3.new(0,ysize,0), Vector3.new(0,(-ysize) - 4,0))
         dot = Vector3.new(0,1,0):Dot(normal)
         tries = tries + 1
-        if (not hit) or (hit and not canPlantGoOn(hit, tile)) or (not isDotValid(dot)) or (not isAreaGood(pos, size, ysize)) then
+        if (not hit) or (hit and not canPlantGoOn(hit, tile, biome)) or (not isDotValid(dot)) or (not isAreaGood(pos, size, ysize, biome, tile)) then
             grass = grasses[math.random(1, #grasses)]
             rayStartPos = randomPointOnPartSurface(grass)
             hit = nil
@@ -97,7 +125,7 @@ return function(tile, plantName)
     until
         tries > 40 or (hit)
     if tries > 40 then
-        print("timed out!")
+        --print("timed out!")
         return
     end
 
