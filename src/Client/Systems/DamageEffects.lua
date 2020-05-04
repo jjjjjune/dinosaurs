@@ -1,17 +1,17 @@
 local import = require(game.ReplicatedStorage.Shared.Import)
 local Messages = import "Shared/Utils/Messages"
 
-local TweenService = game:GetService("TweenService")
 local CollectionService = game:GetService("CollectionService")
 
 local tagsToEffectsMap = {
-    Rock = import "Shared/Effects/RockEffect"
+    Rock = import "Shared/Effects/RockEffect",
+    Character = import "Shared/Effects/CharacterDamageEffect"
 }
 
-local function playDamageEffect(object)
+local function playDamageEffect(object, ...)
     for tag, effect in pairs(tagsToEffectsMap) do
         if CollectionService:HasTag(object, tag) then
-            effect(object)
+            effect(object, ...)
             return
         end
     end

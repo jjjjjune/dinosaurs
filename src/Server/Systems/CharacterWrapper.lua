@@ -1,5 +1,8 @@
 local import = require(game.ReplicatedStorage.Shared.Import)
+
 local Messages = import "Shared/Utils/Messages"
+
+local CollectionService = game:GetService("CollectionService")
 
 local CharacterWrapper = {}
 
@@ -13,6 +16,7 @@ function CharacterWrapper:start()
                 Messages:sendClient(player, "DiedClient", character)
             end)
             character:WaitForChild("Health"):Destroy()
+            CollectionService:AddTag(character, "Character")
         end)
     end)
 end

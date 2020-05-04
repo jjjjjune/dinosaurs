@@ -46,6 +46,7 @@ function Particles:start()
 		else
 			attach.Parent = position
 		end
+		
 		attach.Name = "Particle"
 		CollectionService:AddTag(attach,"Particle")
 
@@ -60,6 +61,22 @@ function Particles:start()
 		attach.Parent = workspace.Terrain
 		CollectionService:AddTag(attach,"Particle")
 		local particleInstance = ParticlesFolder[particleName]:Clone()
+		particleInstance.Parent = attach
+		particleInstance:Emit(amount)
+	end)
+	Messages:hook("PlayParticleColor", function(particleName, color, amount, position)
+		local attach = Instance.new("Attachment")
+		if typeof(position) ~= "Instance" then
+			attach.Position = position
+			attach.Parent = workspace.Terrain
+		else
+			attach.Parent = position
+		end
+		attach.Name = "Particle"
+		CollectionService:AddTag(attach,"Particle")
+
+		local particleInstance = ParticlesFolder[particleName]:Clone()
+		particleInstance.Color = ColorSequence.new(color)
 		particleInstance.Parent = attach
 		particleInstance:Emit(amount)
 	end)

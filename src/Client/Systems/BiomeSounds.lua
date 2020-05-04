@@ -16,7 +16,7 @@ local sounds = {
 local maxVolumes = {
     ["Rainforest"] = .01,
     ["Ocean"] = .03,
-    ["Desert"] = .05,
+    ["Desert"] = .2,
 }
 
 local soundInstances = {}
