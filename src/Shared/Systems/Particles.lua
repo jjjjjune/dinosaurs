@@ -46,7 +46,7 @@ function Particles:start()
 		else
 			attach.Parent = position
 		end
-		
+
 		attach.Name = "Particle"
 		CollectionService:AddTag(attach,"Particle")
 

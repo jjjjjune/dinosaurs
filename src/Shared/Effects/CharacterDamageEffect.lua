@@ -44,4 +44,8 @@ return function(character, damageType)
     end
 
     Messages:send("PlayParticleColor", "DamageSmoke", DamageColors[damageType], 8, character.Head.Position)
+    Messages:send("PlaySoundOnClient",{
+        instance = game.ReplicatedStorage.Sounds.DamagedSDS,
+        part = character.Head,
+    })
 end

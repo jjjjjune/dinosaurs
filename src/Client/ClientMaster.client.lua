@@ -15,6 +15,9 @@ local loadOrder = {
 	"Client/Systems/ToolStorage",
 	"Client/Systems/Building",
 	"Client/Systems/DamageEffects",
+	"Client/Systems/Knockback",
+
+	"Client/Systems/SpikyThings",
 
 	"Client/Systems/BiomeSounds",
 	"Client/Systems/ClientEffects",
