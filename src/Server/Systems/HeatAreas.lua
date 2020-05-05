@@ -21,7 +21,7 @@ local function heatStep()
             checkPart.Parent = workspace
             for _, p in pairs(checkPart:GetTouchingParts()) do
                 local item = p.Parent
-                if item and not item.Parent:FindFirstChild("Humanoid") then
+                if item and not item:FindFirstChild("Humanoid") then
                     local product = Cookables[item.Name]
                     if product then
                         local pos = item.PrimaryPart.Position
@@ -30,7 +30,14 @@ local function heatStep()
                         items.createItem(product, pos)
                         Messages:send("PlaySound", "Smoke", pos)
                         Messages:send("PlayParticle", "DeathSmoke", 20, pos)
+                    else
+                        if CollectionService:HasTag(item, "Organic") then
+                            print("setting on fire")
+                            Messages:send("SetOnFire", item)
+                        end
                     end
+                elseif item and item:FindFirstChild("Humanoid") then
+                    --Messages:send("SetOnFire", item)
                 end
             end
             checkPart:Destroy()
