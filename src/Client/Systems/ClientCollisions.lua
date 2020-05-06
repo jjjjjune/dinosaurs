@@ -10,7 +10,8 @@ local HIT_DEBOUNCE = 1
 
 local function onHitSpikyThing(part)
     Messages:send("PlayDamageEffect", game.Players.LocalPlayer.Character, "normal")
-    game.Players.LocalPlayer.Character.Humanoid:TakeDamage(10)
+    Messages:sendServer("ReportCollision", part.Parent)
+   -- game.Players.LocalPlayer.Character.Humanoid:TakeDamage(10)
     local dir = CFrame.new(game.Players.LocalPlayer.Character.PrimaryPart.Position, part.Position).lookVector
     dir = dir + Vector3.new(0,-1,0)
     Messages:send("Knockback", -dir*50, .2)
@@ -23,11 +24,14 @@ local function onHitboxContact(part)
             lastContact = tick()
         end
     end
+    if CollectionService:HasTag(part.Parent, "FreshWater") then
+        Messages:sendServer("ReportCollision", part.Parent)
+    end
 end
 
-local SpikyThings = {}
+local ClientCollisions = {}
 
-function SpikyThings:start()
+function ClientCollisions:start()
     Messages:hook("CharacterAddedClient", function(character)
         lastContact = 0
         local hitbox = character:WaitForChild("Hitbox")
@@ -35,4 +39,4 @@ function SpikyThings:start()
     end)
 end
 
-return SpikyThings
+return ClientCollisions

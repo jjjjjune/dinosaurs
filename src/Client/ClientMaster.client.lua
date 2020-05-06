@@ -17,7 +17,7 @@ local loadOrder = {
 	"Client/Systems/DamageEffects",
 	"Client/Systems/Knockback",
 
-	"Client/Systems/SpikyThings",
+	"Client/Systems/ClientCollisions",
 
 	"Client/Systems/BiomeSounds",
 	"Client/Systems/ClientEffects",

@@ -4,6 +4,7 @@ local CollectionService = game:GetService("CollectionService")
 
 local originalBaseOffsets = {}
 local originalHeights = {}
+local allWater = {}
 
 local function dry(freshWater)
     freshWater.Sand.Material = Enum.Material.Marble
@@ -87,12 +88,40 @@ end
 
 local Water = {}
 
+
+local function isWithin(position, part)
+    local barrierCorner1 = part.Position - Vector3.new(part.Size.X/2,0,part.Size.Z/2)
+    local barrierCorner2 = part.Position + Vector3.new(part.Size.X/2,0,part.Size.Z/2)
+    local x1, y1, x2, y2 = barrierCorner1.X, barrierCorner1.Z, barrierCorner2.X, barrierCorner2.Z
+    local realY1 = part.Position.Y - 3
+    local realY2 = part.Position.Y + 3
+    if position.X > x1 and position.X < x2 then
+        if position.Z > y1 and position.Z < y2 then
+            if position.Y > realY1 and position.Y < realY2 then 
+                return true
+            end
+        end
+    end
+end
+
+function Water.isPositionWithinWater(position)
+    for water, _ in pairs(allWater) do
+        if isWithin(position, water.Water) then
+            return true
+        end
+    end
+end
+
 function Water:start()
     Messages:hook("DryAllWater", dryAllWater)
     Messages:hook("WetAllWater", wetAllWater)
     Messages:hook("DrinkWater", drinkWater)
     CollectionService:GetInstanceAddedSignal("FreshWater"):connect(function(freshWater)
         updateWaterAppearance(freshWater)
+        allWater[freshWater] = true
+    end)
+    CollectionService:GetInstanceRemovedSignal("FreshWater"):connect(function(freshWater)
+        allWater[freshWater] = nil
     end)
     for _, v in pairs(CollectionService:GetTagged("FreshWater")) do
         updateWaterAppearance(v)
