@@ -9,6 +9,7 @@ local lastContact = tick()
 local HIT_DEBOUNCE = 1
 
 local function onHitSpikyThing(part)
+    print("report spike collisioon")
     Messages:send("PlayDamageEffect", game.Players.LocalPlayer.Character, "normal")
     Messages:sendServer("ReportCollision", part.Parent)
    -- game.Players.LocalPlayer.Character.Humanoid:TakeDamage(10)

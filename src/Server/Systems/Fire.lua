@@ -72,22 +72,24 @@ local function putOutFire(object)
 end
 
 local function manageBurnParticle(object)
-    if not object:FindFirstChild("BurnHitbox") then
-        local burnHitbox = Instance.new("Part")
-        CollectionService:AddTag(burnHitbox, "RayIgnore")
-        burnHitbox.Size = object:GetModelSize()
-        burnHitbox.Transparency = 1
-        burnHitbox.Name = "BurnHitbox"
-        burnHitbox.Massless = true
-        burnHitbox.CFrame = object:GetModelCFrame()
-        burnHitbox.CanCollide = false
-        burnHitbox.Parent = object
-        local w = Instance.new("WeldConstraint", burnHitbox)
-        w.Part0 = burnHitbox
-        w.Part1 = object.PrimaryPart
-        local particle = game.ReplicatedStorage.Particles.SystemFire:Clone()
-        particle.Parent = burnHitbox
-        particle:Emit(20)
+    if CollectionService:HasTag(object, "Burning") then
+        if not object:FindFirstChild("BurnHitbox") then
+            local burnHitbox = Instance.new("Part")
+            CollectionService:AddTag(burnHitbox, "RayIgnore")
+            burnHitbox.Size = object:GetModelSize()
+            burnHitbox.Transparency = 1
+            burnHitbox.Name = "BurnHitbox"
+            burnHitbox.Massless = true
+            burnHitbox.CFrame = object:GetModelCFrame()
+            burnHitbox.CanCollide = false
+            burnHitbox.Parent = object
+            local w = Instance.new("WeldConstraint", burnHitbox)
+            w.Part0 = burnHitbox
+            w.Part1 = object.PrimaryPart
+            local particle = game.ReplicatedStorage.Particles.SystemFire:Clone()
+            particle.Parent = burnHitbox
+            particle:Emit(20)
+        end
     end
 end
 

@@ -9,9 +9,9 @@ local CollisionReports = {}
 
 function CollisionReports:start()
     Messages:hook("ReportCollision", function(player, object)
-        if (object.PrimaryPart.Position - player.Character.PrimaryPart.Position).magnitude < 50 then
+        if object and object.PrimaryPart and (object.PrimaryPart.Position - player.Character.PrimaryPart.Position).magnitude < 50 then
             if CollectionService:HasTag(object, "Spiky") then
-                Damage(player.Character, {damage = -10, type = "normal"})
+                Damage(player.Character, {damage = 10, type = "normal"})
             end
         end
     end)

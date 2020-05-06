@@ -45,6 +45,19 @@ local function updateWaterAppearance(entityInstance)
             entityInstance.Water.Transparency = .2
         end
     else
+        if not originalBaseOffsets[entityInstance] then
+            originalBaseOffsets[entityInstance] = entityInstance.Water.CFrame:toObjectSpace(entityInstance.PrimaryPart.CFrame)
+            originalHeights[entityInstance] = entityInstance.Water.Size.Y
+        end
+        local water = entityInstance.Water
+        local originalOffset = originalBaseOffsets[entityInstance]
+        local amountAlpha = amount/entityInstance.Amount.MaxValue
+        local newHeight = originalHeights[entityInstance] * amountAlpha
+        local newSize = Vector3.new(water.Size.X, newHeight, water.Size.Z)
+        local diff = 1 - amountAlpha
+        local newCF = entityInstance.PrimaryPart.CFrame * originalOffset * CFrame.new(0, -diff/2, 0)
+        water.Size = newSize
+        water.CFrame = newCF
         if amount == 0 then
             dry(entityInstance)
         else
