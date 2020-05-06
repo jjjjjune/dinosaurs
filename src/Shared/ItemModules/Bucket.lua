@@ -27,10 +27,11 @@ function Item.serverUse(player, item)
     local foundContainer
 
     local shouldTransform = false
+    local foundFire = false
 
     for _, part in pairs(touchingParts) do
         if CollectionService:HasTag(part.Parent, "FreshWater") then
-            if (item.Name == "Bucket" and part.Parent.Amount.Value > 0) or (part.Parent.Amount.Value < part.Parent.Amount.MaxValue) then
+            if (item.Name == "Bucket" and part.Parent.Amount.Value > 0) or (item.Name == "Water Bucket" and part.Parent.Amount.Value < part.Parent.Amount.MaxValue) then
                 if CollectionService:HasTag(part.Parent, "Building") then
                     foundContainer = part.Parent
                 else
@@ -41,6 +42,7 @@ function Item.serverUse(player, item)
         if CollectionService:HasTag(part.Parent, "Burning") then
             if item.Name == "Water Bucket" then
                 Messages:send("PutOutFire", part.Parent)
+                foundFire = true
             end
         end
     end
@@ -58,14 +60,18 @@ function Item.serverUse(player, item)
             Messages:send("TakeFromContainer", foundFreshWater)
             shouldTransform = true
         elseif foundContainer then
-            Messages:send("TakeFromContainer", foundFreshWater)
+            Messages:send("TakeFromContainer", foundContainer)
             shouldTransform = true
         end
     end
-    
+
+    if foundFire then
+        shouldTransform = true
+    end
+
     if shouldTransform then
         if item.Name == "Bucket" then
-            item.Name = "Water Bucket" 
+            item.Name = "Water Bucket"
             item.Water.Transparency = 0.4
         else
             item.Name = "Bucket"

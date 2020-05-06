@@ -4,6 +4,17 @@ local Messages = import "Shared/Utils/Messages"
 local currentWeather = nil
 local weatherEnd = tick() - 100
 
+local lastRainRefill = tick()
+
+local weatherFunctions = {
+    Rain = function()
+        if tick() - lastRainRefill > 2 then
+            lastRainRefill = tick()
+            Messages:send("FillSkyReceptacles")
+        end
+    end,
+}
+
 local function createWeather(weatherType, length)
     currentWeather = weatherType
     weatherEnd = tick() + length
@@ -20,6 +31,9 @@ function Weather:start()
                 Messages:sendAllClients("WeatherSetTo", nil)
                 currentWeather = nil
             end
+            if currentWeather and weatherFunctions[currentWeather] then
+                weatherFunctions[currentWeather]()
+            end
         end
     end)
     Messages:hook("CreateWeather", function(weatherType, duration)
@@ -28,7 +42,7 @@ function Weather:start()
             currentWeather = nil
         end
         if weatherType == "Rain" then
-            Messages:send("WetAllWater")
+            --Messages:send("WetAllWater")
         end
         createWeather(weatherType, duration)
         weatherEnd = tick() + duration

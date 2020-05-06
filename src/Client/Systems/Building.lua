@@ -14,6 +14,9 @@ local function setCharTransparency()
         if v:IsA("BasePart") and v.Parent ~= placementModel then
             v.LocalTransparencyModifier = .8
         end
+        if v:IsA("ParticleEmitter") and v:IsDescendantOf(placementModel) then
+            v.Enabled = false
+        end
     end
 end
 
