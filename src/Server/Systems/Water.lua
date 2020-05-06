@@ -86,6 +86,18 @@ local function drinkWater(player, entityInstance)
     updateWaterAppearance(entityInstance)
 end
 
+local function takeFromContainer(container)
+    container.Amount.Value = container.Amount.Value - 1
+    updateWaterAppearance(container)
+    Messages:send("PlaySound", "Drinking", container.PrimaryPart)
+end
+
+local function fillContainer(container)
+    container.Amount.Value = container.Amount.Value + 1
+    updateWaterAppearance(container)
+    Messages:send("PlaySound", "Drinking", container.PrimaryPart)
+end
+
 local Water = {}
 
 
@@ -116,6 +128,8 @@ function Water:start()
     Messages:hook("DryAllWater", dryAllWater)
     Messages:hook("WetAllWater", wetAllWater)
     Messages:hook("DrinkWater", drinkWater)
+    Messages:hook("TakeFromContainer",takeFromContainer)
+    Messages:hook("FillContainer",fillContainer)
     CollectionService:GetInstanceAddedSignal("FreshWater"):connect(function(freshWater)
         updateWaterAppearance(freshWater)
         allWater[freshWater] = true

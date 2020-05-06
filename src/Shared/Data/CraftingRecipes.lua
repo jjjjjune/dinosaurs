@@ -2,6 +2,11 @@ local Recipes = {}
 
 Recipes.Workbench = {
     {
+        product = "Bucket",
+        ingredient = "Log",
+        default = true,
+    },
+    {
         product = "Pickaxe",
         ingredient = "Log",
         default = true,
