@@ -45,7 +45,6 @@ local function updateWaterAppearance(entityInstance)
     end--]]
 
     if not originalBaseOffsets[entityInstance] then
-        print("no original offset for: ", entityInstance.Name)
         originalBaseOffsets[entityInstance] = entityInstance.PrimaryPart.CFrame:toObjectSpace(entityInstance.Water.CFrame)
         originalHeights[entityInstance] = entityInstance.Water.Size.Y
     end
@@ -53,13 +52,12 @@ local function updateWaterAppearance(entityInstance)
     local water = entityInstance.Water
     local originalOffset = originalBaseOffsets[entityInstance]
     local amountAlpha = amount/entityInstance.Amount.MaxValue
+
     local newHeight = originalHeights[entityInstance] * amountAlpha
-    print("new height is: ", newHeight)
     local newSize = Vector3.new(water.Size.X, newHeight, water.Size.Z)
+
     local diff = 1 - amountAlpha
-    print("difference is: ", diff)
-    print("original height is: ", originalHeights[entityInstance])
-    print("original offset is", originalOffset)
+
     local newCF = entityInstance.PrimaryPart.CFrame * originalOffset * CFrame.new(0, -diff/2, 0)
     water.Size = newSize
     water.CFrame = newCF
@@ -86,7 +84,6 @@ local function updateWaterAppearance(entityInstance)
 end
 
 local function dryAllWater()
-    print("DRYING ALL WATER")
     for _, freshWater in pairs(CollectionService:GetTagged("FreshWater")) do
         if not CollectionService:HasTag(freshWater, "Building") then
             if freshWater:IsDescendantOf(workspace) then
