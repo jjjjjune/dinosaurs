@@ -1,6 +1,6 @@
 return {
     Clay = "Clay Brick",
     Iron = "Iron Bar",
-    Log = "Coal",
+    --Log = "Coal",
     ["Big Log"] = "Coal",
 }

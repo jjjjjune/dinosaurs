@@ -75,9 +75,11 @@ end
 local function growPlant(plantModel)
     local currentPhase = ((tonumber(plantModel.Name) ~= 0) and tonumber(plantModel.Name)) or 1
     local maxPhase = getMaxPhase(plantModel.Type.Value)
-    setPhase(plantModel, math.min(maxPhase, currentPhase+1))
-    if currentPhase+1 == maxPhase then
-        onPlantFinishedGrowing(plantModel)
+    if currentPhase < maxPhase then
+        setPhase(plantModel, math.min(maxPhase, currentPhase+1))
+        if currentPhase+1 == maxPhase then
+            onPlantFinishedGrowing(plantModel)
+        end
     end
 end
 

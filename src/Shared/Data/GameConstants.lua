@@ -1,4 +1,4 @@
 return {
     SEASON_LENGTH = 12,
-    SACRIFICE_GOAL = 0
+    SACRIFICE_GOAL = 10
 }

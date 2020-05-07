@@ -77,6 +77,11 @@ local function manageBurnParticle(object)
             local burnHitbox = Instance.new("Part")
             CollectionService:AddTag(burnHitbox, "RayIgnore")
             burnHitbox.Size = object:GetModelSize()
+            if CollectionService:HasTag(object, "Plant") then
+                if burnHitbox.Size.X > 5 then
+                    burnHitbox.Size = Vector3.new(5, object:GetModelSize().Y, 5)
+                end
+            end
             burnHitbox.Transparency = 1
             burnHitbox.Name = "BurnHitbox"
             burnHitbox.Massless = true
