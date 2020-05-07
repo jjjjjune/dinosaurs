@@ -27,7 +27,6 @@ local function equipStoredTool(player, slotName)
     local storeData = Data:get(player, "storedTools")
     local storedTool = storeData[slotName]
     local foundStoredTool
-    print("slot name is: ", slotName)
     if not storedTool or storedTool.item == nil then
         return
     end

@@ -87,11 +87,13 @@ local function reactToSeason(category, actualCurrentSeason)
     end
     if category == 3 then
         --Messages:send("CreateWeather", "Rain", 30)
+        performStandardSeasonWeather(actualCurrentSeason)
         Messages:sendAllClients("Notify", "HUNGER_COLOR", seasonIcons[currentSeason], "SOMETHING GOOD HAPPENS.")
         shouldLower = true
     end
     if category == 4 then
-        Messages:send("CreateWeather", "Rain", 30)
+       -- Messages:send("CreateWeather", "Rain", 30)
+        performStandardSeasonWeather(actualCurrentSeason)
         Messages:sendAllClients("Notify", "HEALTH_COLOR", seasonIcons[currentSeason], "THE PLANTS GROW.")
         Messages:send("GrowAllPlants")
         shouldLower = true

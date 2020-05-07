@@ -127,7 +127,6 @@ local function manageSpread(object)
         local potentialBurnable = part.Parent
         if potentialBurnable ~= object then
             if canSpreadTo(object, potentialBurnable) then
-                print(object, "can spread fire to ", potentialBurnable)
                 setOnFire(potentialBurnable)
             end
         end

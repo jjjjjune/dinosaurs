@@ -18,7 +18,6 @@ local function blink(lavaPart)
     end
     local eye = eyes[math.random(1, #eyes)]
     if not eye:FindFirstChild("GodEyeBlink") then
-        print("blinking")
         local anim = game.ReplicatedStorage.Animations.GodEyeBlink:Clone()
         anim.Parent = eye
         local track = eye.AnimationController:LoadAnimation(anim)

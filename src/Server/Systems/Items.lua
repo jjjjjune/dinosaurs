@@ -104,8 +104,6 @@ local function throw(player, item, desiredCF, target)
                     v.Anchored = true
                 end
             end
-        else
-            print("asttach to buildabnle surface!!!")
         end
     end
 end

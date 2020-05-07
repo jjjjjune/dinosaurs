@@ -48,7 +48,6 @@ local function playSound(soundName, position, group, pitchshift, useFolder, forc
         sound = folder[soundName]:Clone()
 	end
 	if pitchshift then
-		print("shifting pitch")
 		if forcePitch then
 			sound.PlaybackSpeed = pitchshift
 		else

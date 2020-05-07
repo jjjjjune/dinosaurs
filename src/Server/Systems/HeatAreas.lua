@@ -32,7 +32,6 @@ local function heatStep()
                         Messages:send("PlayParticle", "DeathSmoke", 20, pos)
                     else
                         if CollectionService:HasTag(item, "Organic") then
-                            print("setting on fire")
                             Messages:send("SetOnFire", item)
                         end
                     end

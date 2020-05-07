@@ -148,12 +148,9 @@ function Biomes:start()
     end)
     Messages:hook("WeatherSetTo", function(weather)
         if weather == "Rain" then
-            print("performing biome check yeeeeee")
             delay(2, function()
                 performBiomeCheck(false)
             end)
-        else
-            print("weather not  rain i g")
         end
     end)
 end

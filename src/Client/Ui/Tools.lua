@@ -65,10 +65,8 @@ end
 local function onHotkeyPressedForCategory(itemCategory)
     local data = currentInventory[itemCategory]
     if data and data.item ~= nil then
-        print("doing equip storedf tool")
         Messages:sendServer("EquipStoredTool", itemCategory)
     else
-        print("STORE ACTION!!")
         Messages:send("OnStoreAction")
     end
 end

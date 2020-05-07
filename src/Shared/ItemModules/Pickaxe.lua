@@ -77,7 +77,6 @@ function Tool.clientUse(item)
 end
 
 function Tool.serverUse(player, item)
-    print("server using")
     Messages:reproOnClients(player, "PlaySound", "Swing2", item.PrimaryPart.Position)
     local rock = getClosestRock(player)
     if rock then
