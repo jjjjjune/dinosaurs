@@ -104,15 +104,19 @@ local function wetAllWater()
 end
 
 local function drinkWater(player, entityInstance)
+    local needsUpdate = false
     if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
         local Stats = import "Server/Systems/Stats"
         local stat = Stats.getStat(player, "thirst")
         if stat.current < stat.max and entityInstance.Amount.Value > 0 then
             Messages:send("AddStat", player, "thirst", 1)
             entityInstance.Amount.Value = entityInstance.Amount.Value - 1
+            needsUpdate = true
         end
     end
-    updateWaterAppearance(entityInstance)
+    if needsUpdate then
+        updateWaterAppearance(entityInstance)
+    end
 end
 
 local function takeFromContainer(container)

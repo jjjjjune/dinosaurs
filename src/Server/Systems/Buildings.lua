@@ -83,6 +83,7 @@ local Buildings = {}
 function Buildings:start()
     Messages:hook("MapDoneGenerating", function(isFirstTime)
         if isFirstTime then
+            print("map done genrating first time")
             local folder = game.ServerStorage.StartTileBuildings
             local starttile = workspace:FindFirstChild("starttile", true):Clone()
             folder:SetPrimaryPartCFrame(starttile.PrimaryPart.CFrame)

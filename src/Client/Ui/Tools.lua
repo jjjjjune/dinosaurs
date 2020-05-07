@@ -2,7 +2,7 @@ local import = require(game.ReplicatedStorage.Shared.Import)
 local Messages = import "Shared/Utils/Messages"
 local ToolsUi = game.Players.LocalPlayer.PlayerGui:WaitForChild("Tools")
 
-local currentInventory = _G.Data.storedTools
+local currentInventory = _G.Data.server.storedTools
 
 local order = {
     "Weapon",
@@ -55,10 +55,10 @@ local function refreshTools()
 end
 
 local function onPlayerDataSet(data)
-    for toolName, toolData in pairs(data.storedTools) do
+    for toolName, toolData in pairs(data.server.storedTools) do
         skin(ToolsUi.Frame[toolName])
     end
-    currentInventory = data.storedTools
+    currentInventory = data.server.storedTools
     refreshTools()
 end
 

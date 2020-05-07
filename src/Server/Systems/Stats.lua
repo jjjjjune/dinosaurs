@@ -4,7 +4,7 @@ local RunService = game:GetService("RunService")
 
 local STATS = {
     {name = "hunger", max = 10, decayRate = 40, decayAmount = -1},
-    {name = "thirst", max = 10, decayRate = 5, decayAmount = -1},
+    {name = "thirst", max = 10, decayRate = 40, decayAmount = -1},
 }
 
 local playerStats = {}

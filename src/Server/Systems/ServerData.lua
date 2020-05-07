@@ -13,7 +13,7 @@ local Immutable = import "Immutable"
 local IS_SAVING_IN_STUDIO = false
 
 local function getServerId()
-    return "TestServer49"
+    return "TestServer50"
 end
 
 local function copy(value)
@@ -37,15 +37,39 @@ local function getDefaultData()
     return defaultData
 end
 
+local function getDefaultPlayerData()
+    local defaultData = {}
+    for key, value in pairs(Constants.DEFAULT_SERVER_PLAYER_DATA) do
+        defaultData[key] = copy(value)
+	end
+	if game:GetService("RunService"):IsStudio() or game.PlaceId == 3725285976 or game.PlaceId == 3725292176 then
+		for key, value in pairs(Constants.TEST_SERVER_PLAYER_DATA) do
+			defaultData[key] = copy(value)
+		end
+	end
+    return defaultData
+end
+
 
 local ServerData = {}
 
 function ServerData:updated()
-    --[[local Data = import "Shared/Systems/Data"
+
+end
+
+function ServerData:updatedPlayers()
     for _, player in pairs(game.Players:GetPlayers()) do
-        Data:set(player, "server", self.cache)
-    end--]] 
-    -- not a good way to do this
+        Messages:sendClient(player, "UpdatePlayerServerData", self.cache.players[player.UserId])
+    end
+end
+
+function ServerData:setPlayerValue(player, key, value)
+    self.cache.players[player.UserId][key] = value
+    self:updatedPlayers()
+end
+
+function ServerData:getPlayerValue(player, key)
+    return self.cache.players[player.UserId][key]
 end
 
 function ServerData:setValue(key, value)
@@ -60,7 +84,7 @@ end
 function ServerData:saveCache()
     if RunService:IsStudio() then
         if IS_SAVING_IN_STUDIO == false then
-            warn(" WE ARE NOT SAVCING DATA IN STGUDIO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+            warn("no data save in studio")
             return
         end
     end
@@ -76,6 +100,16 @@ function ServerData:start()
         end
     end)
     game:BindToClose(function() self:saveCache() end)
+    game:GetService("Players").PlayerAdded:connect(function(player)
+        if not self.cache.players[player.UserId] then
+            self.cache.players[player.UserId] = getDefaultPlayerData()
+        end
+    end)
+    for _, player in pairs(game.Players:GetPlayers()) do
+        if not self.cache.players[player.UserId] then
+            self.cache.players[player.UserId] = getDefaultPlayerData()
+        end
+    end
 end
 
 return ServerData

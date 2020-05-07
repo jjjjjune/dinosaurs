@@ -1,10 +1,10 @@
 local import = require(game.ReplicatedStorage.Shared.Import)
 local Messages = import "Shared/Utils/Messages"
-local Data = import "Shared/Systems/Data"
+local ServerData = import "Server/Systems/ServerData"
 local CollectionService = game:GetService("CollectionService")
 
 local function storeTool(player, itemInstance)
-    local storeData = Data:get(player, "storedTools")
+    local storeData = ServerData:getPlayerValue(player, "storedTools")
     local slotData
     for category, data in pairs(storeData) do
         if CollectionService:HasTag(itemInstance, category) then
@@ -20,11 +20,11 @@ local function storeTool(player, itemInstance)
         Messages:sendClient(player, "ForceSetItem", itemModel)
     end
     slotData.item = itemInstance.Name
-    Data:set(player, "storedTools", storeData)
+    ServerData:setPlayerValue(player, "storedTools", storeData)
 end
 
 local function equipStoredTool(player, slotName)
-    local storeData = Data:get(player, "storedTools")
+    local storeData = ServerData:getPlayerValue(player, "storedTools")
     local storedTool = storeData[slotName]
     local foundStoredTool
     if not storedTool or storedTool.item == nil then
@@ -32,7 +32,7 @@ local function equipStoredTool(player, slotName)
     end
     foundStoredTool = storedTool.item
     storedTool.item = nil
-    Data:set(player, "storedTools", storeData)
+    ServerData:setPlayerValue(player, "storedTools", storeData)
     local foundStorableTool = false
     for _, possibleTool in pairs(player.Character:GetChildren()) do
         if possibleTool:IsA("Model") and CollectionService:HasTag(possibleTool, slotName) then
