@@ -3,6 +3,7 @@ local import = require(game.ReplicatedStorage.Shared.Import)
 local TagsToModulesMap = {}
 TagsToModulesMap.Items = {}
 TagsToModulesMap.Entities = {}
+TagsToModulesMap.Monsters = {}
 
 -- items
 
@@ -21,5 +22,9 @@ TagsToModulesMap.Items.Building = import "Shared/ItemModules/Building"
 TagsToModulesMap.Entities.FreshWater = import "Shared/EntityModules/FreshWater"
 TagsToModulesMap.Entities.Plant = import "Shared/EntityModules/Plant"
 TagsToModulesMap.Entities.Workbench = import "Shared/EntityModules/Workbench"
+
+-- monsters
+
+TagsToModulesMap.Monsters.Lizard = import "Shared/MonsterModules/Lizard"
 
 return TagsToModulesMap
