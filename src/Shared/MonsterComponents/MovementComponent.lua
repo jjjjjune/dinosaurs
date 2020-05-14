@@ -1,127 +1,59 @@
 local import = require(game.ReplicatedStorage.Shared.Import)
 
-local PathfindingService = game:GetService("PathfindingService")
-local CollectionService = game:GetService("CollectionService")
-
-local FastSpawn = import "Shared/Utils/FastSpawn"
+local CastRay = import "Shared/Utils/CastRay"
 
 local MovementComponent = {}
 
 MovementComponent.__index = MovementComponent
 
-function MovementComponent:pathfindToGoal()
-    self.isPathfinding = true
-    local goal = self.goal
-    if self.lastPathfindGoal ~= goal then
-        self.waypoints = nil
-        self.currentWaypointIndex = 1
-        FastSpawn(function()
-            self.path:ComputeAsync(self.model.PrimaryPart.Position, goal)
-            self.waypoints = self.path:GetWaypoints()
-            for _, point in pairs(self.waypoints) do
-                local debugPart = Instance.new("Part", workspace)
-                CollectionService:AddTag(debugPart, "RayIgnore")
-                debugPart.CanCollide = false
-                debugPart.Color = Color3.new(1,0,0)
-                debugPart.Anchored = true
-                debugPart.Name = "Debug"
-                debugPart.CFrame = CFrame.new(point.Position)
-                debugPart.Size = Vector3.new(1,1,1)
-            end
-        end)
-        self.lastPathfindGoal = goal
-    end
-    if self.waypoints and #self.waypoints > 0 then
-        print("ok waypoints")
-        local waypoint = self.waypoints[self.currentWaypointIndex]
-        local action = waypoint.Action
-        if action == 0 then
-            print("moving to way point")
-            self.humanoid.WalkToPoint = (waypoint.Position)
-            --self:walkToGoal(waypoint.Position)
-        else
-            print("jump waypoint")
-            self.humanoid.WalkToPoint = (waypoint.Position)
-            self:jump()
-        end
-        local distance = (self.model.PrimaryPart.Position - waypoint.Position).magnitude
-        if distance < 10 then
-            self.currentWaypointIndex = math.min(#self.waypoints, self.currentWaypointIndex + 1)
-        end
-    else
-        print("no waypoints rip")
-        self:walkToGoal()
-    end
-end
 
 function MovementComponent:getDistanceToGoal()
     local f = Vector3.new(1,1,1)
-    return (self.model.PrimaryPart.Position*f - self.goal*f).magnitude
-end
-
-function MovementComponent:onNewGoalSet()
-    self.walking = false
+    return (self.model.Head.Position*f - self.goal*f).magnitude
 end
 
 function MovementComponent:setGoal(goal)
-    if goal ~= self.goal then
-        self:onNewGoalSet()
-    end
     self.goal = goal
 end
 
-function MovementComponent:walkToGoal(goal)
-    if goal then
-        self.walking = false
-    end
-    if not self.walking then
-        self.walking = true
-        self.humanoid.WalkToPoint = (goal or self.goal)
-    end
+function MovementComponent:walkToGoal()
+    self.walking = true
+    self.lookAtGoal = (self.goal)
+    self.moveToGoal = (self.goal)
 end
 
 function MovementComponent:stop()
-    print("stop called no funny auth")
-    if self.walking then
-        self.walking = false
-        print("stop being called and funny auth")
-        --self.humanoid:MoveTo(self.model.PrimaryPart.Position)
-    end
+    self.walking = false
+    self.moveToGoal = nil
 end
 
 function MovementComponent:jump()
+    if not self.jumpEnd then
+        self.jumpEnd = tick()
+    end
     if tick() > self.nextJump then
-        self.humanoid.Jump = true
-        self.nextJump = tick() + 2
+        self.jumpEnd = tick() + self.jumpLength
+        self.nextJump = tick() + self.jumpDebounce
     end
 end
 
 function MovementComponent:goToGoal(dt)
     if not self.lastGoal then
         self.lastGoal = self.goal
-        self.isPathfinding = false
         self.stuckTime = 0
-    else
-        if self.goal ~= self.lastGoal then
-            self.lastGoal = self.goal
-            self.isPathfinding = false
-            self.stuckTime = 0
-        end
     end
-    if self.walking and self.isPathfinding then
-        self:pathfindToGoal()
-        return
-    end
-    if self.stuckTime > 1 and self.stuckTime < 5 then
+    if self.stuckTime > .5 then
         self:jump()
         self:walkToGoal()
-    elseif self.stuckTime >= 5 then
-        self:pathfindToGoal()
     else
         self:walkToGoal()
     end
+    self:evaluateStuckness(dt)
+end
+
+function MovementComponent:evaluateStuckness(dt)
     if self.walking then
-        if (self.model.PrimaryPart.Velocity*Vector3.new(1,0,1)).magnitude < 20 then
+        if (self.model.PrimaryPart.Velocity*Vector3.new(1,0,1)).magnitude < 10 then
             self.stuckTime = self.stuckTime + dt
         else
             self.stuckTime = 0
@@ -131,27 +63,101 @@ function MovementComponent:goToGoal(dt)
     end
 end
 
-function MovementComponent:step(dt)
+function MovementComponent:floorRay(dt)
+    local start = self.model.HumanoidRootPart.Position + (self.model.HumanoidRootPart.Velocity*dt)
+    local hit, pos, normal = CastRay(start, Vector3.new(0,-8,0), {self.model})
+
+    if hit then
+        self.lastNormal = normal
+    end
+
+    return hit
+end
+
+function MovementComponent:move(hit)
+    if self.moveToGoal then
+        print("has a move to goal")
+        self.model.HumanoidRootPart.BodyVelocity.Velocity = self.model.HumanoidRootPart.CFrame.lookVector * self.speed
+        if self.jumping and hit then
+            self.model.HumanoidRootPart.BodyVelocity.Velocity = self.model.HumanoidRootPart.BodyVelocity.Velocity + Vector3.new(0,3000,0)
+        end
+    else
+        print("does not have a move to goal")
+        self.model.HumanoidRootPart.BodyVelocity.Velocity = Vector3.new()
+    end
+end
+
+function MovementComponent:checkIfShouldBeMoving(dt)
     if self.goal then
         local distance = self:getDistanceToGoal()
-        if distance > 10 then
+        if distance > self.closenessThreshold then
             self:goToGoal(dt)
         else
             self:stop()
             self.stuckTime = 0
-            self.isPathfinding = false
         end
+    else
+        self:stop()
     end
 end
 
-function MovementComponent:init(model)
+function MovementComponent:alignToNormal()
+    local goalGyroCF =  self.model.HumanoidRootPart.BodyGyro.CFrame
+
+    if self.lookAtGoal then
+        goalGyroCF = CFrame.new(self.model.HumanoidRootPart.Position*Vector3.new(1,0,1), self.lookAtGoal*Vector3.new(1,0,1))
+    end
+
+    if self.lastNormal and self.lookAtGoal then
+
+        local goalOffset = (self.lookAtGoal*Vector3.new(1,0,1)) - (self.model.HumanoidRootPart.Position*Vector3.new(1,0,1))
+        local yGoal = math.atan2(goalOffset.Z, -goalOffset.X) + math.pi / 2
+
+        local normal = self.lastNormal
+        local lookVector = Vector3.new(0, 0, -1)
+        local rightVector = Vector3.new(1, 0, 0)
+
+        local tilt = math.asin(lookVector:Dot(normal))
+        local roll = math.asin(rightVector:Dot(normal))
+        local floorCF = CFrame.Angles(-tilt, 0, -roll)
+
+        goalGyroCF = CFrame.new(self.model.HumanoidRootPart.Position) * floorCF * CFrame.Angles(0, yGoal, 0)
+
+    end
+
+    self.model.HumanoidRootPart.BodyGyro.CFrame = goalGyroCF
+end
+
+function MovementComponent:handleJumpForces()
+    if self.jumpEnd and tick() < self.jumpEnd then
+        self.maxYVelocity = 1000000
+        self.jumping = true
+    else
+        self.jumping = false
+        self.maxYVelocity = 0
+    end
+
+    self.model.HumanoidRootPart.BodyVelocity.MaxForce = Vector3.new(1000000,self.maxYVelocity or 0,1000000)
+end
+
+function MovementComponent:step(dt)
+    local hit = self:floorRay(dt)
+
+    self:alignToNormal()
+
+    self:handleJumpForces()
+
+    self:move(hit)
+
+    self:checkIfShouldBeMoving(dt)
+end
+
+function MovementComponent:init(model, movementProperties)
     self.model = model
-    self.humanoid = model.Humanoid
-    self.path = PathfindingService:CreatePath({
-        AgentHeight = 7,
-        AgentRadius = 7,
-        CanJump = true
-    })
+    self.speed = movementProperties.speed
+    self.jumpDebounce = movementProperties.jumpDebounce
+    self.closenessThreshold = movementProperties.closenessThreshold
+    self.jumpLength = movementProperties.jumpLength
 end
 
 function MovementComponent.new()

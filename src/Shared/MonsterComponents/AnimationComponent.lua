@@ -4,19 +4,24 @@ local AnimationComponent = {}
 
 AnimationComponent.__index = AnimationComponent
 
-function AnimationComponent:playTrack(trackName)
+function AnimationComponent:playTrack(trackName, speed, weight)
     if not self.tracks[trackName].IsPlaying then
-        self.tracks[trackName]:Play()
+        self.tracks[trackName]:Play(.25)
+    end
+    if speed then
+        self.tracks[trackName]:AdjustSpeed(speed)
+    end
+    if weight then
+        self.tracks[trackName]:AdjustWeight(weight)
     end
 end
 
 function AnimationComponent:stopTrack(trackName)
-    self.tracks[trackName]:Stop(.5)
+    self.tracks[trackName]:Stop(.25)
 end
 
 function AnimationComponent:init(model, animations)
     self.model = model
-    self.humanoid = model.Humanoid
     self.animationInstances = {}
     self.tracks = {}
     for animationName, id in pairs(animations) do
@@ -24,16 +29,9 @@ function AnimationComponent:init(model, animations)
         instance.Name = animationName
         instance.AnimationId = id
         self.animationInstances[animationName] = instance
-        self.tracks[animationName] = self.humanoid:LoadAnimation(instance)
+        self.tracks[animationName] = self.model.AnimationController:LoadAnimation(instance)
     end
     self:playTrack("Idle")
-    self.humanoid.Running:connect(function(speed)
-        if speed > 1 then
-            self:playTrack("Walking")
-        else
-            self:stopTrack("Walking")
-        end
-    end)
 end
 
 function AnimationComponent.new()

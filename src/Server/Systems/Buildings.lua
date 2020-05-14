@@ -91,6 +91,11 @@ function Buildings:start()
                 v.Parent = workspace.Buildings
             end
             folder:Destroy()
+            for _, v in pairs(game.Players:GetPlayers()) do
+                if v.Character then
+                    v.Character:MoveTo(workspace:FindFirstChild("Altar", true).Base.Position)
+                end
+            end
         end
     end)
     spawn(function()

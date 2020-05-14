@@ -19,17 +19,17 @@ end
 function IdleComponent:getIdlePosition()
     if tick() > self.nextIdleMovement then
         self.nextIdleMovement = tick() + self:getIdleMoveDuration()
-        self.idlePosition = workspace.Wheatlies.Head.Position--self.spawnPosition + self:getIdleOffset()
+        self.idlePosition = self.spawnPosition + self:getIdleOffset()
         local hit, pos = CastRay(self.idlePosition, Vector3.new(0,-100,0))
         self.idlePosition = pos
     end
-    local debugPart = Instance.new("Part", workspace)
+    --[[local debugPart = Instance.new("Part", workspace)
     CollectionService:AddTag(debugPart, "RayIgnore")
     debugPart.CanCollide = false
     debugPart.Color = Color3.new(0,0,1)
     debugPart.Anchored = true
     debugPart.CFrame = CFrame.new(self.idlePosition)
-    debugPart.Size = Vector3.new(1,1,1)
+    debugPart.Size = Vector3.new(1,1,1)--]]
     return self.idlePosition
 end
 

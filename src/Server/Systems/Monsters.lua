@@ -21,7 +21,7 @@ local Monsters = {}
 
 function Monsters:start()
     repeat wait() until workspace:FindFirstChild("Wheatlies")
-    wait(1)
+    wait(10)
     local monster = game.ServerStorage.Monsters.Lizard:Clone()
     monster.Parent = workspace
     monster.PrimaryPart.CFrame = CFrame.new(workspace.Wheatlies.Head.Position)
