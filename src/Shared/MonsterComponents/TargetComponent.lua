@@ -92,7 +92,7 @@ function TargetComponent:step()
     if item and self:getCanSeePosition(item.PrimaryPart.Position) then
         self.state.lastValidTarget = item
     end
-    if self.state.lastValidTarget and self.state.lastValidTarget.PrimaryPart then
+    if self.state.lastValidTarget and self.state.lastValidTarget.PrimaryPart and self.state.lastValidTarget.Parent ~= nil then
         self.state.lastValidTargetPosition = self.state.lastValidTarget.PrimaryPart.Position
         self.state.distanceFromTarget = (self.state.lastValidTargetPosition - self.position).magnitude
         self.isTargetVisible = self:getCanSeePosition(self.state.lastValidTargetPosition)

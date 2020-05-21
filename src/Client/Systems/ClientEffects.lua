@@ -47,6 +47,13 @@ function ClientEffects:start()
 		end)
 	end)
 
+	Messages:hook("CharacterAddedClient", function(character)
+		FastSpawn(function()
+			wait(.2)
+			camShake:Shake(CameraShaker.Presets["Earthquake"])
+		end)
+    end)
+
 	game:GetService("RunService").RenderStepped:connect(oceanEffect)
 end
 

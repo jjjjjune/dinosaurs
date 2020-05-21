@@ -29,7 +29,7 @@ local loadOrder = {
 }
 
 local ui = {
-	"Client/Ui/TopbarPlus",
+	--"Client/Ui/TopbarPlus",
 	"Client/Ui/Button",
 	"Client/Ui/Tooltips",
 	--"Client/Ui/SeasonBar",

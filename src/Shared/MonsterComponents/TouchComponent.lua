@@ -22,7 +22,6 @@ end
 
 function TouchComponent:onHitboxContact(part)
     if CollectionService:HasTag(part.Parent, "Spiky") then
-        print("touched spikey")
         if tick() - self.lastContact > HIT_DEBOUNCE then
             self:onHitSpikyThing(part)
             self.lastContact = tick()
@@ -37,7 +36,6 @@ function TouchComponent:init(model)
     self.model = model
     self.lastContact = tick()
     model.Hitbox.Touched:connect(function(hit)
-        print("was touched")
         self:onHitboxContact(hit)
     end)
 end

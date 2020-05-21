@@ -64,6 +64,9 @@ end
 
 function LizardAttackComponent:attackIsStillValid()
     local distance = self.targetComponent.state.distanceFromTarget
+    if not self.attackTarget.Parent then
+        return false
+    end
     return not (self.attackTarget.Parent:FindFirstChild("Humanoid")) and distance <= self.attackDistance
 end
 

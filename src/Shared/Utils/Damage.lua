@@ -20,7 +20,6 @@ return function(target, damageInfo)
     if player and not damageInfo.serverApplication then
         Messages:reproOnClients(player, "PlayDamageEffect", target, damageInfo.type)
     else
-        print("playing dmaage effect")
         Messages:sendAllClients("PlayDamageEffect", target, damageInfo.type)
     end
 
