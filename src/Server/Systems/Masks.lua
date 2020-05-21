@@ -12,8 +12,8 @@ local function spawnEffectPlayed(player, character)
         weldConstraint.Part0 = mask.PrimaryPart
         weldConstraint.Part1 = head
         mask.Parent = character
-        Messages:send("PlaySound", "Smoke", mask.PrimaryPart.Position)
-        Messages:send("PlayParticle", "DeathSmoke",  10, mask.PrimaryPart.Position)
+        Messages:send("PlaySound", "AppearSmoke", mask.PrimaryPart.Position)
+        Messages:send("PlayParticle", "AppearSmoke",  10, mask.PrimaryPart.Position)
         Messages:send("MaskAdded",player, character)
     end)
 end

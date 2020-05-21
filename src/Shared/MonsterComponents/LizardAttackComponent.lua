@@ -90,7 +90,7 @@ function LizardAttackComponent:stepAttack()
         else
             local maxTime = .25
             local timeUntilEnd = (self.attackEnd - tick())/maxTime
-            self.rope.Length = self.maxRopeLength*timeUntilEnd
+            self.rope.Length = math.max(1, self.maxRopeLength*timeUntilEnd)
         end
     else
         Messages:send("PlaySound", "Lick"..math.random(1,4).."", self.model.Head.Position)
@@ -126,7 +126,7 @@ function LizardAttackComponent:init(model, properties)
     self.damage = properties.damage
     self.rope = self.model.TongueStart.RopeConstraint
     self.rope.Length = 0
-    self.nextAttack = tick() + 8
+    self.nextAttack = tick() + properties.spawnAttackDebounce
 end
 
 function LizardAttackComponent.new()

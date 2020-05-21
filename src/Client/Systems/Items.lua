@@ -79,7 +79,7 @@ local function attemptThrowItem() -- the fact that this is for both normal items
             possibleItem.Parent = workspace
             if not CollectionService:HasTag(possibleItem, "Building") then 
                 possibleItem.PrimaryPart.CFrame = character.HumanoidRootPart.CFrame * CFrame.new(0,0,-4)
-                possibleItem.PrimaryPart.Velocity = character.HumanoidRootPart.Velocity * 2.5
+                possibleItem.PrimaryPart.Velocity = character.HumanoidRootPart.Velocity * 1
             else
                 for _, v in pairs(possibleItem:GetDescendants()) do
                     if v:IsA("BasePart") then

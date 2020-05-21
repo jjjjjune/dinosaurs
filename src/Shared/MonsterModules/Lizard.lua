@@ -64,7 +64,8 @@ function Lizard:init(model)
         damage = 15,
         damageType = "poison",
         reloadTime = 4,
-        chargeTime = 2
+        chargeTime = 2,
+        spawnAttackDebounce = 4,
     })
 
     self.touchComponent = TouchComponent.new()

@@ -4,15 +4,18 @@ local FastSpawn = import "Shared/Utils/FastSpawn"
 local CastRay = import "Shared/Utils/CastRay"
 local CollectionService = game:GetService("CollectionService")
 
+local GetCharacterPosition = import "Shared/Utils/GetCharacterPosition"
+
 local FootstepsFolder = import "ReplicatedStorage/Footsteps"
 
 local RunService = game:GetService("RunService")
 
+local FOOTSTEP_RADIUS = 300
 local FOOT_STEP_DISTANCE = 5
 local soundDebounce = .2
 local lastSound = time()
-local oldBind
-local hum, rFoot, lFoot, lastLeftPosition, lastRightPosition
+
+local footstepConnections = {}
 
 local materialTypes = {
     "sand","snow","planks","metal", "ice","grass","floor","carpet","dirt", "basic","stone","wood", "hi"
@@ -62,7 +65,7 @@ local function getMaterial(part)
     return material
 end
 
-local function onFootstep(part, foot, resultPosition)
+local function onFootstep(part, foot, resultPosition, normal)
     if time() - lastSound < soundDebounce then
         return
     else
@@ -81,6 +84,8 @@ local function onFootstep(part, foot, resultPosition)
         footstepPart.Anchored = true
         footstepPart.CanCollide = false
         footstepPart.CFrame = CFrame.new(resultPosition) * CFrame.new(0, (-(footstepPart.Size.X/2)) + .01,0) * CFrame.Angles(0,0,math.pi/2)
+        footstepPart.CFrame = CFrame.new(footstepPart.Position, footstepPart.Position + normal)
+        footstepPart.CFrame = footstepPart.CFrame * CFrame.Angles(0,math.pi/2,0)
         footstepPart.Color = Color3.new(part.Color.r * .9, part.Color.g * .9, part.Color.b * .9)
         footstepPart.Material = Enum.Material.SmoothPlastic
         local x = Instance.new("SpecialMesh", footstepPart)
@@ -91,40 +96,72 @@ local function onFootstep(part, foot, resultPosition)
     end
 end
 
-local function onFrameChange()
-    local rayDir = Vector3.new(0,-2.5,0)
-    local didHitLeft, currentLeftPosition = CastRay(lFoot.Position + Vector3.new(0,1.5,0), rayDir, {hum.Parent})
-    local didHitRight, currentRightPosition = CastRay(rFoot.Position+ Vector3.new(0,1.5,0), rayDir, {hum.Parent})
+local function onFrameChange(character, rFoot, lFoot, lastLeftPosition, lastRightPosition)
+    local rayDir = Vector3.new(0,math.max(lFoot.Size.Y, 2.5) * - 1,0)
+    local didHitLeft, currentLeftPosition, normal2 = CastRay(lFoot.Position + Vector3.new(0,1.5,0), rayDir, {character})
+    local didHitRight, currentRightPosition, normal = CastRay(rFoot.Position+ Vector3.new(0,1.5,0), rayDir, {character})
     if didHitLeft then
         if ((currentLeftPosition) - lastLeftPosition).magnitude > FOOT_STEP_DISTANCE then
-            onFootstep(didHitLeft, lFoot, currentLeftPosition)
+            onFootstep(didHitLeft, lFoot, currentLeftPosition, normal)
             lastLeftPosition = currentLeftPosition
         end
     end
     if didHitRight then
         if (currentRightPosition - lastRightPosition).magnitude > FOOT_STEP_DISTANCE then
-            onFootstep(didHitRight, rFoot, currentRightPosition)
+            onFootstep(didHitRight, rFoot, currentRightPosition, normal2)
             lastRightPosition = currentRightPosition
         end
     end
+
+    return lastLeftPosition, lastRightPosition
 end
 
 local function bindFootsteps(character)
-    if oldBind then
-        oldBind:disconnect()
-        oldBind = nil
-    end
-    FastSpawn(function()
-        hum = character:WaitForChild("Humanoid")
+    local rFoot, lFoot
+    if character:FindFirstChild("Humanoid") then
         rFoot = character:WaitForChild("RightFoot")
         lFoot = character:WaitForChild("LeftFoot")
-        lastLeftPosition = Vector3.new()
-        lastRightPosition = Vector3.new()
+    else
+        rFoot = character:WaitForChild("BackLeft")
+        lFoot = character:WaitForChild("BackRight")
+    end
+    local lastLeftPosition = Vector3.new()
+    local lastRightPosition = Vector3.new()
 
-        oldBind = RunService.Stepped:connect(function(dt)
-            onFrameChange()
-        end)
+    local bind = RunService.Stepped:connect(function(dt)
+        lastLeftPosition, lastRightPosition = onFrameChange(character, rFoot, lFoot, lastLeftPosition, lastRightPosition)
     end)
+
+    return bind
+end
+
+local function handleFootsteps()
+    local position = GetCharacterPosition()
+    for instance, connection in pairs(footstepConnections) do
+        if instance.Parent == nil then
+            print("unbinding steps nil")
+            connection:disconnect()
+            footstepConnections[instance] = nil
+        else
+            local pos = instance.PrimaryPart and instance.PrimaryPart.Position
+            if (pos and position) and (pos - position).magnitude < FOOTSTEP_RADIUS then
+
+            else
+                print("unbinding steps")
+                connection:disconnect()
+                footstepConnections[instance] = nil
+            end
+        end
+    end
+    for _, animal in pairs(CollectionService:GetTagged("Animal")) do
+        if not footstepConnections[animal] then
+            local pos = animal.PrimaryPart and animal.PrimaryPart.Position
+            if (pos and position) and (pos - position).magnitude < FOOTSTEP_RADIUS then
+                print("binding animal footsteps")
+                footstepConnections[animal] = bindFootsteps(animal)
+            end
+        end
+    end
 end
 
 local Footsteps = {}
@@ -132,10 +169,16 @@ local Footsteps = {}
 function Footsteps:start()
     FastSpawn(function()
         initializeMaterialToSoundMap()
+        while wait(5) do
+            handleFootsteps()
+        end
     end)
     Messages:hook("CharacterAddedClient", function(character)
-        bindFootsteps(character)
+        footstepConnections[character] = bindFootsteps(character)
         character:WaitForChild("HumanoidRootPart"):WaitForChild("Running"):Destroy()
+    end)
+    Messages:hook("PlayerDied", function ()
+        handleFootsteps()
     end)
 end
 
