@@ -23,12 +23,11 @@ function Monsters:start()
     repeat wait() until workspace:FindFirstChild("Wheatlies")
     wait(10)
     local monster = game.ServerStorage.Monsters.Lizard:Clone()
+    
+    monster.PrimaryPart.CFrame = CFrame.new(workspace.Wheatlies.Head.Position + Vector3.new(0,20,0))
     monster.Parent = workspace
-    monster.PrimaryPart.CFrame = CFrame.new(workspace.Wheatlies.Head.Position)
     local component = getComponent(monster).new()
     component:init(monster)
-    PhysicsService:SetPartCollisionGroup(monster.Torso, "MonsterGroup")
-    PhysicsService:SetPartCollisionGroup(monster.Head, "MonsterGroup")
 end
 
 return Monsters

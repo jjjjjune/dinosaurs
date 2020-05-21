@@ -17,7 +17,9 @@ function AnimationComponent:playTrack(trackName, speed, weight)
 end
 
 function AnimationComponent:stopTrack(trackName)
-    self.tracks[trackName]:Stop(.25)
+    if self.tracks[trackName].IsPlaying then
+        self.tracks[trackName]:Stop(.25)
+    end
 end
 
 function AnimationComponent:init(model, animations)

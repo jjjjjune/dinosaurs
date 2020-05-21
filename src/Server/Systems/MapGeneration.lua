@@ -458,7 +458,7 @@ local function backUpMap(allTiles)
             x = tile.x,
             y = tile.y,
             z = tile.z,
-            biome = (noise > .55 and  "Desert") or "Rainforest",
+            biome = "Desert"--(noise > .55 and  "Desert") or "Rainforest",
         })
     end
     ServerData:setValue("tileMap", map)

@@ -24,7 +24,7 @@ return function(character, damageType)
         Color = DamageColors[damageType]
     }
 
-    for _, part in pairs(character:GetChildren()) do
+    for _, part in pairs(character:GetDescendants()) do
         if part:IsA("BasePart") then
             local endGoals = {
                 Color = part.Color
@@ -44,8 +44,12 @@ return function(character, damageType)
     end
 
     Messages:send("PlayParticleColor", "DamageSmoke", DamageColors[damageType], 8, character.Head.Position)
-    Messages:send("PlaySoundOnClient",{
-        instance = game.ReplicatedStorage.Sounds.DamagedSDS,
-        part = character.Head,
-    })
+    if game:GetService("RunService"):IsClient() then 
+        Messages:send("PlaySoundOnClient",{
+            instance = game.ReplicatedStorage.Sounds.DamagedSDS,
+            part = character.Head,
+        })
+    else
+        Messages:send("PlaySound", "DamagedSDS", character.Head.Position)
+    end
 end

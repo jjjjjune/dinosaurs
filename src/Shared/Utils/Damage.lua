@@ -3,7 +3,11 @@ local Messages = import "Shared/Utils/Messages"
 
 return function(target, damageInfo)
 
-    target.Humanoid.Health = target.Humanoid.Health - damageInfo.damage
+    if target:FindFirstChild("Humanoid") then
+        target.Humanoid.Health = target.Humanoid.Health - damageInfo.damage
+    else
+        target.Health.Value = target.Health.Value - damageInfo.damage
+    end
 
     if damageInfo.damage < 0 then
         damageInfo.type = "heal"
@@ -16,6 +20,7 @@ return function(target, damageInfo)
     if player and not damageInfo.serverApplication then
         Messages:reproOnClients(player, "PlayDamageEffect", target, damageInfo.type)
     else
+        print("playing dmaage effect")
         Messages:sendAllClients("PlayDamageEffect", target, damageInfo.type)
     end
 

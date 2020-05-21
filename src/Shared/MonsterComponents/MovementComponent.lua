@@ -76,13 +76,11 @@ end
 
 function MovementComponent:move(hit)
     if self.moveToGoal then
-        print("has a move to goal")
         self.model.HumanoidRootPart.BodyVelocity.Velocity = self.model.HumanoidRootPart.CFrame.lookVector * self.speed
         if self.jumping and hit then
-            self.model.HumanoidRootPart.BodyVelocity.Velocity = self.model.HumanoidRootPart.BodyVelocity.Velocity + Vector3.new(0,3000,0)
+            self.model.HumanoidRootPart.BodyVelocity.Velocity = self.model.HumanoidRootPart.BodyVelocity.Velocity + Vector3.new(0,4000,0)
         end
     else
-        print("does not have a move to goal")
         self.model.HumanoidRootPart.BodyVelocity.Velocity = Vector3.new()
     end
 end

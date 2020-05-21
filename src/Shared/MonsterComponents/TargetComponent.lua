@@ -28,6 +28,24 @@ local function getClosestItemOfName(position, name)
     return closestItem
 end
 
+local function getClosestCharacter(position)
+    local closestDistance = MIN_FIND_DISTANCE
+    local closestItem
+    for _, character in pairs(CollectionService:GetTagged("Character")) do
+        if character.Humanoid.Health > 0 then 
+            local itemPos = character.PrimaryPart and character.PrimaryPart.Position
+            if itemPos then
+                local dist = (position - itemPos).magnitude
+                if (dist < closestDistance) then
+                    closestDistance = dist
+                    closestItem = character
+                end
+            end
+        end
+    end
+    return closestItem
+end
+
 
 local TargetComponent = {}
 
@@ -64,14 +82,14 @@ function TargetComponent:getCanSeePosition(position)
 end
 
 function TargetComponent:getTarget()
-    return self.state.lastValidTarget
+    return ((self.state.lastValidTarget and self.state.lastValidTarget.Parent ~= nil) and self.state.lastValidTarget) or nil
 end
 
 function TargetComponent:step()
     self.position = (self.model.PrimaryPart and self.model.PrimaryPart.Position) or Vector3.new()
     local wantedItem = self.wantedItems[1]
-    local item = getClosestItemOfName(self.position, wantedItem)
-    if item then
+    local item = getClosestCharacter(self.position)--getClosestItemOfName(self.position, wantedItem)
+    if item and self:getCanSeePosition(item.PrimaryPart.Position) then
         self.state.lastValidTarget = item
     end
     if self.state.lastValidTarget and self.state.lastValidTarget.PrimaryPart then
@@ -84,10 +102,6 @@ function TargetComponent:step()
         self.state.isTargetVisible = false
         self.state.distanceFromTarget = 100000
     end
-
-    -- for i, v in pairs(self.state) do
-    --     print("state", i, v)
-    -- end
 end
 
 function TargetComponent:init(model)

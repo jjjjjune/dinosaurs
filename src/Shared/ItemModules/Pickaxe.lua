@@ -7,6 +7,8 @@ local CollectionService = game:GetService("CollectionService")
 
 local CastRay = import "Shared/Utils/CastRay"
 
+local Damage = import "Shared/Utils/Damage"
+
 local swings = 0
 
 local function getSwingAnimation()
@@ -40,9 +42,39 @@ local function getHitPosition(player, rock)
     return goal
 end
 
+local function chopRock(item, rock)
+    local shouldDestroy = rock:FindFirstChild("Health") and rock.Health.Value == 1
+    local pos = getHitPosition(game.Players.LocalPlayer, rock)
+    if shouldDestroy then
+        Messages:send("PlayParticle", "HitSparks", 40, pos)
+        Messages:send("PlaySoundOnClient",{
+            instance = game.ReplicatedStorage.Sounds.HitPan2,
+            part = item.PrimaryPart,
+        })
+        Messages:send("PlayDamageEffect", rock)
+        --rock.Parent = nil
+    else
+        Messages:send("PlayParticle", "HitSparks", 10, pos)
+        Messages:send("PlaySoundOnClient",{
+            instance = game.ReplicatedStorage.Sounds.HitPan,
+            part = item.PrimaryPart,
+        })
+        Messages:send("PlayDamageEffect", rock)
+    end
+end
+
 local Tool = {}
 
 Tool.debounce = .4
+
+function Tool.damageClient(victim, part)
+    Messages:send("PlayDamageEffect", victim, "normal", part)
+    Messages:sendServer("RegisterHit", victim)
+    Messages:send("PlaySoundOnClient",{
+        instance = game.ReplicatedStorage.Sounds.HitBasic,
+        part = victim.PrimaryPart
+    })
+end
 
 function Tool.clientUse(item)
     local rock = getClosestRock(game.Players.LocalPlayer)
@@ -52,25 +84,13 @@ function Tool.clientUse(item)
             part = item.PrimaryPart
         })
         if rock then
-            local shouldDestroy = rock:FindFirstChild("Health") and rock.Health.Value == 1
-            local pos = getHitPosition(game.Players.LocalPlayer, rock)
-            if shouldDestroy then
-                Messages:send("PlayParticle", "HitSparks", 40, pos)
-                Messages:send("PlaySoundOnClient",{
-                    instance = game.ReplicatedStorage.Sounds.HitPan2,
-                    part = item.PrimaryPart,
-                })
-                Messages:send("PlayDamageEffect", rock)
-                --rock.Parent = nil
-            else
-                Messages:send("PlayParticle", "HitSparks", 10, pos)
-                Messages:send("PlaySoundOnClient",{
-                    instance = game.ReplicatedStorage.Sounds.HitPan,
-                    part = item.PrimaryPart,
-                })
-                Messages:send("PlayDamageEffect", rock)
-            end
+            chopRock(item, rock)
         end
+        Messages:send("RegisterHitbox", "Default", function(part)
+            if CollectionService:HasTag(part.Parent, "Animal") then
+                Tool.damageClient(part.Parent, part)
+            end
+        end)
     end)
     Messages:send("PlayAnimationClient", getSwingAnimation())
     swings = swings + 1

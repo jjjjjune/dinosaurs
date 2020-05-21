@@ -16,6 +16,7 @@ local loadOrder = {
 	"Client/Systems/Building",
 	"Client/Systems/DamageEffects",
 	"Client/Systems/Knockback",
+	"Client/Systems/Combat",
 
 	"Client/Systems/ClientCollisions",
 
@@ -28,6 +29,7 @@ local loadOrder = {
 }
 
 local ui = {
+	"Client/Ui/TopbarPlus",
 	"Client/Ui/Button",
 	"Client/Ui/Tooltips",
 	--"Client/Ui/SeasonBar",
