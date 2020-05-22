@@ -52,15 +52,15 @@ function Lizard:init(model)
     self.idleComponent:init(self.model)
 
     self.targetComponent = TargetComponent.new()
-    self.targetComponent.wantedItems = {"Log"}
-    self.targetComponent.wantedEnemyTags = {}
+    self.targetComponent.wantItem = "Banana"
+    self.targetComponent.wantedEnemyTags = {"Character"}
     self.targetComponent:init(self.model)
 
     self.attackComponent = LizardAttackComponent.new()
     self.attackComponent:init(self.model, {
         animationComponent = self.animationComponent,
         targetComponent = self.targetComponent,
-        attackDistance = 35,
+        attackDistance = 45,
         damage = 15,
         damageType = "poison",
         reloadTime = 4,

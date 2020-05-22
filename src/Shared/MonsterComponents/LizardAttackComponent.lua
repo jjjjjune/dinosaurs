@@ -6,13 +6,15 @@ local Messages = import "Shared/Utils/Messages"
 
 local Damage = import "Shared/Utils/Damage"
 
+local CastRay = import "Shared/Utils/CastRay"
+
 local LizardAttackComponent = {}
 
 LizardAttackComponent.__index = LizardAttackComponent
 
 function LizardAttackComponent:doDamage(target)
     if CollectionService:HasTag(target, "Item") then
-        self.attackTarget:Destroy()
+        Messages:send("PlayParticle", "PinkWater", 15, target.PrimaryPart.Position)
     else
         Damage(target, {damage = self.damage, type = self.damageType, serverApplication = true})
         --Messages:send("Knockback", target, self.model.PrimaryPart.CFrame.lookVector * 100)
@@ -30,19 +32,52 @@ function LizardAttackComponent:initializeAttack(target)
     self.chargeEnd = tick() + self.chargeTime
     self.attackEnd = self.chargeEnd + .25
     self.attackTarget = target
+    self.model.Head.Hiss.PlaybackSpeed = 1 + math.random(0,20)/100
     self.model.Head.Hiss:Play()
 end
 
 function LizardAttackComponent:attack(target)
     --Messages:send("PlayParticle", "Water", 10, self.model.TongueStart.Position)
+    local dir = (CFrame.new(self.model.Head.Position, self.attackTarget.PrimaryPart.Position).lookVector) * self.attackDistance
+    local hit, pos = CastRay(self.model.Head.Position, dir, {self.model})
+    if hit and hit:IsDescendantOf(self.attackTarget) then
+        self.attackFailed = false
+    else
+        self.attackFailed = true
+    end
     local len = (target.PrimaryPart.Position - self.model.TongueStart.Position).magnitude
     self.maxRopeLength = len
     self.rope.Length = len
     self.model.TongueEnd.CFrame = target.PrimaryPart.CFrame
-    self.tongueWeld = Instance.new("WeldConstraint", self.model.TongueEnd)
-    self.tongueWeld.Part0 = self.model.TongueEnd
-    self.tongueWeld.Part1 = target.PrimaryPart
+    if not self.attackFailed then
+        --[[if not target:FindFirstChild("Humanoid") then
+            self.tongueWeld = Instance.new("WeldConstraint", self.model.TongueEnd)
+            self.tongueWeld.Part0 = self.model.TongueEnd
+            self.tongueWeld.Part1 = target.PrimaryPart
+        else--]]
+            self.tongueWeld = Instance.new("SpringConstraint", self.model.TongueEnd)
+            self.springAttach1= Instance.new("Attachment", self.model.TongueEnd)
+            self.springAttach2 = Instance.new("Attachment", target.PrimaryPart)
+            self.tongueWeld.FreeLength = 1
+            self.tongueWeld.LimitsEnabled = true
+            if target:FindFirstChild("Humanoid") then
+                self.tongueWeld.MaxLength = 14
+            else
+                self.tongueWeld.MaxLength = 2
+            end
+            self.tongueWeld.Attachment0 = self.springAttach1
+            self.tongueWeld.Attachment1 = self.springAttach2
+        --end
+        self:doDamage(self.attackTarget)
+    end
     Messages:send("PlaySound", "PaintballFireLight", self.model.Head.Position)
+end
+
+function LizardAttackComponent:onFinishedEating(target)
+    Messages:send("PlaySound", "Lick"..math.random(1,4).."", self.model.Head.Position)
+    if CollectionService:HasTag(target, "Item") then
+        target:Destroy()
+    end
 end
 
 function LizardAttackComponent:stopAttack(didComplete)
@@ -50,8 +85,14 @@ function LizardAttackComponent:stopAttack(didComplete)
     if self.tongueWeld then
         self.tongueWeld:Destroy()
     end
-    if didComplete then
-        self:doDamage(self.attackTarget)
+    if self.springAttach1 then
+        self.springAttach1:Destroy()
+        self.springAttach2:Destroy()
+        self.springAttach1 = nil
+        self.springAttach2 = nil
+    end
+    if didComplete and (not self.attackFailed) then
+        self:onFinishedEating(self.attackTarget)
         self.attackTarget = nil
     else
         self.attackTarget = nil
@@ -65,6 +106,10 @@ end
 function LizardAttackComponent:attackIsStillValid()
     local distance = self.targetComponent.state.distanceFromTarget
     if not self.attackTarget.Parent then
+        return false
+    end
+    if self.cancelAttack then
+        self.cancelAttack = nil
         return false
     end
     return not (self.attackTarget.Parent:FindFirstChild("Humanoid")) and distance <= self.attackDistance
@@ -93,7 +138,6 @@ function LizardAttackComponent:stepAttack()
             self.rope.Length = math.max(1, self.maxRopeLength*timeUntilEnd)
         end
     else
-        Messages:send("PlaySound", "Lick"..math.random(1,4).."", self.model.Head.Position)
         self:stopAttack(true)
     end
 end

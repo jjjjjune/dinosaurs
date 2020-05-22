@@ -28,11 +28,18 @@ local function getClosestItemOfName(position, name)
     return closestItem
 end
 
-local function getClosestCharacter(position)
+local function getClosestEnemyOfSet(position, set)
     local closestDistance = MIN_FIND_DISTANCE
     local closestItem
-    for _, character in pairs(CollectionService:GetTagged("Character")) do
-        if character.Humanoid.Health > 0 then 
+    for _, character in pairs(set) do
+        local isValid do
+            if CollectionService:HasTag(character, "Character") then
+                isValid = character.Humanoid.Health > 0
+            else
+                isValid = not CollectionService:HasTag(character, "Corpse")
+            end
+        end
+        if isValid then 
             local itemPos = character.PrimaryPart and character.PrimaryPart.Position
             if itemPos then
                 local dist = (position - itemPos).magnitude
@@ -85,10 +92,24 @@ function TargetComponent:getTarget()
     return ((self.state.lastValidTarget and self.state.lastValidTarget.Parent ~= nil) and self.state.lastValidTarget) or nil
 end
 
+function TargetComponent:getValidEnemy()
+    local allEnemies = {}
+    for _, enemyTag in pairs(self.wantedEnemyTags) do
+        for _, enemy in pairs(CollectionService:GetTagged(enemyTag)) do
+            if enemy ~= self.model then
+                table.insert(allEnemies, enemy)
+            end
+        end
+    end
+    return getClosestEnemyOfSet(self.position, allEnemies)
+end
+
 function TargetComponent:step()
     self.position = (self.model.PrimaryPart and self.model.PrimaryPart.Position) or Vector3.new()
-    local wantedItem = self.wantedItems[1]
-    local item = getClosestCharacter(self.position)--getClosestItemOfName(self.position, wantedItem)
+    local wantedItem = self.wantItem
+    local item do
+        item = getClosestItemOfName(self.position, wantedItem) or self:getValidEnemy()
+    end
     if item and self:getCanSeePosition(item.PrimaryPart.Position) then
         self.state.lastValidTarget = item
     end

@@ -78,7 +78,7 @@ function MovementComponent:move(hit)
     if self.moveToGoal then
         self.model.HumanoidRootPart.BodyVelocity.Velocity = self.model.HumanoidRootPart.CFrame.lookVector * self.speed
         if self.jumping and hit then
-            self.model.HumanoidRootPart.BodyVelocity.Velocity = self.model.HumanoidRootPart.BodyVelocity.Velocity + Vector3.new(0,4000,0)
+            self.model.HumanoidRootPart.BodyVelocity.Velocity = self.model.HumanoidRootPart.BodyVelocity.Velocity + Vector3.new(0,2000,0)
         end
     else
         self.model.HumanoidRootPart.BodyVelocity.Velocity = Vector3.new()

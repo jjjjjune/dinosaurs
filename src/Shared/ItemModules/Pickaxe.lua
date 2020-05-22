@@ -5,9 +5,9 @@ local import = require(game.ReplicatedStorage.Shared.Import)
 local Messages = import "Shared/Utils/Messages"
 local CollectionService = game:GetService("CollectionService")
 
-local CastRay = import "Shared/Utils/CastRay"
+local GetCharacter = import "Shared/Utils/GetCharacter"
 
-local Damage = import "Shared/Utils/Damage"
+local CastRay = import "Shared/Utils/CastRay"
 
 local swings = 0
 
@@ -65,11 +65,15 @@ end
 
 local Tool = {}
 
-Tool.debounce = .4
+Tool.debounce = .5
+
+Tool.damageType = "normal"
+
+Tool.damage = 10
 
 function Tool.damageClient(victim, part)
     Messages:send("PlayDamageEffect", victim, "normal", part)
-    Messages:sendServer("RegisterHit", victim)
+    Messages:sendServer("RegisterHit", victim, GetCharacter().PrimaryPart.CFrame.lookVector * 100)
     Messages:send("PlaySoundOnClient",{
         instance = game.ReplicatedStorage.Sounds.HitBasic,
         part = victim.PrimaryPart
