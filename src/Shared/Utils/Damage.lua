@@ -6,6 +6,9 @@ return function(target, damageInfo)
     if target:FindFirstChild("Humanoid") then
         target.Humanoid.Health = target.Humanoid.Health - damageInfo.damage
     else
+        if target.Health.Value == 0 then -- trigger changed event trolololololollo
+            target.Health.Value = 1
+        end
         target.Health.Value = target.Health.Value - damageInfo.damage
     end
 

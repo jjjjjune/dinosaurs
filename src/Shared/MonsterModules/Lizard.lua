@@ -45,7 +45,8 @@ function Lizard:init(model)
         ChargeAttack = "rbxassetid://5009187418",
         Falling = "rbxassetid://5009163593",
         Idle = "rbxassetid://5009118786",
-        Speak = "rbxassetid://5037809602"
+        Speak = "rbxassetid://5037809602",
+        Dead = "rbxassetid://5079811280"
     })
 
     self.idleComponent = IdleComponent.new()
@@ -54,7 +55,9 @@ function Lizard:init(model)
     self.targetComponent = TargetComponent.new()
     self.targetComponent.wantItem = "Banana"
     self.targetComponent.wantedEnemyTags = {"Character"}
-    self.targetComponent:init(self.model)
+    self.targetComponent:init(self.model, {
+        giveUpTargetTime = 10,
+    })
 
     self.attackComponent = LizardAttackComponent.new()
     self.attackComponent:init(self.model, {
@@ -153,20 +156,30 @@ function Lizard:makeDropItems()
     for _, itemName in pairs(itemsToMake) do
         local newPos = self.model.PrimaryPart.Position + Vector3.new(random(-5,5), 0, random(-5,5))
         Items.createItem(itemName, newPos)
-        Messages:send("PlayParticle", "DeathSmoke",  20, newPos)
+        Messages:send("PlayParticle", "DeathSmoke",  10, newPos)
     end
 end
 
 function Lizard:die()
 
+    print("call die")
+
     self.mainThread:disconnect()
 
-    Messages:send("CreateMonsterCorpse", self.model)
+    if not self.isDead then
+        self.isDead = true
+        self.model.Torso.TextureID = "rbxassetid://5079825969"
+        self.animationComponent:stopTrack("Idle")
+        self.animationComponent:playTrack("Dead")
+        self.model.Head.RotVelocity = Vector3.new(math.random(), math.random(), math.random())*10
+        self.model.HumanoidRootPart.BodyGyro:Destroy()
+        self.model.HumanoidRootPart.BodyVelocity:Destroy()
+        self.model.Torso.CanCollide = true
+    else
+        self:makeDropItems()
 
-    self:makeDropItems()
-
-    self.model:Destroy()
-
+        self.model:Destroy()
+    end
 end
 
 function Lizard.new()

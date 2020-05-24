@@ -67,7 +67,8 @@ function LizardAttackComponent:attack(target)
     Messages:send("PlaySound", "PaintballFireLight", self.model.Head.Position)
 end
 
-function LizardAttackComponent:onDamaged() 
+function LizardAttackComponent:onDamaged()
+    self.nextCharge = tick() + .25
     self.cancelAttack = true
 end
 

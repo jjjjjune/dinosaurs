@@ -89,7 +89,9 @@ function TargetComponent:getCanSeePosition(position)
 end
 
 function TargetComponent:getTarget()
-    return ((self.state.lastValidTarget and self.state.lastValidTarget.Parent ~= nil) and self.state.lastValidTarget) or nil
+    local condition1 = (self.state.lastValidTarget and self.state.lastValidTarget.Parent ~= nil)
+    local condition2 = (self.state.cantSeeTargetCounter or 0) < self.giveUpTargetTime
+    return condition1 and condition2 and self.state.lastValidTarget
 end
 
 function TargetComponent:getValidEnemy()
@@ -104,29 +106,40 @@ function TargetComponent:getValidEnemy()
     return getClosestEnemyOfSet(self.position, allEnemies)
 end
 
-function TargetComponent:step()
+function TargetComponent:step(dt)
     self.position = (self.model.PrimaryPart and self.model.PrimaryPart.Position) or Vector3.new()
     local wantedItem = self.wantItem
     local item do
         item = getClosestItemOfName(self.position, wantedItem) or self:getValidEnemy()
     end
     if item and self:getCanSeePosition(item.PrimaryPart.Position) then
+        self.state.cantSeeTargetCounter = nil
         self.state.lastValidTarget = item
     end
     if self.state.lastValidTarget and self.state.lastValidTarget.PrimaryPart and self.state.lastValidTarget.Parent ~= nil then
         self.state.lastValidTargetPosition = self.state.lastValidTarget.PrimaryPart.Position
         self.state.distanceFromTarget = (self.state.lastValidTargetPosition - self.position).magnitude
-        self.isTargetVisible = self:getCanSeePosition(self.state.lastValidTargetPosition)
+        self.state.isTargetVisible = self:getCanSeePosition(self.state.lastValidTargetPosition)
     else
         self.state.lastValidTarget = nil
         self.state.lastValidTargetPosition = nil
         self.state.isTargetVisible = false
         self.state.distanceFromTarget = 100000
     end
+    if not self.state.isTargetVisible then
+        if not self.state.cantSeeTargetCounter then
+            self.state.cantSeeTargetCounter = 0
+        else
+            self.state.cantSeeTargetCounter = self.state.cantSeeTargetCounter + dt
+        end
+    else
+        self.state.cantSeeTargetCounter = nil
+    end
 end
 
-function TargetComponent:init(model)
+function TargetComponent:init(model, props)
     self.model = model
+    self.giveUpTargetTime = props.giveUpTargetTime
 end
 
 function TargetComponent.new()
