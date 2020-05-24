@@ -50,27 +50,25 @@ function LizardAttackComponent:attack(target)
     self.rope.Length = len
     self.model.TongueEnd.CFrame = target.PrimaryPart.CFrame
     if not self.attackFailed then
-        --[[if not target:FindFirstChild("Humanoid") then
-            self.tongueWeld = Instance.new("WeldConstraint", self.model.TongueEnd)
-            self.tongueWeld.Part0 = self.model.TongueEnd
-            self.tongueWeld.Part1 = target.PrimaryPart
-        else--]]
-            self.tongueWeld = Instance.new("SpringConstraint", self.model.TongueEnd)
-            self.springAttach1= Instance.new("Attachment", self.model.TongueEnd)
-            self.springAttach2 = Instance.new("Attachment", target.PrimaryPart)
-            self.tongueWeld.FreeLength = 1
-            self.tongueWeld.LimitsEnabled = true
-            if target:FindFirstChild("Humanoid") then
-                self.tongueWeld.MaxLength = 14
-            else
-                self.tongueWeld.MaxLength = 2
-            end
-            self.tongueWeld.Attachment0 = self.springAttach1
-            self.tongueWeld.Attachment1 = self.springAttach2
-        --end
+        self.tongueWeld = Instance.new("SpringConstraint", self.model.TongueEnd)
+        self.springAttach1= Instance.new("Attachment", self.model.TongueEnd)
+        self.springAttach2 = Instance.new("Attachment", target.PrimaryPart)
+        self.tongueWeld.FreeLength = 1
+        self.tongueWeld.LimitsEnabled = true
+        if target:FindFirstChild("Humanoid") then
+            self.tongueWeld.MaxLength = 14
+        else
+            self.tongueWeld.MaxLength = 2
+        end
+        self.tongueWeld.Attachment0 = self.springAttach1
+        self.tongueWeld.Attachment1 = self.springAttach2
         self:doDamage(self.attackTarget)
     end
     Messages:send("PlaySound", "PaintballFireLight", self.model.Head.Position)
+end
+
+function LizardAttackComponent:onDamaged() 
+    self.cancelAttack = true
 end
 
 function LizardAttackComponent:onFinishedEating(target)

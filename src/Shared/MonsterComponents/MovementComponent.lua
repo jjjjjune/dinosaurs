@@ -128,7 +128,8 @@ end
 
 function MovementComponent:handleJumpForces()
     if self.jumpEnd and tick() < self.jumpEnd then
-        self.maxYVelocity = 1000000
+        print("jumping")
+        self.maxYVelocity = 900000
         self.jumping = true
     else
         self.jumping = false

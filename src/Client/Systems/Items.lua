@@ -177,7 +177,7 @@ function Items:start()
         bindCarry()
     end)
     Messages:hook("OnStoreAction", function()
-        if carryItemInstance then
+        if carryItemInstance and carryItemInstance.Parent ~= nil then
             unequipCarryItem("STORE BIND")
             Messages:send("StoreTool", carryItemInstance)
             bindCarry()

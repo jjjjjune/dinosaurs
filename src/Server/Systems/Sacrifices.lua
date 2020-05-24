@@ -60,7 +60,7 @@ local function initializeAltar(altar)
             --hit.Parent.Humanoid:TakeDamage(10)
         end
         if CollectionService:HasTag(hit.Parent, "Item") then
-            if not hit.Parent:FindFirstChild("Humanoid") then
+            if not hit.Parent.Parent:FindFirstChild("Humanoid") then
                 onSacrificedItem(hit.Parent, altar)
             end
         end

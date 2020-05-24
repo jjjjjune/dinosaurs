@@ -38,7 +38,7 @@ end
 
 local function setInitialLighting()
     spawn(function()
-        local currentSeason = Messages:requestServer("GetSeason")
+        local currentSeason = Messages:requestServer("GetSeason") or 1
         currentSeasonName = SeasonsData[currentSeason].name
         onSeasonSetTo(currentSeason)
     end)

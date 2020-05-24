@@ -96,6 +96,8 @@ function Lizard:init(model)
 
         if self.model.Health.Value <= 0 then
             self:die()
+        else
+            self.attackComponent:onDamaged()
         end
 
     end)
