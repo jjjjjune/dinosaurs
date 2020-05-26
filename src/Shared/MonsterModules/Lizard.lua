@@ -8,6 +8,7 @@ local TargetComponent = import "Shared/MonsterComponents/TargetComponent"
 local LizardAttackComponent = import "Shared/MonsterComponents/LizardAttackComponent"
 local TouchComponent = import "Shared/MonsterComponents/TouchComponent"
 local RideableComponent = import "Shared/MonsterComponents/RideableComponent"
+local TameableComponent = import "Shared/MonsterComponents/TameableComponent"
 
 local Lizard = {}
 
@@ -79,6 +80,9 @@ function Lizard:init(model)
 
     self.touchComponent = TouchComponent.new()
     self.touchComponent:init(self.model)
+
+    self.tameableComponent = TameableComponent.new()
+    self.tameableComponent:init(self.model)
 
     self.drops = {
         {name = "Skull", min = 1, max = 2, chance = 45},
