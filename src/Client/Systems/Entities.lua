@@ -20,10 +20,6 @@ function Entities:start()
     Binds.bindTagToAction("Entity", "INTERACT", function(item)
         useEntity(item)
     end)
-    -- this will be before 
-    -- Binds.bindTagToAction("Grabbable", "GRAB", function(item)
-    --     -- this will be for picking up and moving small plants or other structures, which will probably happen in an "edit" mode
-    -- end)
 end
  
 return Entities

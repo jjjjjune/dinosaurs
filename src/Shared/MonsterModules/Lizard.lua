@@ -7,13 +7,14 @@ local IdleComponent = import "Shared/MonsterComponents/IdleComponent"
 local TargetComponent = import "Shared/MonsterComponents/TargetComponent"
 local LizardAttackComponent = import "Shared/MonsterComponents/LizardAttackComponent"
 local TouchComponent = import "Shared/MonsterComponents/TouchComponent"
+local RideableComponent = import "Shared/MonsterComponents/RideableComponent"
 
 local Lizard = {}
 
 Lizard.__index = Lizard
 
 function Lizard:step()
-    if not self.attackComponent.attacking then 
+    if not self.attackComponent.attacking then
         local target = self.targetComponent:getTarget()
         if target and target.PrimaryPart then
             self.movementComponent:setGoal(target.PrimaryPart.Position)
@@ -30,12 +31,16 @@ function Lizard:init(model)
 
     self.animationScaledWalkspeed = 22 -- this is about the speed at which the animation expects the lizzy to travel
 
+    self.rideableComponent = RideableComponent.new()
+    self.rideableComponent:init(self.model, {})
+
     self.movementComponent = MovementComponent.new()
     self.movementComponent:init(self.model, {
         jumpDebounce = 2,
         speed = 20,
         closenessThreshold = 11,
         jumpLength = .5,
+        rideableComponent = self.rideableComponent,
     })
 
     self.animationComponent = AnimationComponent.new()
@@ -69,6 +74,7 @@ function Lizard:init(model)
         reloadTime = 4,
         chargeTime = 2,
         spawnAttackDebounce = 4,
+        rideableComponent = self.rideableComponent,
     })
 
     self.touchComponent = TouchComponent.new()
@@ -112,6 +118,7 @@ function Lizard:init(model)
         self.idleComponent:step(dt)
         self.attackComponent:step(dt)
         self.touchComponent:step(dt)
+        self.rideableComponent:step(dt)
 
         self:step(dt)
 
@@ -162,9 +169,9 @@ end
 
 function Lizard:die()
 
-    print("call die")
-
     self.mainThread:disconnect()
+
+    self.rideableComponent:dismount()
 
     if not self.isDead then
         self.isDead = true

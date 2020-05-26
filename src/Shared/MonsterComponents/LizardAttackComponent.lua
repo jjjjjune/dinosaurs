@@ -145,13 +145,15 @@ function LizardAttackComponent:step(dt)
     if self.attacking then
         self:stepAttack()
     else
-        local target = self.targetComponent:getTarget()
-        if target then
-            local distance = self.targetComponent.state.distanceFromTarget
-            local attackDistance = self.attackDistance
-            if distance < attackDistance then
-                if self:canAttack(target) then
-                    self:initializeAttack(target)
+        if not self.rideableComponent:isMounted() then
+            local target = self.targetComponent:getTarget()
+            if target then
+                local distance = self.targetComponent.state.distanceFromTarget
+                local attackDistance = self.attackDistance
+                if distance < attackDistance then
+                    if self:canAttack(target) then
+                        self:initializeAttack(target)
+                    end
                 end
             end
         end
@@ -167,9 +169,11 @@ function LizardAttackComponent:init(model, properties)
     self.damageType = properties.damageType
     self.chargeTime = properties.chargeTime
     self.damage = properties.damage
+    self.rideableComponent = properties.rideableComponent
+    self.nextAttack = tick() + properties.spawnAttackDebounce
+
     self.rope = self.model.TongueStart.RopeConstraint
     self.rope.Length = 0
-    self.nextAttack = tick() + properties.spawnAttackDebounce
 end
 
 function LizardAttackComponent.new()

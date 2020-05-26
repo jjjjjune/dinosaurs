@@ -23,7 +23,7 @@ local function getClosestItemOfTag(position, tag)
         return
     end
     for _, item in pairs(tagsCache[tag]) do
-        if isValid(item) then 
+        if isValid(item) then
             local itemPos = item.PrimaryPart and item.PrimaryPart.Position
             if itemPos then
                 local dist = (position - itemPos).magnitude
@@ -47,13 +47,14 @@ local function getClosestItemOfTag(position, tag)
         for _, p in pairs(checkPart:GetTouchingParts()) do
             if CollectionService:HasTag(p.Parent, tag) and isValid(p.Parent) then
                 closestItem = p.Parent
+                closestDistance = (p.Position - position).magnitude
                 break
             end
         end
         checkPart:Destroy()
     end
     lastFoundTagItem[tag] = closestItem
-    return closestItem
+    return closestItem, closestDistance
 end
 
 local function handleActionUi(actionName, boundData)
@@ -62,17 +63,18 @@ local function handleActionUi(actionName, boundData)
     local foundPosition
     local foundTarget
     local charPosition = GetCharacterPosition()
+    local lowestDist = 1000
     if position then
         for _, tag in pairs(boundData.tags) do
-            local item = getClosestItemOfTag(position, tag)
-            if item then
+            local item, dist = getClosestItemOfTag(position, tag)
+            if item and dist < lowestDist then
+                lowestDist = dist
                 foundTarget = item
                 foundPosition = item.PrimaryPart.Position
                 shouldShow = true
                 if charPosition and charPosition.Y < foundPosition.Y then
                     foundPosition = Vector3.new(foundPosition.X, charPosition.Y, foundPosition.Z)
                 end
-                break -- breaking here so it wont give you results for multiple tags 
             end
         end
     end

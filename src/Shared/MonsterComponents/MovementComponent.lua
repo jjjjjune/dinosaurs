@@ -128,7 +128,6 @@ end
 
 function MovementComponent:handleJumpForces()
     if self.jumpEnd and tick() < self.jumpEnd then
-        print("jumping")
         self.maxYVelocity = 900000
         self.jumping = true
     else
@@ -140,15 +139,21 @@ function MovementComponent:handleJumpForces()
 end
 
 function MovementComponent:step(dt)
-    local hit = self:floorRay(dt)
+    if self.rideableComponent:isMounted() then
 
-    self:alignToNormal()
+    else
 
-    self:handleJumpForces()
+        local hit = self:floorRay(dt)
 
-    self:move(hit)
+        self:alignToNormal()
 
-    self:checkIfShouldBeMoving(dt)
+        self:handleJumpForces()
+
+        self:move(hit)
+
+        self:checkIfShouldBeMoving(dt)
+
+    end
 end
 
 function MovementComponent:init(model, movementProperties)
@@ -157,6 +162,11 @@ function MovementComponent:init(model, movementProperties)
     self.jumpDebounce = movementProperties.jumpDebounce
     self.closenessThreshold = movementProperties.closenessThreshold
     self.jumpLength = movementProperties.jumpLength
+    self.rideableComponent = movementProperties.rideableComponent
+
+    local speedValue = Instance.new("IntValue", model)
+    speedValue.Name = "Speed"
+    speedValue.Value = movementProperties.speed
 end
 
 function MovementComponent.new()
