@@ -21,5 +21,5 @@ function Entities:start()
         useEntity(item)
     end)
 end
- 
+
 return Entities

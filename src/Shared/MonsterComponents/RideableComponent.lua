@@ -65,7 +65,6 @@ function RideableComponent:init(model, props)
             self:dismount(player)
         end
     end)
-    CollectionService:AddTag(model, "Rideable") -- will need to move this somewhere else
 end
 
 function RideableComponent.new()

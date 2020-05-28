@@ -48,12 +48,12 @@ local function getClosestItemOfTag(position, tag)
             if CollectionService:HasTag(p.Parent, tag) and isValid(p.Parent) then
                 closestItem = p.Parent
                 closestDistance = (p.Position - position).magnitude
+                lastFoundTagItem[tag] = closestItem
                 break
             end
         end
         checkPart:Destroy()
     end
-    lastFoundTagItem[tag] = closestItem
     return closestItem, closestDistance
 end
 
@@ -98,7 +98,7 @@ end
 local function performActionCallbackForAction(actionName)
     local foundItem
     local tagBindInfo = boundActionTags[actionName]
-    if tagBindInfo then 
+    if tagBindInfo then
         for _, tag in pairs(tagBindInfo.tags) do
             if lastFoundTagItem[tag] then
                 foundItem = lastFoundTagItem[tag]

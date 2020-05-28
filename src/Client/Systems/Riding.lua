@@ -37,11 +37,36 @@ local function align(dt, mount, dir)
         goalGyroCF = CFrame.new(mount.PrimaryPart.Position) * floorCF * CFrame.Angles(0, yGoal, 0)
 
         mount.PrimaryPart.BodyGyro.CFrame = goalGyroCF
+
+        --print(math.deg(tilt), math.deg(yGoal), math.deg(roll))
     end
 end
 
+-- cant climnb slopes : (
 local function move(dt, mountModel, dir)
-    mountModel.PrimaryPart.BodyVelocity.Velocity = dir * mountModel.Speed.Value
+    local floorHit, pos = CastRay(mountModel.PrimaryPart.Position, Vector3.new(0, -3, 0))
+    local isOnFloor = floorHit ~= nil
+    if dir.magnitude == 0 then
+        mountModel.PrimaryPart.BodyVelocity.Velocity  = Vector3.new()
+        mountModel.PrimaryPart.BodyVelocity.MaxForce = Vector3.new(1,0,1)*1000000
+    else
+        if isOnFloor then
+            mountModel.PrimaryPart.BodyVelocity.MaxForce = Vector3.new(1,1,1)*1000000
+        else
+            mountModel.PrimaryPart.BodyVelocity.MaxForce = Vector3.new(1,0,1)*1000000
+        end
+        local x, y, z = mountModel.PrimaryPart.CFrame:toEulerAnglesXYZ()
+        x = math.deg(x)
+        y = math.deg(y)
+        z = math.deg(z)
+        local isOnFlatGround = (math.abs(x) <= 1) and (math.abs(z) <= 1)
+        if isOnFlatGround then
+            mountModel.PrimaryPart.BodyVelocity.Velocity = dir * mountModel.Speed.Value
+        else
+            --mountModel.PrimaryPart.BodyVelocity.Velocity = dir * mountModel.Speed.Value
+            mountModel.PrimaryPart.BodyVelocity.Velocity = mountModel.PrimaryPart.CFrame.lookVector * mountModel.Speed.Value
+        end
+    end
 end
 
 local function rideStep(dt)
