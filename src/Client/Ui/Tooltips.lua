@@ -1,16 +1,17 @@
 local import = require(game.ReplicatedStorage.Shared.Import)
 local Messages = import "Shared/Utils/Messages"
-local ContextActionService = game:GetService("ContextActionService")
 local ActionBinds = import "Shared/Data/ActionBinds"
-local PlayerGui = game.Players.LocalPlayer.PlayerGui
-local TooltipGeneric = PlayerGui:WaitForChild("Tooltips"):WaitForChild("TooltipGeneric")
 local GetDevice = import "Shared/Utils/GetDevice"
+
 local RunService = game:GetService("RunService")
 
-local currentTargets = {}
-local tooltipFrames = {} 
+local PlayerGui = game.Players.LocalPlayer.PlayerGui
+local TooltipGeneric = PlayerGui:WaitForChild("Tooltips"):WaitForChild("TooltipGeneric")
 
-local CONTROLS_PRIORITY = 2
+local GetCharacterPosition = import "Shared/Utils/GetCharacterPosition"
+
+local currentTargets = {}
+local tooltipFrames = {}
 
 local function skin(tooltipFrame, actionName)
     local bindInfo = ActionBinds[actionName]
@@ -54,6 +55,13 @@ local function skinTooltipsToDevice()
     end
 end
 
+local function setButtonTransparency(button, transparency)
+    button.ImageTransparency = transparency
+    button.ImageLabel.ImageTransparency = transparency
+    button.TextLabel.TextTransparency = transparency
+    button.TextLabelShadow.TextTransparency = transparency
+end
+
 local Tooltips = {}
 
 function Tooltips:start()
@@ -72,6 +80,14 @@ function Tooltips:start()
             button.Position = UDim2.new(0, vector.X, 0, vector.Y)
         else
             button.Position = UDim2.new(0, vector.X + 36, 0, vector.Y)
+        end
+        local characterPosition = GetCharacterPosition()
+        if characterPosition then
+            if (characterPosition - worldPosition).magnitude < 8 then
+                setButtonTransparency(button, .6)
+            else
+                setButtonTransparency(button, 0)
+            end
         end
     end)
     Messages:hook("HideTooltip", function(actionName)

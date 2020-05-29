@@ -1,16 +1,19 @@
 local import = require(game.ReplicatedStorage.Shared.Import)
 
 local GetCharacter = import "Shared/Utils/GetCharacter"
-
 local Messages = import "Shared/Utils/Messages"
-
 local Binds = import "Client/Systems/Binds"
-
 local CastRay = import "Shared/Utils/CastRay"
 
+local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 
 local lastNormal = Vector3.new()
+
+local JUMP_TIME = .2
+local JUMP_FORCE = 7000
+
+local lastJump = 0
 
 local mountModel
 local rideConnection
@@ -42,9 +45,8 @@ local function align(dt, mount, dir)
     end
 end
 
--- cant climnb slopes : (
 local function move(dt, mountModel, dir)
-    local floorHit, pos = CastRay(mountModel.PrimaryPart.Position, Vector3.new(0, -3, 0))
+    local floorHit, pos = CastRay(mountModel.PrimaryPart.Position, Vector3.new(0, -3, 0), {mountModel, GetCharacter()})
     local isOnFloor = floorHit ~= nil
     if dir.magnitude == 0 then
         mountModel.PrimaryPart.BodyVelocity.Velocity  = Vector3.new()
@@ -63,9 +65,12 @@ local function move(dt, mountModel, dir)
         if isOnFlatGround then
             mountModel.PrimaryPart.BodyVelocity.Velocity = dir * mountModel.Speed.Value
         else
-            --mountModel.PrimaryPart.BodyVelocity.Velocity = dir * mountModel.Speed.Value
             mountModel.PrimaryPart.BodyVelocity.Velocity = mountModel.PrimaryPart.CFrame.lookVector * mountModel.Speed.Value
         end
+    end
+    if tick() - lastJump < JUMP_TIME then
+        mountModel.PrimaryPart.BodyVelocity.MaxForce = Vector3.new(1,1,1)*1000000
+        mountModel.PrimaryPart.BodyVelocity.Velocity = mountModel.PrimaryPart.BodyVelocity.Velocity + Vector3.new(0, JUMP_FORCE, 0)
     end
 end
 
@@ -77,6 +82,12 @@ local function rideStep(dt)
         move(dt, mountModel, dir)
     end
 end
+
+local function jump()
+    lastJump = tick()
+end
+
+local jumpEvent
 
 local Riding = {}
 
@@ -91,6 +102,12 @@ function Riding:start()
         rideConnection = RunService.Heartbeat:connect(function(dt)
             rideStep(dt)
         end)
+        model.HumanoidRootPart.NameBillboard.Enabled = false
+        jumpEvent = UserInputService.JumpRequest:connect(function()
+            if tick() - lastJump > 1 then
+                jump()
+            end
+        end)
     end)
     Messages:hook("Dismounted", function()
         GetCharacter().Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
@@ -99,6 +116,9 @@ function Riding:start()
             rideConnection:disconnect()
             rideConnection = nil
         end
+        mountModel.HumanoidRootPart.NameBillboard.Enabled = true
+        mountModel = nil
+        jumpEvent:disconnect()
     end)
 end
 

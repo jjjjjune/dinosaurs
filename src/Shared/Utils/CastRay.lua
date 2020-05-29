@@ -3,7 +3,7 @@ return function(origin, direction, additionalIgnore)
     local ignore = CollectionService:GetTagged("RayIgnore")
     local ray = Ray.new(origin, direction)
     if additionalIgnore then
-        for i, v in pairs(additionalIgnore) do
+        for _, v in pairs(additionalIgnore) do
             table.insert(ignore, v)
         end
     end

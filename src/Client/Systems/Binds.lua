@@ -44,16 +44,20 @@ local function getClosestItemOfTag(position, tag)
         checkPart.Anchored = true
         checkPart.Touched:connect(function() end)
         checkPart.Parent = workspace
+        closestDistance = MIN_FIND_DISTANCE
         for _, p in pairs(checkPart:GetTouchingParts()) do
             if CollectionService:HasTag(p.Parent, tag) and isValid(p.Parent) then
-                closestItem = p.Parent
-                closestDistance = (p.Position - position).magnitude
-                lastFoundTagItem[tag] = closestItem
-                break
+                local dist = (p.Position - position).magnitude
+                if dist < closestDistance then
+                    closestItem = p.Parent
+                    closestDistance = dist
+                    --break
+                end
             end
         end
         checkPart:Destroy()
     end
+    lastFoundTagItem[tag] = closestItem
     return closestItem, closestDistance
 end
 
@@ -87,7 +91,7 @@ local function bindStep()
         local shouldShowForAction, foundPosition, foundTarget = handleActionUi(actionName, boundData)
 
         if shouldShowForAction then
-            Messages:send("ShowTooltip", actionName, foundPosition, foundTarget) 
+            Messages:send("ShowTooltip", actionName, foundPosition, foundTarget)
         else
             Messages:send("HideTooltip", actionName)
         end

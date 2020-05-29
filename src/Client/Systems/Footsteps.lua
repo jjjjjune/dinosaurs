@@ -73,6 +73,7 @@ local function onFootstep(part, foot, resultPosition, normal)
     end
     local material = getMaterial(part)
     local sounds = materialToSoundMap[material]
+    print("material is: ", material, part.Name, part.Parent.Name)
     local chosenSoundInstance = sounds[math.random(1, #sounds)]
     Messages:send("PlaySoundOnClient",{
         instance = chosenSoundInstance,
@@ -83,7 +84,7 @@ local function onFootstep(part, foot, resultPosition, normal)
         footstepPart.Size = Vector3.new(0, .5 + math.random(), .5 + math.random())
         footstepPart.Anchored = true
         footstepPart.CanCollide = false
-        footstepPart.CFrame = CFrame.new(resultPosition) * CFrame.new(0, (-(footstepPart.Size.X/2)) + .01,0) * CFrame.Angles(0,0,math.pi/2)
+        footstepPart.CFrame = CFrame.new(resultPosition) * CFrame.Angles(0,0,math.pi/2)
         footstepPart.CFrame = CFrame.new(footstepPart.Position, footstepPart.Position + normal)
         footstepPart.CFrame = footstepPart.CFrame * CFrame.Angles(0,math.pi/2,0)
         footstepPart.Color = Color3.new(part.Color.r * .9, part.Color.g * .9, part.Color.b * .9)
@@ -97,9 +98,15 @@ local function onFootstep(part, foot, resultPosition, normal)
 end
 
 local function onFrameChange(character, rFoot, lFoot, lastLeftPosition, lastRightPosition)
-    local rayDir = Vector3.new(0,math.max(lFoot.Size.Y, 2.5) * - 1,0)
-    local didHitLeft, currentLeftPosition, normal2 = CastRay(lFoot.Position + Vector3.new(0,1.5,0), rayDir, {character})
-    local didHitRight, currentRightPosition, normal = CastRay(rFoot.Position+ Vector3.new(0,1.5,0), rayDir, {character})
+    local leftDir = Vector3.new(0,-1,0) * ((lFoot.Size.Y/2)+.25)
+    local rightDir = Vector3.new(0,-1,0)  * ((rFoot.Size.Y/2)+.25)
+    local didHitLeft, currentLeftPosition, normal2 = CastRay(lFoot.Position, leftDir, {character})
+    local didHitRight, currentRightPosition, normal = CastRay(rFoot.Position, rightDir, {character})
+    if character:FindFirstChild("Humanoid") then
+        if character.Humanoid:GetState() == Enum.HumanoidStateType.Physics then
+            return lastLeftPosition, lastRightPosition
+        end
+    end
     if didHitLeft then
         if ((currentLeftPosition) - lastLeftPosition).magnitude > FOOT_STEP_DISTANCE then
             onFootstep(didHitLeft, lFoot, currentLeftPosition, normal)
@@ -139,7 +146,6 @@ local function handleFootsteps()
     local position = GetCharacterPosition()
     for instance, connection in pairs(footstepConnections) do
         if instance.Parent == nil then
-            print("unbinding steps nil")
             connection:disconnect()
             footstepConnections[instance] = nil
         else
@@ -147,7 +153,6 @@ local function handleFootsteps()
             if (pos and position) and (pos - position).magnitude < FOOTSTEP_RADIUS then
 
             else
-                print("unbinding steps")
                 connection:disconnect()
                 footstepConnections[instance] = nil
             end
@@ -157,7 +162,6 @@ local function handleFootsteps()
         if not footstepConnections[animal] then
             local pos = animal.PrimaryPart and animal.PrimaryPart.Position
             if (pos and position) and (pos - position).magnitude < FOOTSTEP_RADIUS then
-                print("binding animal footsteps")
                 footstepConnections[animal] = bindFootsteps(animal)
             end
         end
