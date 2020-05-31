@@ -40,8 +40,6 @@ local function align(dt, mount, dir)
         goalGyroCF = CFrame.new(mount.PrimaryPart.Position) * floorCF * CFrame.Angles(0, yGoal, 0)
 
         mount.PrimaryPart.BodyGyro.CFrame = goalGyroCF
-
-        --print(math.deg(tilt), math.deg(yGoal), math.deg(roll))
     end
 end
 
@@ -96,21 +94,25 @@ function Riding:start()
         rideableEntity.Mount:FireServer()
     end)
     Messages:hook("Mounted", function(model)
+        print("MOUNTED HAS BEEN CAUGHT ON CLIENT")
+        print("health is: ", GetCharacter().Humanoid.Health)
         GetCharacter().Humanoid:ChangeState(Enum.HumanoidStateType.Physics)
+        print("health 2  is: ", GetCharacter().Humanoid.Health)
         Messages:send("PlayAnimationClient", "Ride")
         mountModel = model
         rideConnection = RunService.Heartbeat:connect(function(dt)
             rideStep(dt)
         end)
+        print("health 3 is: ", GetCharacter().Humanoid.Health)
         model.HumanoidRootPart.NameBillboard.Enabled = false
         jumpEvent = UserInputService.JumpRequest:connect(function()
             if tick() - lastJump > 1 then
                 jump()
             end
         end)
+        print("health is 4 : ", GetCharacter().Humanoid.Health)
     end)
     Messages:hook("Dismounted", function()
-        GetCharacter().Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
         Messages:send("StopAnimationClient", "Ride")
         if rideConnection then
             rideConnection:disconnect()
@@ -118,7 +120,10 @@ function Riding:start()
         end
         mountModel.HumanoidRootPart.NameBillboard.Enabled = true
         mountModel = nil
-        jumpEvent:disconnect()
+        if jumpEvent then
+            jumpEvent:disconnect()
+        end
+        GetCharacter().Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
     end)
 end
 

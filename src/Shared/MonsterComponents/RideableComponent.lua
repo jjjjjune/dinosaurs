@@ -14,6 +14,7 @@ function RideableComponent:canBeMounted(player)
             return true
         end
     end
+    return false
 end
 
 function RideableComponent:canBeRidden()
@@ -23,15 +24,21 @@ function RideableComponent:canBeRidden()
     return true
 end
 
-function RideableComponent:isMounted()
-    local condition1 = self.rider and self.rider.Parent and self.rider.PrimaryPart and self.rider:FindFirstChild("Humanoid") and self.rider.Humanoid.Health >= 0
+function RideableComponent:riderValid()
+    local condition1 = self.rider.Parent and self.rider.PrimaryPart and self.rider:FindFirstChild("Humanoid") and self.rider.Humanoid.Health > 0
     return condition1
+end
+
+function RideableComponent:isMounted()
+    return self.rider ~= nil
 end
 
 function RideableComponent:dismount()
     self.riderWeld:Destroy()
     local player = game:GetService("Players"):GetPlayerFromCharacter(self.rider)
-    Messages:sendClient(player, "Dismounted")
+    if player then
+        Messages:sendClient(player, "Dismounted")
+    end
     self.rider = nil
     self.model.PrimaryPart:SetNetworkOwnershipAuto()
 end
@@ -50,6 +57,8 @@ end
 function RideableComponent:step(dt)
     if self:isMounted() and not self:canBeRidden() then
         self:dismount()
+    elseif self:isMounted() and not self:riderValid() then
+        self:dismount()
     end
 end
 
@@ -62,7 +71,7 @@ function RideableComponent:init(model, props)
         if self:canBeMounted(player) then
             self:mount(player)
         elseif self:isMounted() and self.rider == player.Character then
-            self:dismount(player)
+            self:dismount()
         end
     end)
 end

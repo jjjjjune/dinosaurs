@@ -57,6 +57,7 @@ local function getClosestItemOfTag(position, tag)
         end
         checkPart:Destroy()
     end
+    --print("the item is: ", closestItem)
     lastFoundTagItem[tag] = closestItem
     return closestItem, closestDistance
 end

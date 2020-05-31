@@ -7,6 +7,7 @@ local RespawnManager = {}
 function RespawnManager:start()
     Messages:hook("PlayerDied", function(player, characterThatDied)
         if #game.Players:GetPlayers() == 1 then
+            wait(1)
             warn("auto loading character cause server")
             player:LoadCharacter()
             return
@@ -28,6 +29,7 @@ function RespawnManager:start()
             end
         else
             -- fell off map or something?
+            wait(1)
             player:LoadCharacter()
         end
     end)
@@ -50,6 +52,7 @@ function RespawnManager:start()
         end
         repeat wait() until workspace:FindFirstChild("Altar", true)
         local altar = workspace:FindFirstChild("Altar", true)
+        character.PrimaryPart.RootPriority = 127
         character.PrimaryPart.CFrame = altar.PrimaryPart.CFrame * CFrame.new(0,2,0)
         Messages:send("CreateItem", "Banana", (altar.PrimaryPart.CFrame * CFrame.new(20,20,0)).p)
         Messages:send("CreateItem", "Taming Potion", (altar.PrimaryPart.CFrame * CFrame.new(20,20,0)).p)

@@ -73,7 +73,6 @@ local function onFootstep(part, foot, resultPosition, normal)
     end
     local material = getMaterial(part)
     local sounds = materialToSoundMap[material]
-    print("material is: ", material, part.Name, part.Parent.Name)
     local chosenSoundInstance = sounds[math.random(1, #sounds)]
     Messages:send("PlaySoundOnClient",{
         instance = chosenSoundInstance,
