@@ -123,7 +123,10 @@ function Riding:start()
         if jumpEvent then
             jumpEvent:disconnect()
         end
-        GetCharacter().Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+        local character = GetCharacter()
+        if character and character:FindFirstChild("Humanoid") then
+            character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+        end
     end)
 end
 
