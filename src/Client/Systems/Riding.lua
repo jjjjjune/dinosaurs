@@ -94,6 +94,7 @@ function Riding:start()
         rideableEntity.Mount:FireServer()
     end)
     Messages:hook("Mounted", function(model)
+        workspace.CurrentCamera.CameraSubject = model.PrimaryPart
         print("MOUNTED HAS BEEN CAUGHT ON CLIENT")
         print("health is: ", GetCharacter().Humanoid.Health)
         GetCharacter().Humanoid:ChangeState(Enum.HumanoidStateType.Physics)
@@ -125,6 +126,7 @@ function Riding:start()
         end
         local character = GetCharacter()
         if character and character:FindFirstChild("Humanoid") then
+            workspace.CurrentCamera.CameraSubject = character.Humanoid
             character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
         end
     end)
