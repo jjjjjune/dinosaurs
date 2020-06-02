@@ -13,6 +13,7 @@ end
 function TameableComponent:onTamed(player)
     if player then
         -- was tamed by a player
+        self.model.Health.Value = self.model.Health.MaxValue
         self.model.OwnerId.Value = player.UserId
     else
         -- value was set by data loading script
