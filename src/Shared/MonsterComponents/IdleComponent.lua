@@ -13,7 +13,7 @@ function IdleComponent:getIdleMoveDuration()
 end
 
 function IdleComponent:getIdleOffset()
-    return Vector3.new(math.random(-200,200), 0, math.random(-200,200))
+    return Vector3.new(math.random(-50,50), 0, math.random(-50,50))
 end
 
 function IdleComponent:getIdlePosition()

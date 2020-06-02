@@ -95,15 +95,17 @@ function TargetComponent:getTarget()
 end
 
 function TargetComponent:getValidEnemy()
-    local allEnemies = {}
-    for _, enemyTag in pairs(self.wantedEnemyTags) do
-        for _, enemy in pairs(CollectionService:GetTagged(enemyTag)) do
-            if enemy ~= self.model then
-                table.insert(allEnemies, enemy)
+    if self.model.Tamed.Value == false then
+        local allEnemies = {}
+        for _, enemyTag in pairs(self.wantedEnemyTags) do
+            for _, enemy in pairs(CollectionService:GetTagged(enemyTag)) do
+                if enemy ~= self.model then
+                    table.insert(allEnemies, enemy)
+                end
             end
         end
+        return getClosestEnemyOfSet(self.position, allEnemies)
     end
-    return getClosestEnemyOfSet(self.position, allEnemies)
 end
 
 function TargetComponent:step(dt)

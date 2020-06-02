@@ -32,8 +32,11 @@ function Lizard:init(model)
 
     self.animationScaledWalkspeed = 22 -- this is about the speed at which the animation expects the lizzy to travel
 
+    self.idleComponent = IdleComponent.new()
+    self.idleComponent:init(self.model)
+
     self.rideableComponent = RideableComponent.new()
-    self.rideableComponent:init(self.model, {})
+    self.rideableComponent:init(self.model, {idleComponent = self.idleComponent})
 
     self.movementComponent = MovementComponent.new()
     self.movementComponent:init(self.model, {
@@ -54,9 +57,6 @@ function Lizard:init(model)
         Speak = "rbxassetid://5037809602",
         Dead = "rbxassetid://5079811280"
     })
-
-    self.idleComponent = IdleComponent.new()
-    self.idleComponent:init(self.model)
 
     self.targetComponent = TargetComponent.new()
     self.targetComponent.wantItem = "Banana"

@@ -59,6 +59,8 @@ function RideableComponent:step(dt)
         self:dismount()
     elseif self:isMounted() and not self:riderValid() then
         self:dismount()
+    elseif self:isMounted() then
+        self.idleComponent.spawnPosition = self.model.PrimaryPart.Position
     end
 end
 
@@ -74,6 +76,7 @@ function RideableComponent:init(model, props)
             self:dismount()
         end
     end)
+    self.idleComponent = props.idleComponent
 end
 
 function RideableComponent.new()

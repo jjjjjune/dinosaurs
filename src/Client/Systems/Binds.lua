@@ -51,7 +51,7 @@ local function getClosestItemOfTag(position, tag)
                 if dist < closestDistance then
                     closestItem = p.Parent
                     closestDistance = dist
-                    --break
+                    break
                 end
             end
         end
@@ -101,18 +101,26 @@ local function bindStep()
 end
 
 local function performActionCallbackForAction(actionName)
+    print("performing callback for ", actionName)
     local foundItem
     local tagBindInfo = boundActionTags[actionName]
     if tagBindInfo then
+        local closestDist = 10000
+        local closestTagItem
+        local closestTag
         for _, tag in pairs(tagBindInfo.tags) do
             if lastFoundTagItem[tag] then
                 foundItem = lastFoundTagItem[tag]
             end
-            if foundItem then
-                tagBindInfo.callbacks[tag](foundItem)
-                Messages:send("PlayPressedEffect", actionName)
-                break
+            if foundItem and (foundItem.PrimaryPart.Position - GetCharacterPosition()).magnitude < closestDist then
+                closestDist = (foundItem.PrimaryPart.Position - GetCharacterPosition()).magnitude
+                closestTagItem = foundItem
+                closestTag = tag
             end
+        end
+        if closestTagItem then
+            tagBindInfo.callbacks[closestTag](foundItem)
+            Messages:send("PlayPressedEffect", actionName)
         end
     else
         warn("no bound action for : ", actionName)
