@@ -36,6 +36,13 @@ function LizardAttackComponent:initializeAttack(target)
     self.model.Head.Hiss:Play()
 end
 
+function LizardAttackComponent:isValidHitTarget(target)
+    local condition1 = target:FindFirstChild("Health")
+    local condition2 = target:FindFirstChild("Humanoid")
+    local condition3 = CollectionService:HasTag(target, "Item") and target.Name == self.targetComponent.wantItem
+    return target ~= self.model and (condition1 or condition2 or condition3)
+end
+
 function LizardAttackComponent:attack(target)
     --Messages:send("PlayParticle", "Water", 10, self.model.TongueStart.Position)
     local dir = (CFrame.new(self.model.Head.Position, self.attackTarget.PrimaryPart.Position).lookVector) * self.attackDistance
@@ -43,7 +50,14 @@ function LizardAttackComponent:attack(target)
     if hit and hit:IsDescendantOf(self.attackTarget) then
         self.attackFailed = false
     else
-        self.attackFailed = true
+        if self:isValidHitTarget(hit.Parent) then -- if the attack hits the wrong thing, but the thing it hits is a valid target also
+            print("we hit funny thing")
+            self.attackFailed = false
+            self.attackTarget = hit.Parent
+            target = hit.Parent
+        else
+            self.attackFailed = true
+        end
     end
     local len = (target.PrimaryPart.Position - self.model.TongueStart.Position).magnitude
     self.maxRopeLength = len

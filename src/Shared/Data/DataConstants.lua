@@ -6,11 +6,12 @@ Data.DEFAULT_DATA = {
 }
 
 Data.TEST_DATA = {
- 
+
 }
 
 Data.DEFAULT_SERVER_DATA = {
     players = {},
+    seasonsSurvived = 1,
 }
 
 Data.DEFAULT_SERVER_PLAYER_DATA = {
