@@ -130,7 +130,7 @@ end
 
 function MovementComponent:handleJumpForces()
     if self.jumpEnd and tick() < self.jumpEnd then
-        self.maxYVelocity = 900000
+        self.maxYVelocity = self.jumpVelocity
         self.jumping = true
     else
         self.jumping = false
@@ -172,6 +172,7 @@ function MovementComponent:init(model, movementProperties)
     self.jumpLength = movementProperties.jumpLength
     self.rideableComponent = movementProperties.rideableComponent
     self.animationComponent = movementProperties.animationComponent
+    self.jumpVelocity = movementProperties.jumpVelocity
 
     local speedValue = Instance.new("IntValue", model)
     speedValue.Name = "Speed"
