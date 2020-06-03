@@ -34,6 +34,7 @@ function MovementComponent:jump()
     end
     if tick() > self.nextJump then
         Messages:send("PlaySound", "AnimalJump", self.model.PrimaryPart.Position)
+        Messages:send("PlayParticle", "JumpParticle", 10, self.model.PrimaryPart.Position)
         self.jumpEnd = tick() + self.jumpLength
         self.nextJump = tick() + self.jumpDebounce
     end

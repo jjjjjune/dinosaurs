@@ -34,6 +34,9 @@ function RideableComponent:isMounted()
 end
 
 function RideableComponent:dismount()
+    if not self.rider then
+        return
+    end
     self.riderWeld:Destroy()
     local player = game:GetService("Players"):GetPlayerFromCharacter(self.rider)
     if player then
