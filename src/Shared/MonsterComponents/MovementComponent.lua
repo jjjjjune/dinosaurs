@@ -1,5 +1,6 @@
 local import = require(game.ReplicatedStorage.Shared.Import)
 
+local Messages = import "Shared/Utils/Messages"
 local CastRay = import "Shared/Utils/CastRay"
 
 local MovementComponent = {}
@@ -32,6 +33,7 @@ function MovementComponent:jump()
         self.jumpEnd = tick()
     end
     if tick() > self.nextJump then
+        Messages:send("PlaySound", "AnimalJump", self.model.PrimaryPart.Position)
         self.jumpEnd = tick() + self.jumpLength
         self.nextJump = tick() + self.jumpDebounce
     end
@@ -135,6 +137,12 @@ function MovementComponent:handleJumpForces()
         self.maxYVelocity = 0
     end
 
+    if self.jumping then
+        self.animationComponent:playTrack("Falling")
+    else
+        self.animationComponent:stopTrack("Falling")
+    end
+
     self.model.HumanoidRootPart.BodyVelocity.MaxForce = Vector3.new(1000000,self.maxYVelocity or 0,1000000)
 end
 
@@ -163,6 +171,7 @@ function MovementComponent:init(model, movementProperties)
     self.closenessThreshold = movementProperties.closenessThreshold
     self.jumpLength = movementProperties.jumpLength
     self.rideableComponent = movementProperties.rideableComponent
+    self.animationComponent = movementProperties.animationComponent
 
     local speedValue = Instance.new("IntValue", model)
     speedValue.Name = "Speed"

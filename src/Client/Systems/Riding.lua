@@ -107,8 +107,11 @@ function Riding:start()
         print("health 3 is: ", GetCharacter().Humanoid.Health)
         model.HumanoidRootPart.NameBillboard.Enabled = false
         jumpEvent = UserInputService.JumpRequest:connect(function()
-            if tick() - lastJump > 1 then
+            local hit, _ = CastRay(model.PrimaryPart.Position, Vector3.new(0,-5,0), {model, GetCharacter()})
+            local isOnGround = hit ~= nil
+            if tick() - lastJump > .5 and isOnGround then
                 jump()
+                Messages:send("PlaySoundServer", "AnimalJump", model.PrimaryPart.Position)
             end
         end)
         print("health is 4 : ", GetCharacter().Humanoid.Health)

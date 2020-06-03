@@ -71,7 +71,7 @@ local function monsterStep()
 			local point = getValidSpawnPoint(monsterName)
 			if point then
 				print("spoawning")
-				spawnMonster(monsterName, point.PrimaryPart.Position + Vector3.new(0,10,0))
+				spawnMonster(monsterName, point.PrimaryPart.Position + Vector3.new(0,20,0))
 			end
 		end
 	end

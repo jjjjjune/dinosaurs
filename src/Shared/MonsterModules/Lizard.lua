@@ -38,15 +38,6 @@ function Lizard:init(model)
     self.rideableComponent = RideableComponent.new()
     self.rideableComponent:init(self.model, {idleComponent = self.idleComponent})
 
-    self.movementComponent = MovementComponent.new()
-    self.movementComponent:init(self.model, {
-        jumpDebounce = 2,
-        speed = 20,
-        closenessThreshold = 11,
-        jumpLength = .5,
-        rideableComponent = self.rideableComponent,
-    })
-
     self.animationComponent = AnimationComponent.new()
     self.animationComponent:init(self.model, {
         Walking = "rbxassetid://5009072693",
@@ -56,6 +47,16 @@ function Lizard:init(model)
         Idle = "rbxassetid://5009118786",
         Speak = "rbxassetid://5037809602",
         Dead = "rbxassetid://5079811280"
+    })
+
+    self.movementComponent = MovementComponent.new()
+    self.movementComponent:init(self.model, {
+        jumpDebounce = 2,
+        speed = 20,
+        closenessThreshold = 11,
+        jumpLength = .5,
+        rideableComponent = self.rideableComponent,
+        animationComponent = self.animationComponent
     })
 
     self.targetComponent = TargetComponent.new()
