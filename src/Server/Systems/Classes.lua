@@ -35,7 +35,6 @@ local Classes = {}
 
 function Classes:start()
     Messages:hook("CharacterAdded", function(player, character)
-        print("classes char added being fired")
         wait()
         local class = possibleClasses[math.random(1, #possibleClasses)]
         setClass(character, class)

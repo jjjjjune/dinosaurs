@@ -67,10 +67,8 @@ end
 local function monsterStep()
 	for _, monsterName in pairs(activeMonsters) do
 		if shouldSpawnNewMonster(monsterName) then
-			print("SHOULD SPAWN")
 			local point = getValidSpawnPoint(monsterName)
 			if point then
-				print("spoawning")
 				spawnMonster(monsterName, point.PrimaryPart.Position + Vector3.new(0,20,0))
 			end
 		end

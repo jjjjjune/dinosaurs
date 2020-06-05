@@ -434,10 +434,8 @@ local function getWfcGridOfSize(xsize, ysize, zsize)
 end
 
 local function onWaterUpdated()
-    print("water updated")
     local water = workspace.Effects.Water
     local yPos = water.Position.Y - 20
-    print("water y pos is: ", yPos)
     for i, tile in pairs(generatedMapTiles) do
         if not workspace.Tiles:FindFirstChild(i.."") then
             local folder = Instance.new("Folder", workspace.Tiles)
@@ -445,7 +443,6 @@ local function onWaterUpdated()
         end
         local folder = workspace.Tiles:FindFirstChild(i.."")
         if tile.PrimaryPart and tile.PrimaryPart.Position.Y >= yPos - 70 then
-            print("yeah primary part pos is : ", tile.PrimaryPart.Position.Y)
             tile.Parent = folder
         end
     end
