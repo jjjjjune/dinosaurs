@@ -61,13 +61,22 @@ local function attemptThrowItem() -- the fact that this is for both normal items
     -- is one of the most unfortunate aspects of this code base so far
     local character = GetCharacter()
     for _, possibleItem in pairs(character:GetChildren()) do
-        if CollectionService:HasTag(possibleItem, "Item") or CollectionService:HasTag(possibleItem, "Building")then
-            if not CollectionService:HasTag(possibleItem, "Building") then 
-                Messages:send("PlaySoundOnClient",{
-                    instance = game.ReplicatedStorage.Sounds.HeavyWhoosh,
-                    part = character.Head, 
-                    volume = (possibleItem.PrimaryPart.Velocity.Magnitude > 2 and .25) or .1
-                })
+        if CollectionService:HasTag(possibleItem, "Item") or CollectionService:HasTag(possibleItem, "Building") then
+            local velocity = character.HumanoidRootPart.Velocity
+            if not CollectionService:HasTag(possibleItem, "Building") then
+                if velocity.magnitude > 1 then
+                    Messages:send("PlaySoundOnClient",{
+                        instance = game.ReplicatedStorage.Sounds.HeavyWhoosh,
+                        part = character.Head, 
+                        volume = (possibleItem.PrimaryPart.Velocity.Magnitude > 2 and .1) or .05
+                    })
+                else
+                    Messages:send("PlaySoundOnClient",{
+                        instance = game.ReplicatedStorage.Sounds.SoftPlacement,
+                        part = character.Head, 
+                        volume = .15
+                    })
+                end
             else
                 Messages:send("PlaySoundOnClient",{
                     instance = game.ReplicatedStorage.Sounds.ClickHigh,
@@ -79,7 +88,7 @@ local function attemptThrowItem() -- the fact that this is for both normal items
             possibleItem.Parent = workspace
             if not CollectionService:HasTag(possibleItem, "Building") then 
                 possibleItem.PrimaryPart.CFrame = character.HumanoidRootPart.CFrame * CFrame.new(0,0,-4)
-                possibleItem.PrimaryPart.Velocity = character.HumanoidRootPart.Velocity * 1
+                possibleItem.PrimaryPart.Velocity = velocity * 1
             else
                 for _, v in pairs(possibleItem:GetDescendants()) do
                     if v:IsA("BasePart") then

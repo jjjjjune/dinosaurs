@@ -74,11 +74,6 @@ function Sounds:start()
 	Messages:hook("PlaySoundObject", function(sound,pitchshift)
 		playSoundObj(sound, pitchshift)
 	end)
-
-	Messages:hook("PlayStickerSound", function(soundName, position, pitchshift)
-        playSound(soundName, position, nil, pitchshift, StickerSoundsFolder)
-    end)
-
     Messages:hook("PlaySound", function(soundName, position, pitchshift, forcepitch)
         playSound(soundName, position, nil, pitchshift, nil, forcepitch)
     end)

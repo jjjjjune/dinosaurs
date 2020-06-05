@@ -19,25 +19,6 @@ local function getClosestAnimal(position, tag)
             end
         end
     end
-    if not closestItem then
-        local checkPart = Instance.new("Part")
-        checkPart.CanCollide = false
-        CollectionService:AddTag(checkPart, "RayIgnore")
-        checkPart.Transparency = 1
-        checkPart.Size = Vector3.new(9,9,9)
-        checkPart.CFrame = CFrame.new(position)
-        checkPart.Anchored = true
-        checkPart.Touched:connect(function() end)
-        checkPart.Parent = workspace
-        for _, p in pairs(checkPart:GetTouchingParts()) do
-            if CollectionService:HasTag(p.Parent, tag) and not CollectionService:HasTag(p.Parent, "Rideable")  then
-                closestItem = p.Parent
-                closestDistance = (p.Position - position).magnitude
-                break
-            end
-        end
-        checkPart:Destroy()
-    end
     return closestItem, closestDistance
 end
 
