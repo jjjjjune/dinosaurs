@@ -1,13 +1,15 @@
 local import = require(game.ReplicatedStorage.Shared.Import)
 
+local Messages = import "Shared/Utils/Messages"
+
 local loadOrder = {
 	"Shared/Systems/Particles",
 	"Shared/Systems/Data",
 	"Shared/Systems/Sounds",
 
-	"Server/Systems/TopbarPlus",
 	"Server/Systems/CharacterWrapper",
 	"Server/Systems/PlayerWrapper",
+	"Server/Systems/TopbarPlus",
 	"Server/Systems/ServerData",
 	"Server/Systems/Gamemode",
 	"Server/Systems/RespawnManager",
@@ -48,3 +50,5 @@ for _, path in ipairs(loadOrder) do
 	local system = import(path)
 	system:start()
 end
+
+Messages.fireQueue()

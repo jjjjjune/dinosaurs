@@ -62,7 +62,15 @@ function RespawnManager:start()
             player:LoadCharacter()
         end
     end)
-    Messages:hook("SeasonSetTo", function(currentSeason)
+    Messages:hook("MapDoneGenerating", function()
+        for _, p in pairs(game.Players:GetPlayers()) do
+            p:LoadCharacter()
+        end
+    end)
+    Messages:hook("SeasonSetTo", function(currentSeason, isFirstServerLoad)
+        if isFirstServerLoad then
+            return
+        end
         for _, p in pairs(game.Players:GetPlayers()) do
             if (not p.Character) or (p.Character and p.Character:FindFirstChild("Humanoid") and p.Character.Humanoid.Health <= 0) then
                 p:LoadCharacter()

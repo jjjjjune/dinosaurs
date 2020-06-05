@@ -2,6 +2,8 @@ local import = require(game.ReplicatedStorage.Shared.Import)
 local player = game.Players.LocalPlayer
 local FastSpawn = import "Shared/Utils/FastSpawn"
 
+local Messages = import "Shared/Utils/Messages"
+
 local loadOrder = {
 	"Client/Systems/ClientInit",
 	"Client/Systems/Lighting",
@@ -52,11 +54,14 @@ for _, path in ipairs(loadOrder) do
 	end
 end
 
+Messages.fireQueue()
+
 repeat wait() until player:FindFirstChild("PlayerGui")
 
 for _, path in ipairs(ui) do
 	local system = import(path)
-	FastSpawn(function() 
+	FastSpawn(function()
 		system:start(player.PlayerGui)
 	end)
 end
+

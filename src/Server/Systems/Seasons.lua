@@ -54,7 +54,7 @@ function Seasons:start()
 		currentSeason = ServerData:getValue("currentSeason") or 1
 		seasonsSurvived = ServerData:getValue("seasonsSurvived") or 1
 		hasLoadedSeasonData = true
-		Messages:send("SeasonSetTo", currentSeason) -- this order is important for dumb tween reasons   
+		Messages:send("SeasonSetTo", currentSeason, true) -- this order is important for dumb tween reasons
 	end)
 	initializeMainSeasonLoop()
 end

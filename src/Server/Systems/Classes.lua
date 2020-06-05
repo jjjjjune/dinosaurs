@@ -8,17 +8,17 @@ local possibleClasses = {"Citizen", "Gatherer"} -- , "Warrior"
 
 local function setClass(character, className)
     local classAsset = PlayerClassesFolder[className]
-    for _, value in pairs(classAsset.Humanoid:GetChildren()) do 
-        if value:IsA("NumberValue") then 
+    for _, value in pairs(classAsset.Humanoid:GetChildren()) do
+        if value:IsA("NumberValue") then
             character.Humanoid[value.Name].Value = value.Value
         end
     end
     character.UpperTorso.BrickColor = classAsset.UpperTorso.BrickColor
     character.RightUpperLeg.BrickColor = classAsset.RightUpperLeg.BrickColor
     character.LeftUpperLeg.BrickColor = classAsset.LeftUpperLeg.BrickColor
-    for _, v in pairs(character:GetChildren()) do 
-        if v:IsA("Accessory") then 
-            if not v:FindFirstChild("HatAttachment", true) and not v:FindFirstChild("HairAttachment", true) then 
+    for _, v in pairs(character:GetChildren()) do
+        if v:IsA("Accessory") then
+            if not v:FindFirstChild("HatAttachment", true) and not v:FindFirstChild("HairAttachment", true) then
                 v:Destroy()
             end
         end
@@ -35,6 +35,7 @@ local Classes = {}
 
 function Classes:start()
     Messages:hook("CharacterAdded", function(player, character)
+        print("classes char added being fired")
         wait()
         local class = possibleClasses[math.random(1, #possibleClasses)]
         setClass(character, class)

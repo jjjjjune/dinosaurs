@@ -52,7 +52,7 @@ end
 local allPossibilities = {}
 
 for _, x in pairs(game.ServerStorage.Example:GetChildren()) do
-    if not string.find(x.Name, "starttile") then 
+    if not string.find(x.Name, "starttile") then
         table.insert(allPossibilities, x.Name)
     end
 end
@@ -221,7 +221,7 @@ local function getCollapseResult(possibilities)
 				multiplier = game.ServerStorage.Example[poss]["Weight"].Value
 			end
 		end
-		for i = 1, math.max(1, multiplier*100) do 
+		for i = 1, math.max(1, multiplier*100) do
 			table.insert(newPossibilities, poss)
 		end
 	end
@@ -278,7 +278,7 @@ end
 local function getUpdatedPossibilities(toTile, fromTile)
     assert(toTile)
     assert(fromTile and #fromTile.possibilities >= 1, " no possibilities!")
-    
+
     local fromDirection, toDirection = getDirectionalRelationship(fromTile, toTile)
 
     local allowedModuleNames = {}
@@ -318,7 +318,7 @@ local function updateTileNeighborsRecursive(tile)
             local newPossibilities, removedPossibility = getUpdatedPossibilities(neighbor, tile)
             if removedPossibility then
                 neighbor.possibilities = newPossibilities
-                -- Now we've changed this neighbor, all its neighbors need to update              
+                -- Now we've changed this neighbor, all its neighbors need to update
 				updateTileNeighborsRecursive(neighbor)
 				--visualizeTiles(tile.x, tile.y, tile.z)
             end
@@ -329,7 +329,7 @@ end
 local function run(tiles)
 	local i = 1
     local unsolved = getLeastEntropicTileToCollapse()
-	
+
     while unsolved do
         -- Big difference: only need to collapse 1 tile, then we need to force
         -- constraints on whole system.
@@ -341,11 +341,11 @@ local function run(tiles)
 
         unsolved = getLeastEntropicTileToCollapse()
 		i = i + 1
-		
+
 		if i % 16  == 0 and unsolved then
 			--game:GetService("RunService").Stepped:Wait()
 		end
-        
+
     end
 end
 
@@ -369,42 +369,42 @@ local function getWfcGridOfSize(xsize, ysize, zsize)
 
 	local halfx = math.ceil(xsize/2)
 	local halfz = math.ceil(zsize/2)
-	
+
 	-- start tile
-	
+
 	local centerTile = tiles[halfx][ysize-1][halfz]
 	centerTile.possibilities = {"groundtoskyForward"}
 	updateTileNeighborsRecursive(centerTile)
 	collapse(centerTile)
-	
+
     -- tiles around start tile
-    
+
     local slopeTypes = {"slope", "slopealt1", "slopealt2"}
-	
+
 	local tile = tiles[halfx+1][ysize-2][halfz]
     local slopeString = slopeTypes[math.random(1, #slopeTypes)]
     local poss = slopeString.."Backward"
     tile.possibilities = {poss}
 	updateTileNeighborsRecursive(tile)
-	
+
 	local tile = tiles[halfx-1][ysize-2][halfz]
     local slopeString = slopeTypes[math.random(1, #slopeTypes)]
     local poss = slopeString.."Forward"
     tile.possibilities = {poss}
 	updateTileNeighborsRecursive(tile)
-	
+
 	local tile = tiles[halfx][ysize-2][halfz-1]
     local slopeString = slopeTypes[math.random(1, #slopeTypes)]
     local poss = slopeString.."Right"
     tile.possibilities = {poss}
 	updateTileNeighborsRecursive(tile)
-	
+
 	local tile = tiles[halfx][ysize-2][halfz+1]
     local slopeString = slopeTypes[math.random(1, #slopeTypes)]
     local poss = slopeString.."Left"
     tile.possibilities = {poss}
 	updateTileNeighborsRecursive(tile)
-	
+
 	-- corners
 
 	local tile = tiles[xsize][1][1]
@@ -426,7 +426,7 @@ local function getWfcGridOfSize(xsize, ysize, zsize)
     run(tiles)
 
     visualizeTiles()
-    
+
     tiles[halfx][ysize-1][halfz].collapseResult = {"starttileForward"}
     tiles[halfx][ysize-1][halfz].possibilities = {"starttileForward"}
 
@@ -434,8 +434,10 @@ local function getWfcGridOfSize(xsize, ysize, zsize)
 end
 
 local function onWaterUpdated()
+    print("water updated")
     local water = workspace.Effects.Water
     local yPos = water.Position.Y - 20
+    print("water y pos is: ", yPos)
     for i, tile in pairs(generatedMapTiles) do
         if not workspace.Tiles:FindFirstChild(i.."") then
             local folder = Instance.new("Folder", workspace.Tiles)
@@ -443,6 +445,7 @@ local function onWaterUpdated()
         end
         local folder = workspace.Tiles:FindFirstChild(i.."")
         if tile.PrimaryPart and tile.PrimaryPart.Position.Y >= yPos - 70 then
+            print("yeah primary part pos is : ", tile.PrimaryPart.Position.Y)
             tile.Parent = folder
         end
     end
@@ -482,7 +485,7 @@ function MapGeneration:loadFromSerializedMap(map)
     self.tileModelsToTileInfoMap = {}
     for i, tileInfo in pairs(map) do
         local cellName = tileInfo.name
-        if cellName ~= "skyForward" and cellName ~= "skyRight" and cellName ~= "skyBackward" and cellName ~= "skyLeft" then 
+        if cellName ~= "skyForward" and cellName ~= "skyRight" and cellName ~= "skyBackward" and cellName ~= "skyLeft" then
             local rotation = tileNameToRotationMap[cellName] or CFrame.Angles(0,0,0)
             cellName = string.gsub(cellName, "Forward", "")
             cellName = string.gsub(cellName, "Backward", "")
@@ -521,7 +524,6 @@ function MapGeneration:generateInitialMap()
         end
         wait()
     until grid
-    Messages:hook("WaterPositionUpdated", onWaterUpdated)
 
     local halfx = math.ceil(xsize/2)
     local halfz = math.ceil(zsize/2)
@@ -535,9 +537,12 @@ function MapGeneration:generateInitialMap()
     end
 
     backUpMap(allTiles)
+
     self:loadFromSerializedMap(ServerData:getValue("tileMap")) -- displays the map
 
     setInitialOceanHeight()
+
+    print("set initial ocean height")
 
     onWaterUpdated()
 
@@ -545,10 +550,10 @@ function MapGeneration:generateInitialMap()
 end
 
 function MapGeneration:start()
+    Messages:hook("WaterPositionUpdated", onWaterUpdated)
     local savedTileMap = ServerData:getValue("tileMap")
     if savedTileMap then
         self:loadFromSerializedMap(savedTileMap)
-        onWaterUpdated()
         Messages:send("MapDoneGenerating", false)
         return
     else

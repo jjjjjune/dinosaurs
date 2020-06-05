@@ -3,6 +3,9 @@ local httpService = game:GetService("HttpService")
 
 local replicationReady = {}
 local actionQueue = {}
+local nonPlayerActionQueue = {}
+
+local isReady = false
 
 local SignalObject = {}
 
@@ -12,15 +15,13 @@ function SignalObject.new(signals, action, callback)
         ID = httpService:GenerateGUID(),
     }
 
-   function SignalObject:unhook()
-        signals:unhook(action, self.ID)
-    end
-
     return SignalObject
 end
 
 local SIGNAL_REMOTE
 local SIGNAL_REMOTE_FUNCTION
+local SIGNAL_BINDABLE = Instance.new("BindableEvent")
+local SIGNAL_BINDABLE_FUNCTION = Instance.new("BindableFunction")
 
 local isClient = runService:IsClient()
 local isServer = runService:IsServer()
@@ -29,14 +30,9 @@ local Messages = {}
 
 Messages.hooks = {}
 
-function Messages:unhook(action, ID)
-	if self.hooks[action] == nil then return end
-    for _, storedSignalObject in pairs(self.hooks[action]) do
-        if storedSignalObject.ID == self.ID then
-            self.hooks[action] = nil
-        end
-    end
-end
+SIGNAL_BINDABLE.Event:connect(function(callback, ...)
+	callback(...)
+end)
 
 function Messages:hook(action, callback)
     local hooks = self.hooks
@@ -62,16 +58,18 @@ function Messages:send(action, ...)
 	local actionHooksTable = self.hooks[action]
 
 	if actionHooksTable then
-		local args = {...}
-		for _, hookFunction in pairs(actionHooksTable) do
-			local startTime = tick()
-			hookFunction.callback(unpack(args))
-			local nextTime = tick()
-			if (nextTime - startTime) > .5 then
-				warn(action, "message took: ", nextTime - startTime)
+		if not isReady then
+			table.insert(nonPlayerActionQueue, {
+				args = {...},
+				action = action,
+			})
+		else
+			local args = {...}
+			for _, signalObject in pairs(actionHooksTable) do
+				SIGNAL_BINDABLE:Fire(signalObject.callback, unpack(args))
 			end
+			--warn("No defined hook for message: "..action)
 		end
-		--warn("No defined hook for message: "..action)
 	end
 end
 
@@ -97,7 +95,7 @@ function Messages:sendClient(player, action, ...)
 	if typeof(player) ~= "Instance" then
 		warn("for action ", action, " you might have forgotten to use a player as your first arg")
 	end
-	if not replicationReady[player] then
+	if not replicationReady[player] or not isReady then
 		if not actionQueue[player] then
 			actionQueue[player] = {}
 		end
@@ -202,5 +200,12 @@ function Messages:init()
 end
 
 Messages:init()
+
+function Messages.fireQueue()
+	isReady = true
+	for _, actionData in pairs(nonPlayerActionQueue) do
+		Messages:send(actionData.action, unpack(actionData.args))
+	end
+end
 
 return Messages
