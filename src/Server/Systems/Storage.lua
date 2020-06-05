@@ -74,7 +74,7 @@ end
 local function backupItems()
     local items = {}
     for _, item in pairs(CollectionService:GetTagged("Item")) do
-        if not item:IsDescendantOf(game.ServerStorage) then
+        if not item:IsDescendantOf(game.ReplicatedStorage) then
             local pos = item.PrimaryPart.Position
             local info = {}
             info.name = item.Name
