@@ -4,11 +4,16 @@ local ServerData = import "Server/Systems/ServerData"
 local TweenService = game:GetService("TweenService")
 local CollectionService = game:GetService("CollectionService")
 
+local GetWorldPositionFromMapPosition = import "Shared/Utils/GetWorldPositionFromMapPosition"
+
+local Ocean = {}
+
 local OCEAN_LOWER_AMOUNT = 20--200
 
 --600, 419.5, 600
 
-local function updateSand(newHeight)
+function Ocean:updateSand()
+    local newHeight = self.sandGenerationHeight
     for _, t in pairs(workspace.Tiles:GetChildren()) do
         for _, tileModel in pairs(t:GetChildren()) do
             if not tileModel:FindFirstChild("EffectSand") then
@@ -25,9 +30,9 @@ local function updateSand(newHeight)
                 CollectionService:AddTag(sand, "Sand")
                 CollectionService:AddTag(sand, "EffectSand")
 
-                if newHeight  then
+                --[[if newHeight  then
                     CollectionService:AddTag(sand, "NoLowerFirstTime")
-                end
+                end--]]
 
                 local sand2 = Instance.new("Part", tileModel)
 
@@ -54,12 +59,10 @@ local function updateSand(newHeight)
     end
 end
 
-local function lowerOcean()
+function Ocean:lowerOcean()
     local oceanHeight = ServerData:getValue("oceanHeight") or 500
 
     oceanHeight = oceanHeight - OCEAN_LOWER_AMOUNT
-
-    updateSand(oceanHeight)
 
     local newPos = Vector3.new(600, oceanHeight, 600)
 
@@ -71,6 +74,7 @@ local function lowerOcean()
     local sandGoals = {
         Position = newPos - Vector3.new(0,3,0)
     }
+
     local tweenInfo = TweenInfo.new(6, Enum.EasingStyle.Quad,Enum.EasingDirection.Out)
     TweenService:Create(workspace.Effects.Water, tweenInfo, goals):Play()
     TweenService:Create(workspace.Effects.Sand, tweenInfo, sandGoals):Play()
@@ -91,9 +95,14 @@ local function lowerOcean()
     delay(1, function()
         Messages:send("WaterPositionUpdated")
     end)
+
+    self.sandGenerationHeight = oceanHeight
+    print("ok in the lower the ocean height is now ", self.sandGenerationHeight)
+
+    self:updateSand()
 end
 
-local function setOceanHeight(height)
+function Ocean:setOceanHeight(height)
     local newPos = Vector3.new(600, height, 600)
 
     ServerData:setValue("oceanHeight", height)
@@ -103,30 +112,55 @@ local function setOceanHeight(height)
     workspace.Effects.Water.Position = newPos
     workspace.Effects.Sand.Position = newPos - Vector3.new(0,3,0)
 
-    updateSand(newPos.Y)
+    print("set ocean height sand generation height to: ", newPos.Y)
+    self.sandGenerationHeight = newPos.Y
+
+    self:updateSand()
 end
 
-local function onMapDoneGenerating()
-    local oceanHeight = ServerData:getValue("oceanHeight") or 400
+function Ocean:onMapDoneGenerating()
+    local oceanHeight = ServerData:getValue("oceanHeight")
+
     local newPos = Vector3.new(600, oceanHeight, 600)
     workspace.Effects.Sky.Position = newPos
     workspace.Effects.Water.Position = newPos
     workspace.Effects.Sand.Position = newPos - Vector3.new(0,3,0)
 
-    Messages:send("WaterPositionUpdated")
+    print("set generation height to: ", newPos.Y)
+    self.sandGenerationHeight = newPos.Y
 
-    spawn(function()
-        wait()
-        updateSand(newPos.Y)
-    end)
+    Messages:send("WaterPositionUpdated")
 end
 
-local Ocean = {}
+function Ocean:start(mapTileObjects)
+    self.mapTileObjects = mapTileObjects
 
-function Ocean:start()
-    Messages:hook("MapDoneGenerating", onMapDoneGenerating)
-    Messages:hook("LowerOcean", lowerOcean)
-    Messages:hook("SetOceanHeight", setOceanHeight)
+    Messages:hook("LowerOcean", function()
+        self:lowerOcean()
+    end)
+
+    Messages:hook("MapRerendered", function()
+        self:updateSand()
+    end)
+
+    local oceanHeight = ServerData:getValue("oceanHeight")
+
+    if not oceanHeight then
+        print("no saved ocean height doing highest tile thing")
+        local highestTile = {y = -100000000}
+        for _, mapTile in pairs(self.mapTileObjects) do
+            if mapTile.y > highestTile.y and not string.find(mapTile.name:lower(), "sky") then
+                highestTile = mapTile
+            end
+        end
+        oceanHeight = GetWorldPositionFromMapPosition(highestTile.x, highestTile.y, highestTile.z).y - 120
+        ServerData:setValue("oceanHeight", oceanHeight)
+        self:onMapDoneGenerating()
+    else
+        print("we had a saved ocean height and it;s ", oceanHeight)
+        self:setOceanHeight(oceanHeight)
+        Messages:send("WaterPositionUpdated")
+    end
 
 end
 

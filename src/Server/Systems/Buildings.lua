@@ -84,7 +84,7 @@ function Buildings:start()
     Messages:hook("MapDoneGenerating", function(isFirstTime)
         if isFirstTime then
             local folder = game.ServerStorage.StartTileBuildings
-            local starttile = workspace:FindFirstChild("starttile", true):Clone()
+            local starttile = CollectionService:GetTagged("StartTile")[1]:Clone()
             folder:SetPrimaryPartCFrame(starttile.PrimaryPart.CFrame)
             for _, v in pairs(folder:GetChildren()) do
                 v.Parent = workspace.Buildings

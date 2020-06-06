@@ -13,7 +13,7 @@ local Immutable = import "Immutable"
 local IS_SAVING_IN_STUDIO = true
 
 local function getServerId()
-    return "TestServer54"
+    return "TestServer69"
 end
 
 local function copy(value)

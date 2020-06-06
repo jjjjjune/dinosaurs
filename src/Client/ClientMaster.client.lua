@@ -54,14 +54,11 @@ for _, path in ipairs(loadOrder) do
 	end
 end
 
-Messages.fireQueue()
-
 repeat wait() until player:FindFirstChild("PlayerGui")
 
 for _, path in ipairs(ui) do
 	local system = import(path)
-	FastSpawn(function()
-		system:start(player.PlayerGui)
-	end)
+	system:start(player.PlayerGui)
 end
 
+Messages.fireQueue()

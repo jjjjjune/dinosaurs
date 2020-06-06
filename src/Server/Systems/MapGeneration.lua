@@ -4,13 +4,11 @@ local Messages = import "Shared/Utils/Messages"
 local Perlin = import "Shared/Utils/Perlin"
 local ServerData = import "Server/Systems/ServerData"
 
-local tileNameToRotationMap = {}
-
 local directions = {"Left","Right","Forward","Backward", "Up", "Down"}
 local permutationDirections = {"Left", "Right", "Forward", "Backward"}
 
 local allTiles = {}
-local generatedMapTiles = {}
+local tileNameToRotationMap = {}
 
 local function getPermutation(model, direction)
 	local new = model:Clone()
@@ -26,42 +24,47 @@ local function getPermutation(model, direction)
         new:SetPrimaryPartCFrame(new.PrimaryPart.CFrame * CFrame.Angles(0, math.pi, 0))
         cf = new.PrimaryPart.CFrame - new.PrimaryPart.CFrame.p
     end
-    tileNameToRotationMap[new.Name..direction] = cf
 	new.Base.CFrame = originalCF
 	new:SetPrimaryPartCFrame(CFrame.new(0,0,0))
 	new.Name = model.Name..direction
-	new.Parent = workspace -- sadly this is required for da raycast
+    new.Parent = workspace -- sadly this is required for da raycast
+    tileNameToRotationMap[new.Name] = cf
 	local skin = import "Shared/Utils/ConfigureWfcTile"
 	skin(new)
 	new.Parent = nil
 	return new
 end
 
-for _, tileTemplate in pairs(game.ServerStorage.BaseTiles:GetChildren()) do
-    for _, dir in pairs(permutationDirections) do
-		if not tileTemplate:FindFirstChild("NoPermutations") then
-			local newModel = getPermutation(tileTemplate, dir)
-            newModel.Parent = game.ServerStorage.Example
-		else
-			local newModel = getPermutation(tileTemplate, "Forward")
-            newModel.Parent = game.ServerStorage.Example
-		end
+local function populatePermutations()
+    for _, tileTemplate in pairs(game.ServerStorage.BaseTiles:GetChildren()) do
+        for _, dir in pairs(permutationDirections) do
+            if not tileTemplate:FindFirstChild("NoPermutations") then
+                local newModel = getPermutation(tileTemplate, dir)
+                newModel.Parent = game.ServerStorage.Example
+            else
+                local newModel = getPermutation(tileTemplate, "Forward")
+                newModel.Parent = game.ServerStorage.Example
+            end
+        end
     end
 end
 
-local allPossibilities = {}
+populatePermutations()
 
-for _, x in pairs(game.ServerStorage.Example:GetChildren()) do
-    if not string.find(x.Name, "starttile") then
-        table.insert(allPossibilities, x.Name)
+local allPossibilities do
+    allPossibilities = {}
+    for _, x in pairs(game.ServerStorage.Example:GetChildren()) do
+        if not string.find(x.Name, "starttile") then
+            table.insert(allPossibilities, x.Name)
+        end
     end
 end
 
--- ok, now we have a map of [tileName] = {direction = thing that can be here or nil}
 local finalTiles = {}
 local tiles = {}
+local weights = {}
 
-local function newTile(x, y, z) -- holds the possibilities for the tile and the collapsed result
+local function newTile(x, y, z)
     local tile = {}
     tile.x = x
     tile.y = y
@@ -122,15 +125,16 @@ local function getTileInDirection(baseTile, direction)
     end
 end
 
-local possibilitiesMap = {}
-
-for _, exModel in pairs(game.ServerStorage.Example:GetChildren()) do
-    if not possibilitiesMap[exModel.Name] then
-        possibilitiesMap[exModel.Name] = {}
-    end
-    for _, x in pairs(exModel:GetChildren()) do
-        if x:IsA("StringValue") then
-            possibilitiesMap[exModel.Name][x.Name] = x.Value
+local possibilitiesMap do
+    possibilitiesMap = {}
+    for _, exModel in pairs(game.ServerStorage.Example:GetChildren()) do
+        if not possibilitiesMap[exModel.Name] then
+            possibilitiesMap[exModel.Name] = {}
+        end
+        for _, x in pairs(exModel:GetChildren()) do
+            if x:IsA("StringValue") then
+                possibilitiesMap[exModel.Name][x.Name] = x.Value
+            end
         end
     end
 end
@@ -149,8 +153,6 @@ local function getTotalAppearancesOfConnector(connectionType)
 	assert(total > 0)
 	return total
 end
-
-local weights = {}
 
 local function getWeight(possibility)
 	if weights[possibility] then
@@ -238,27 +240,6 @@ local function collapse(tile, lastTile)
     table.insert(finalTiles, tile)
 end
 
-local function visualizeTiles()
-    for _, tile in pairs(allTiles) do
-        local str = tile.x.." "..tile.y.." "..tile.z.." "
-        if not workspace.Tiles:FindFirstChild(str) then
-            local folder = Instance.new("Folder", workspace.Tiles)
-            folder.Name = str
-        end
-        local folder = workspace.Tiles[str]
-        if #folder:GetChildren() > 1 then
-            folder:ClearAllChildren()
-        end
-		local result = tile.possibilities[1]
-        if not folder:FindFirstChild(result) then
-            local newModel
-            newModel = game.ServerStorage.Example[result]:Clone()
-            newModel:SetPrimaryPartCFrame(CFrame.new(tile.x*30, (tile.y*30) - 13, tile.z*30))
-            newModel.Parent = folder
-        end
-    end
-end
-
 local function getDirectionalRelationship(from, to) -- returns a face, not a direction
     if from.x == to.x and from.y == to.y and from.z ==to.z - 1 then
         return "Front", "Back" -- from is is front of tile 2
@@ -320,7 +301,6 @@ local function updateTileNeighborsRecursive(tile)
                 neighbor.possibilities = newPossibilities
                 -- Now we've changed this neighbor, all its neighbors need to update
 				updateTileNeighborsRecursive(neighbor)
-				--visualizeTiles(tile.x, tile.y, tile.z)
             end
         end
     end
@@ -425,27 +405,10 @@ local function getWfcGridOfSize(xsize, ysize, zsize)
 
     run(tiles)
 
-    visualizeTiles()
-
     tiles[halfx][ysize-1][halfz].collapseResult = {"starttileForward"}
     tiles[halfx][ysize-1][halfz].possibilities = {"starttileForward"}
 
     return tiles
-end
-
-local function onWaterUpdated()
-    local water = workspace.Effects.Water
-    local yPos = water.Position.Y - 20
-    for i, tile in pairs(generatedMapTiles) do
-        if not workspace.Tiles:FindFirstChild(i.."") then
-            local folder = Instance.new("Folder", workspace.Tiles)
-            folder.Name = i..""
-        end
-        local folder = workspace.Tiles:FindFirstChild(i.."")
-        if tile.PrimaryPart and tile.PrimaryPart.Position.Y >= yPos - 70 then
-            tile.Parent = folder
-        end
-    end
 end
 
 local function backUpMap(allTiles)
@@ -464,45 +427,17 @@ local function backUpMap(allTiles)
     ServerData:setValue("tileMap", map)
 end
 
-local function setInitialOceanHeight()
-    local highest = -1000
-    for _, t in pairs(generatedMapTiles) do
-        if t.PrimaryPart.Position.Y > highest then
-            highest = t.PrimaryPart.Position.Y
-        end
-    end
-
-    Messages:send("SetOceanHeight", highest - 100)
-end
-
 local MapGeneration = {}
 
 function MapGeneration:loadFromSerializedMap(map)
     workspace.Tiles:ClearAllChildren()
-    self.tileModelsToTileInfoMap = {}
-    for i, tileInfo in pairs(map) do
-        local cellName = tileInfo.name
-        if cellName ~= "skyForward" and cellName ~= "skyRight" and cellName ~= "skyBackward" and cellName ~= "skyLeft" then
-            local rotation = tileNameToRotationMap[cellName] or CFrame.Angles(0,0,0)
-            cellName = string.gsub(cellName, "Forward", "")
-            cellName = string.gsub(cellName, "Backward", "")
-            cellName = string.gsub(cellName, "Left", "")
-            cellName = string.gsub(cellName, "Right", "")
-            local biome = tileInfo.biome
-            local newTile = game.ServerStorage.MapTiles[biome][cellName]:Clone()
-            local biomeValue = Instance.new("StringValue", newTile)
-            biomeValue.Name = "Biome"
-            biomeValue.Value = biome
-            newTile:SetPrimaryPartCFrame(CFrame.new(tileInfo.x*120,tileInfo.y*120,tileInfo.z*120))
-            newTile:SetPrimaryPartCFrame(newTile.PrimaryPart.CFrame * rotation)
-            if newTile.Name ~= "starttile" then
-                newTile.Name = "X"..tileInfo.x.."Y"..tileInfo.y.."Z"..tileInfo.z..""
-            end
-            table.insert(generatedMapTiles, newTile)
-            self.tileModelsToTileInfoMap[newTile] = tileInfo
-            --newTile.Parent = workspace.Tiles
-        end
-    end
+
+    self.TileRenderer = import "Server/MapRenderComponents/TileRenderer"
+    self.TileRenderer:supplyMapTileObjects(map, tileNameToRotationMap)
+    self.TileRenderer:start()
+
+    self.Ocean = import "Server/MapRenderComponents/Ocean"
+    self.Ocean:start(map)
 end
 
 function MapGeneration:generateInitialMap()
@@ -537,17 +472,10 @@ function MapGeneration:generateInitialMap()
 
     self:loadFromSerializedMap(ServerData:getValue("tileMap")) -- displays the map
 
-    setInitialOceanHeight()
-
-    print("set initial ocean height")
-
-    onWaterUpdated()
-
     Messages:send("MapDoneGenerating", true)
 end
 
 function MapGeneration:start()
-    Messages:hook("WaterPositionUpdated", onWaterUpdated)
     local savedTileMap = ServerData:getValue("tileMap")
     if savedTileMap then
         self:loadFromSerializedMap(savedTileMap)

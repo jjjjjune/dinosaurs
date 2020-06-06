@@ -29,7 +29,6 @@ local loadOrder = {
 	"Server/Systems/Rocks",
 	"Server/Systems/Masks",
 	"Server/Systems/Crafting",
-	"Server/Systems/Ocean",
 	"Server/Systems/Buildings",
 	"Server/Systems/Biomes",
 	"Server/Systems/MapGeneration",

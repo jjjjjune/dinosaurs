@@ -94,7 +94,7 @@ local function tickBiome(biome, allBiomeTiles, isFirstTime)
 
     local plantsAmountRandom = Random.new(totalseed)
     local plantsAmount = plantsAmountRandom:NextInteger(minPlantsPerTile*(#allBiomeTiles), maxPlantsPerTile*(#allBiomeTiles))
-    
+
     --print("plants amount is: ", plantsAmount)
 
     local currentPlantsCount = getBiomePlants(biome)
@@ -115,6 +115,7 @@ local function performBiomeCheck(isFirstTime)
 
     local allBiomes = {}
 
+    -- going to have to change this to just look at all rendered tiles
     for _, tileInfo in pairs(tileModelsToTileInfoMap) do
         if not allBiomes[tileInfo.biome] then
             allBiomes[tileInfo.biome] = true
@@ -125,12 +126,8 @@ local function performBiomeCheck(isFirstTime)
         local allBiomeTiles = {}
         for i, tileFolder in pairs(workspace.Tiles:GetChildren()) do
             for _, tile in pairs(tileFolder:GetChildren()) do
-                if tile.Biome.Value == biome then 
-                --if tile.Parent ~= nil and tile.PrimaryPart.Position.Y  > workspace.Effects.Sand.Position.Y - 20 then
-                    --if not info.name == "groundForward" and not info.name == "groundBackward" and not info.name then
+                if tile.Biome.Value == biome then
                     table.insert(allBiomeTiles, tile)
-                    --end
-               -- end
                 end
             end
         end
@@ -143,6 +140,7 @@ local Biomes = {}
 function Biomes:start()
     Messages:hook("MapDoneGenerating", function(isFirstTime)
         if isFirstTime then
+            print("first biome check")
             performBiomeCheck(true)
         end
     end)
