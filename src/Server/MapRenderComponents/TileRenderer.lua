@@ -10,7 +10,7 @@ local TileRenderer = {}
 
 TileRenderer.generatedTiles = {}
 
-function TileRenderer:supplyMapTileObjects(mapTileObjects, tileNameToRotationMap)
+function TileRenderer:supplyMapTileObjects(mapTileObjects, tileNameToRotationMap, firstGen)
     self.mapTileObjects = mapTileObjects
     self.tileNameToRotationMap = tileNameToRotationMap
     for i, tileInfo in pairs(self.mapTileObjects) do
@@ -29,6 +29,8 @@ function TileRenderer:supplyMapTileObjects(mapTileObjects, tileNameToRotationMap
 
             biomeValue.Name = "Biome"
             biomeValue.Value = biome
+
+            CollectionService:AddTag(newTile, "Tile")
 
             newTile:SetPrimaryPartCFrame(CFrame.new(tileInfo.x*120,tileInfo.y*120,tileInfo.z*120))
             newTile:SetPrimaryPartCFrame(newTile.PrimaryPart.CFrame * rotation)

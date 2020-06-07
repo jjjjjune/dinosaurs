@@ -2,6 +2,7 @@ local import = require(game.ReplicatedStorage.Shared.Import)
 local Messages = import "Shared/Utils/Messages"
 local RunService = game:GetService("RunService")
 
+local ServerData = import "Server/Systems/ServerData"
 local GetValidPlantPos = import "Shared/Utils/GetValidPlantPos"
 local FastSpawn = import "Shared/Utils/FastSpawn"
 
@@ -109,16 +110,12 @@ local function tickBiome(biome, allBiomeTiles, isFirstTime)
 end
 
 local function performBiomeCheck(isFirstTime)
-    local MapGeneration = import "Server/Systems/MapGeneration"
-
-    local tileModelsToTileInfoMap = MapGeneration.tileModelsToTileInfoMap
-
     local allBiomes = {}
 
     -- going to have to change this to just look at all rendered tiles
-    for _, tileInfo in pairs(tileModelsToTileInfoMap) do
-        if not allBiomes[tileInfo.biome] then
-            allBiomes[tileInfo.biome] = true
+    for _, tile in pairs(CollectionService:GetTagged("Tile")) do
+        if not allBiomes[tile.Biome.Value] then
+            allBiomes[tile.Biome.Value] = true
         end
     end
 
@@ -138,9 +135,9 @@ end
 local Biomes = {}
 
 function Biomes:start()
-    Messages:hook("MapDoneGenerating", function(isFirstTime)
-        if isFirstTime then
-            print("first biome check")
+    Messages:hook("FirstMapRenderComplete", function()
+        if not ServerData:getValue("FirstBiomeCheck") then
+            ServerData:setValue("FirstBiomeCheck", true)
             performBiomeCheck(true)
         end
     end)

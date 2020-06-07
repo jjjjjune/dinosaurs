@@ -6,6 +6,7 @@ local RespawnManager = {}
 
 function RespawnManager:start()
     Messages:hook("PlayerDied", function(player, characterThatDied)
+        print("PLAEYR DIEEDD")
         if #game.Players:GetPlayers() == 1 then
             wait(1)
             warn("auto loading character cause server")

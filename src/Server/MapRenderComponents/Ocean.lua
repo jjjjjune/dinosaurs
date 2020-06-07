@@ -153,7 +153,7 @@ function Ocean:start(mapTileObjects)
                 highestTile = mapTile
             end
         end
-        oceanHeight = GetWorldPositionFromMapPosition(highestTile.x, highestTile.y, highestTile.z).y - 120
+        oceanHeight = GetWorldPositionFromMapPosition(highestTile.x, highestTile.y, highestTile.z).y - 90
         ServerData:setValue("oceanHeight", oceanHeight)
         self:onMapDoneGenerating()
     else

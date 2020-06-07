@@ -5,7 +5,6 @@ local FastSpawn = import "Shared/Utils/FastSpawn"
 local Messages = import "Shared/Utils/Messages"
 
 local loadOrder = {
-	"Client/Systems/ClientInit",
 	"Client/Systems/Lighting",
 	"Client/Systems/Footsteps",
 	"Client/Systems/ClientSound",
@@ -62,3 +61,6 @@ for _, path in ipairs(ui) do
 end
 
 Messages.fireQueue()
+
+local init = import "Client/Systems/ClientInit"
+init:start()

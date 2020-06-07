@@ -55,6 +55,9 @@ local function refreshTools()
 end
 
 local function onPlayerDataSet(data)
+    if not data.server or not data.server.storedTools then
+        return
+    end
     for toolName, toolData in pairs(data.server.storedTools) do
         skin(ToolsUi.Frame[toolName])
     end
