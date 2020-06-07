@@ -50,7 +50,7 @@ function ClientEffects:start()
 	Messages:hook("CharacterAddedClient", function(character)
 		FastSpawn(function()
 			wait(.2)
-			camShake:Shake(CameraShaker.Presets["Earthquake"])
+			camShake:Shake(CameraShaker.Presets["Bump"])
 		end)
     end)
 

@@ -5,6 +5,10 @@ local Messages = import "Shared/Utils/Messages"
 local CollectionService = game:GetService("CollectionService")
 
 local function onCharAdded(player, character)
+    warn("onCharAdded firing ", tick())
+
+    repeat wait() until character:IsDescendantOf(game)
+
     Messages:send("CharacterAdded", player, character)
 
     Messages:sendClient(player, "CharacterAddedClient", character)
@@ -38,9 +42,6 @@ local CharacterWrapper = {}
 
 function CharacterWrapper:start()
     Messages:hook("PlayerAdded", function(player)
-        if player.Character then
-            onCharAdded(player, player.Character)
-        end
         player.CharacterAdded:connect(function(character)
             onCharAdded(player, character)
         end)

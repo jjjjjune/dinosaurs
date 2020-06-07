@@ -8,7 +8,7 @@ local lastTextures = {}
 local NEON_COLOR = BrickColor.new("CGA brown")
 local SPECIALMESH_COLOR = Color3.fromRGB(234, 148, 0)
 
-local function playRespawnEffect(player, character)
+--[[local function playRespawnEffect(player, character)
     local length = 1.1
     local parts = {}
     for i, possiblePart in pairs(character:GetDescendants()) do
@@ -87,12 +87,58 @@ local function playRespawnEffect(player, character)
         light:Destroy()
         Messages:send("SpawnEffectPlayed", player, character)
     end)
+end--]]
+
+local totalTweenlength = 2
+
+local info = TweenInfo.new(totalTweenlength/2,Enum.EasingStyle.Quad,Enum.EasingDirection.Out)
+
+local function playRespawnEffect(player, character)
+    
+    local goals = {
+        Transparency = 0
+    }
+
+    for _, part in pairs(character:GetDescendants()) do
+        if part:IsA("BasePart") and part.Transparency ~= 1 then
+            print("doing decals HSADHSDHJK")
+            local faces = {
+                "Front",
+                "Back",
+                "Left",
+                "Right",
+                "Top",
+                "Bottom"
+            }
+            local endGoals = {
+                Transparency = 1
+            }
+            for _, face in pairs(faces) do
+                local decal = Instance.new("Decal", part)
+                decal.Color3 = Color3.fromRGB(255,255,0)
+                decal.Texture = "rbxassetid://132155326"
+                decal.Face = face
+                decal.Transparency = 1
+                local tween = TweenService:Create(decal, info, goals)
+                tween.Completed:connect(function()
+                    tween = TweenService:Create(decal, info, endGoals)
+
+                    tween.Completed:connect(function()
+                        decal:Destroy()
+                    end)
+
+                    tween:Play()
+                end)
+                tween:Play()
+            end
+        end
+    end
 end
 
 local SpawnEffect = {}
 
 function SpawnEffect:start()
-    Messages:hook("CharacterAppearanceSet", function(player, character)
+    Messages:hook("MaskAdded", function(player, character)
         playRespawnEffect(player, character)
     end)
 end

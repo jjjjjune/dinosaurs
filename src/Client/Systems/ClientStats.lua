@@ -35,9 +35,6 @@ function StatsClient:start()
             onStatUpdated("health", humanoid.Health)
         end)
     end)
-    if game.Players.LocalPlayer.Character then
-        Messages:send("CharacterAddedClient", game.Players.LocalPlayer.Character)
-    end
 end
 
 return StatsClient

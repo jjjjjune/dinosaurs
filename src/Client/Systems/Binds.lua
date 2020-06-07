@@ -101,7 +101,6 @@ local function bindStep()
 end
 
 local function performActionCallbackForAction(actionName)
-    print("performing callback for ", actionName)
     local foundItem
     local tagBindInfo = boundActionTags[actionName]
     if tagBindInfo then

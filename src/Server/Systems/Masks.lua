@@ -21,7 +21,7 @@ end
 local Masks = {}
 
 function Masks:start()
-    Messages:hook("SpawnEffectPlayed", spawnEffectPlayed)
+    Messages:hook("CharacterAppearanceSet", spawnEffectPlayed)
 end
 
 return Masks
