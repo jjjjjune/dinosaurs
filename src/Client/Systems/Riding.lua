@@ -116,7 +116,6 @@ function Riding:start()
 				Messages:sendServer("PlayParticleServer", "JumpParticle", 10, model.PrimaryPart.Position)
 			end
 		end)
-		print("health is 4 : ", GetCharacter().Humanoid.Health)
 	end)
 	Messages:hook("Dismounted", function()
 		Messages:send("StopAnimationClient", "Ride")

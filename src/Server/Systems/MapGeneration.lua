@@ -429,11 +429,11 @@ end
 
 local MapGeneration = {}
 
-function MapGeneration:loadFromSerializedMap(map)
+function MapGeneration:loadFromSerializedMap(map, isFirstTime)
     workspace.Tiles:ClearAllChildren()
 
     self.TileRenderer = import "Server/MapRenderComponents/TileRenderer"
-    self.TileRenderer:supplyMapTileObjects(map, tileNameToRotationMap)
+    self.TileRenderer:supplyMapTileObjects(map, tileNameToRotationMap, isFirstTime)
     self.TileRenderer:start()
 
     self.Ocean = import "Server/MapRenderComponents/Ocean"
@@ -470,7 +470,7 @@ function MapGeneration:generateInitialMap()
 
     backUpMap(allTiles)
 
-    self:loadFromSerializedMap(ServerData:getValue("tileMap")) -- displays the map
+    self:loadFromSerializedMap(ServerData:getValue("tileMap"), true) -- displays the map
 
     Messages:send("MapDoneGenerating", true)
 end
@@ -478,7 +478,7 @@ end
 function MapGeneration:start()
     local savedTileMap = ServerData:getValue("tileMap")
     if savedTileMap then
-        self:loadFromSerializedMap(savedTileMap)
+        self:loadFromSerializedMap(savedTileMap, false)
         Messages:send("MapDoneGenerating", false)
         return
     else

@@ -97,7 +97,6 @@ function Ocean:lowerOcean()
     end)
 
     self.sandGenerationHeight = oceanHeight
-    print("ok in the lower the ocean height is now ", self.sandGenerationHeight)
 
     self:updateSand()
 end
@@ -112,7 +111,6 @@ function Ocean:setOceanHeight(height)
     workspace.Effects.Water.Position = newPos
     workspace.Effects.Sand.Position = newPos - Vector3.new(0,3,0)
 
-    print("set ocean height sand generation height to: ", newPos.Y)
     self.sandGenerationHeight = newPos.Y
 
     self:updateSand()
@@ -126,7 +124,6 @@ function Ocean:onMapDoneGenerating()
     workspace.Effects.Water.Position = newPos
     workspace.Effects.Sand.Position = newPos - Vector3.new(0,3,0)
 
-    print("set generation height to: ", newPos.Y)
     self.sandGenerationHeight = newPos.Y
 
     Messages:send("WaterPositionUpdated")
@@ -146,7 +143,6 @@ function Ocean:start(mapTileObjects)
     local oceanHeight = ServerData:getValue("oceanHeight")
 
     if not oceanHeight then
-        print("no saved ocean height doing highest tile thing")
         local highestTile = {y = -100000000}
         for _, mapTile in pairs(self.mapTileObjects) do
             if mapTile.y > highestTile.y and not string.find(mapTile.name:lower(), "sky") then
@@ -157,7 +153,6 @@ function Ocean:start(mapTileObjects)
         ServerData:setValue("oceanHeight", oceanHeight)
         self:onMapDoneGenerating()
     else
-        print("we had a saved ocean height and it;s ", oceanHeight)
         self:setOceanHeight(oceanHeight)
         Messages:send("WaterPositionUpdated")
     end

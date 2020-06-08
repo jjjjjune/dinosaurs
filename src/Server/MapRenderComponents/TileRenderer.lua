@@ -25,6 +25,16 @@ function TileRenderer:supplyMapTileObjects(mapTileObjects, tileNameToRotationMap
 
             local biome = tileInfo.biome
             local newTile = game.ServerStorage.MapTiles[biome][cellName]:Clone()
+
+            if not firstGen then
+                for _, possibleWater in pairs(newTile:GetDescendants()) do
+                    if CollectionService:HasTag(possibleWater, "FreshWater") then
+                        print("destroying water source from not first loaded map")
+                        possibleWater:Destroy()
+                    end
+                end
+            end
+
             local biomeValue = Instance.new("StringValue", newTile)
 
             biomeValue.Name = "Biome"

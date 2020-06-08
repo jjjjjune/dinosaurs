@@ -94,14 +94,8 @@ local totalTweenlength = 2
 local info = TweenInfo.new(totalTweenlength/2,Enum.EasingStyle.Quad,Enum.EasingDirection.Out)
 
 local function playRespawnEffect(player, character)
-    
-    local goals = {
-        Transparency = 0
-    }
-
     for _, part in pairs(character:GetDescendants()) do
         if part:IsA("BasePart") and part.Transparency ~= 1 then
-            print("doing decals HSADHSDHJK")
             local faces = {
                 "Front",
                 "Back",
@@ -115,21 +109,19 @@ local function playRespawnEffect(player, character)
             }
             for _, face in pairs(faces) do
                 local decal = Instance.new("Decal", part)
-                decal.Color3 = Color3.fromRGB(255,255,0)
+                decal.Color3 = Color3.fromRGB(255,220,0)
                 decal.Texture = "rbxassetid://132155326"
                 decal.Face = face
-                decal.Transparency = 1
-                local tween = TweenService:Create(decal, info, goals)
+                decal.Transparency = 0
+
+                local tween = TweenService:Create(decal, info, endGoals)
+
                 tween.Completed:connect(function()
-                    tween = TweenService:Create(decal, info, endGoals)
-
-                    tween.Completed:connect(function()
-                        decal:Destroy()
-                    end)
-
-                    tween:Play()
+                    decal:Destroy()
                 end)
+
                 tween:Play()
+
             end
         end
     end
