@@ -157,11 +157,11 @@ local function handleFootsteps()
             end
         end
     end
-    for _, animal in pairs(CollectionService:GetTagged("Animal")) do
-        if not footstepConnections[animal] then
-            local pos = animal.PrimaryPart and animal.PrimaryPart.Position
+    for _, monster in pairs(CollectionService:GetTagged("Monster")) do
+        if not footstepConnections[monster] then
+            local pos = monster.PrimaryPart and monster.PrimaryPart.Position
             if (pos and position) and (pos - position).magnitude < FOOTSTEP_RADIUS then
-                footstepConnections[animal] = bindFootsteps(animal)
+                footstepConnections[monster] = bindFootsteps(monster)
             end
         end
     end

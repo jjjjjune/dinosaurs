@@ -6,7 +6,7 @@ local CollectionService = game:GetService("CollectionService")
 local tagsToEffectsMap = {
     Rock = import "Shared/Effects/RockEffect",
     Character = import "Shared/Effects/CharacterDamageEffect",
-    Animal = import "Shared/Effects/AnimalDamageEffect"
+    Monster = import "Shared/Effects/MonsterDamageEffect"
 }
 
 local function playDamageEffect(object, ...)

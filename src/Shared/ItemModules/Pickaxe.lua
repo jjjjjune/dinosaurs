@@ -91,7 +91,7 @@ function Tool.clientUse(item)
             chopRock(item, rock)
         end
         Messages:send("RegisterHitbox", "Default", function(part)
-            if CollectionService:HasTag(part.Parent, "Animal") then
+            if CollectionService:HasTag(part.Parent, "Monster") then
                 Tool.damageClient(part.Parent, part)
             end
         end)

@@ -6,10 +6,10 @@ local MIN_FIND_DISTANCE = 12
 
 local CollectionService = game:GetService("CollectionService")
 
-local function getClosestAnimal(position, tag)
+local function getClosestMonster(position, tag)
     local closestDistance = MIN_FIND_DISTANCE
     local closestItem
-    for _, item in pairs(CollectionService:GetTagged("Animal")) do
+    for _, item in pairs(CollectionService:GetTagged("Monster")) do
         local itemPos = item.PrimaryPart and item.PrimaryPart.Position
         if itemPos and not CollectionService:HasTag(item, "Rideable") then
             local dist = (position - itemPos).magnitude
@@ -31,8 +31,8 @@ end
 function Item.serverUse(player, item)
     local pos = player.Character and player.Character.PrimaryPart and player.Character.PrimaryPart.Position
     if pos then
-        local animal = getClosestAnimal(pos)
-        animal.Tame:Fire(player)
+        local monster = getClosestMonster(pos)
+        monster.Tame:Fire(player)
         Messages:sendClient(player, "Notify", "HEALTH_COLOR", "SPRING", "THE ANIMAL HAS BEEN TAMED.")
         return true
     else

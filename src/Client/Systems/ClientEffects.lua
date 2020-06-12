@@ -52,6 +52,7 @@ function ClientEffects:start()
 			wait(.2)
 			camShake:Shake(CameraShaker.Presets["Bump"])
 		end)
+		character:WaitForChild("HumanoidRootPart").Velocity = Vector3.new(0,400,0)
     end)
 
 	game:GetService("RunService").RenderStepped:connect(oceanEffect)
