@@ -118,7 +118,7 @@ local function performActionCallbackForAction(actionName)
             end
         end
         if closestTagItem then
-            tagBindInfo.callbacks[closestTag](foundItem)
+            tagBindInfo.callbacks[closestTag](closestTagItem)
             Messages:send("PlayPressedEffect", actionName)
         end
     else
