@@ -5,8 +5,6 @@ local TweenService = game:GetService("TweenService")
 local Messages = import "Shared/Utils/Messages"
 local DamageColors = import "Shared/Data/DamageColors"
 
-local CollectionService = game:GetService("CollectionService")
-
 local totalTweenlength = .3
 
 local info = TweenInfo.new(totalTweenlength/2,Enum.EasingStyle.Quad,Enum.EasingDirection.Out)

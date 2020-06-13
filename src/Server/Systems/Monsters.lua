@@ -13,13 +13,16 @@ local monsterSpawnStep = 5 -- only check every 5 seconds if we should spawn a mo
 local nextMonsterSpawnStep = tick() + monsterSpawnStep
 
 local activeMonsters = {
-	"Lizard"
+	"Lizard",
+	"Alpaca",
 }
 
 local function getComponent(monster)
 	for tagName, moduleState in pairs(TagsToModulesMap.Monsters) do
 		if CollectionService:HasTag(monster, tagName) then
 			return moduleState
+		else
+			print(monster, "does not have tag ", tagName)
 		end
 	end
 end

@@ -27,5 +27,6 @@ TagsToModulesMap.Entities.Workbench = import "Shared/EntityModules/Workbench"
 -- monsters
 
 TagsToModulesMap.Monsters.Lizard = import "Shared/MonsterModules/Lizard"
+TagsToModulesMap.Monsters.Alpaca = import "Shared/MonsterModules/Alpaca"
 
 return TagsToModulesMap

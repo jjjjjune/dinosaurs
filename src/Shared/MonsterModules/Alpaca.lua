@@ -5,32 +5,27 @@ local MovementComponent = import "Shared/MonsterComponents/MovementComponent"
 local AnimationComponent = import "Shared/MonsterComponents/AnimationComponent"
 local IdleComponent = import "Shared/MonsterComponents/IdleComponent"
 local TargetComponent = import "Shared/MonsterComponents/TargetComponent"
-local LizardAttackComponent = import "Shared/MonsterComponents/LizardAttackComponent"
 local TouchComponent = import "Shared/MonsterComponents/TouchComponent"
 local RideableComponent = import "Shared/MonsterComponents/RideableComponent"
 local TameableComponent = import "Shared/MonsterComponents/TameableComponent"
 
-local Lizard = {}
+local Alpaca = {}
 
-Lizard.__index = Lizard
+Alpaca.__index = Alpaca
 
-function Lizard:step()
-    if not self.attackComponent.attacking then
-        local target = self.targetComponent:getTarget()
-        if target and target.PrimaryPart then
-            self.movementComponent:setGoal(target.PrimaryPart.Position)
-        else
-            self.movementComponent:setGoal(self.idleComponent:getIdlePosition())
-        end
+function Alpaca:step()
+    local target = self.targetComponent:getTarget()
+    if target and target.PrimaryPart then
+        self.movementComponent:setGoal(target.PrimaryPart.Position)
     else
-        self.movementComponent:setGoal(nil)
+        self.movementComponent:setGoal(self.idleComponent:getIdlePosition())
     end
 end
 
-function Lizard:init(model)
+function Alpaca:init(model)
     self.model = model
 
-    self.animationScaledWalkspeed = 22 -- this is about the speed at which the animation expects the lizzy to travel
+    self.animationScaledWalkspeed = 10 -- this is about the speed at which the animation expects the lizzy to travel
 
     self.idleComponent = IdleComponent.new()
     self.idleComponent:init(self.model)
@@ -40,13 +35,11 @@ function Lizard:init(model)
 
     self.animationComponent = AnimationComponent.new()
     self.animationComponent:init(self.model, {
-        Walking = "rbxassetid://5009072693",
-        Attack = "rbxassetid://5009197262",
-        ChargeAttack = "rbxassetid://5009187418",
-        Falling = "rbxassetid://5009163593",
-        Idle = "rbxassetid://5009118786",
+        Walking = "rbxassetid://5164870702",
+        Falling = "rbxassetid://05169216971",
+        Idle = "rbxassetid://5164850972",
         Speak = "rbxassetid://5037809602",
-        Dead = "rbxassetid://5079811280"
+        Dead = "rbxassetid://5164884358"
     })
 
     self.movementComponent = MovementComponent.new()
@@ -62,22 +55,9 @@ function Lizard:init(model)
 
     self.targetComponent = TargetComponent.new()
     self.targetComponent.wantItem = "Banana"
-    self.targetComponent.wantedEnemyTags = {"Character", "Alpaca"}
+    self.targetComponent.wantedEnemyTags = {}
     self.targetComponent:init(self.model, {
         giveUpTargetTime = 10,
-    })
-
-    self.attackComponent = LizardAttackComponent.new()
-    self.attackComponent:init(self.model, {
-        animationComponent = self.animationComponent,
-        targetComponent = self.targetComponent,
-        attackDistance = 45,
-        damage = 15,
-        damageType = "poison",
-        reloadTime = 4,
-        chargeTime = 2,
-        spawnAttackDebounce = 4,
-        rideableComponent = self.rideableComponent,
     })
 
     self.touchComponent = TouchComponent.new()
@@ -111,8 +91,6 @@ function Lizard:init(model)
 
         if self.model.Health.Value <= 0 then
             self:die()
-        else
-            self.attackComponent:onDamaged()
         end
 
     end)
@@ -122,7 +100,6 @@ function Lizard:init(model)
         self.movementComponent:step(dt)
         self.targetComponent:step(dt)
         self.idleComponent:step(dt)
-        self.attackComponent:step(dt)
         self.touchComponent:step(dt)
         self.rideableComponent:step(dt)
 
@@ -138,7 +115,7 @@ function Lizard:init(model)
     self.model.PrimaryPart:SetNetworkOwner()
 end
 
-function Lizard:makeDropItems()
+function Alpaca:makeDropItems()
     local Items = import "Server/Systems/Items"
 
     local dropTable = self.drops
@@ -173,7 +150,7 @@ function Lizard:makeDropItems()
     end
 end
 
-function Lizard:die()
+function Alpaca:die()
 
     self.mainThread:disconnect()
 
@@ -195,9 +172,9 @@ function Lizard:die()
     end
 end
 
-function Lizard.new()
+function Alpaca.new()
     local class = {}
-    return setmetatable(class, Lizard)
+    return setmetatable(class, Alpaca)
 end
 
-return Lizard
+return Alpaca
