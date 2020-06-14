@@ -77,12 +77,9 @@ function Alpaca:init(model)
     }
 
     self.hitNoises = {
-        "Hiss1",
-        "Hiss2",
-        "Hiss3",
-        "Hiss4",
-        "Hiss5",
-        "Hiss6"
+        "Alpaca1",
+        "Alpaca2",
+        "Alpaca3",
     }
 
     self.lastHealth = self.model.Health.Value
