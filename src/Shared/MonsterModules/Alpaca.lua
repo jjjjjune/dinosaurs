@@ -15,10 +15,15 @@ Alpaca.__index = Alpaca
 
 function Alpaca:step()
     local target = self.targetComponent:getTarget()
-    if target and target.PrimaryPart then
-        self.movementComponent:setGoal(target.PrimaryPart.Position)
+    local fleeing = self.targetComponent:getFleeing()
+    if fleeing then
+        self.movementComponent:setGoal(self.targetComponent:getFleePosition())
     else
-        self.movementComponent:setGoal(self.idleComponent:getIdlePosition())
+        if target and target.PrimaryPart then
+            self.movementComponent:setGoal(target.PrimaryPart.Position)
+        else
+            self.movementComponent:setGoal(self.idleComponent:getIdlePosition())
+        end
     end
 end
 
@@ -45,7 +50,7 @@ function Alpaca:init(model)
     self.movementComponent = MovementComponent.new()
     self.movementComponent:init(self.model, {
         jumpDebounce = 2,
-        speed = 20,
+        speed = 28,
         closenessThreshold = 11,
         jumpLength = .5,
         rideableComponent = self.rideableComponent,
@@ -54,6 +59,7 @@ function Alpaca:init(model)
     })
 
     self.targetComponent = TargetComponent.new()
+    self.targetComponent.fleeFromTags = {"Lizard", "Character"}
     self.targetComponent.wantItem = "Banana"
     self.targetComponent.wantedEnemyTags = {}
     self.targetComponent:init(self.model, {

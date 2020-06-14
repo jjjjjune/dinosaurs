@@ -53,6 +53,14 @@ local function getClosestEnemyOfSet(position, set)
     return closestItem
 end
 
+local function getPositionOnEdgeOfCirlceAwayFrom(position, distance)
+    local deg = math.random(1, 360)
+    local rad = math.rad(deg)
+    local cf = CFrame.new(position) * CFrame.Angles(0, rad, 0)
+    cf = cf * CFrame.new(0, 0, -distance)
+    return cf.p
+end
+
 
 local TargetComponent = {}
 
@@ -106,6 +114,45 @@ function TargetComponent:getValidEnemy()
         end
         return getClosestEnemyOfSet(self.position, allEnemies)
     end
+end
+
+function TargetComponent:getFleeing(forceRecalc)
+    self.lastFleeCalculation = self.lastFleeCalculation or tick()
+    self.lastFleeing = self.lastFleeing or false
+    local timeSinceLastFleeCalculation = tick() - self.lastFleeCalculation
+    if timeSinceLastFleeCalculation > 1 or forceRecalc then
+        print("new flee calc")
+        self.lastFleeCalculation = tick()
+        local fleeFrom = {}
+        for _, enemyTag in pairs(self.fleeFromTags) do
+            for _, enemy in pairs(CollectionService:GetTagged(enemyTag)) do
+                if enemy ~= self.model then
+                    table.insert(fleeFrom, enemy)
+                end
+            end
+        end
+        local targetToFleeFrom = getClosestEnemyOfSet(self.position, fleeFrom)
+        if targetToFleeFrom and self:getCanSeePosition(targetToFleeFrom.PrimaryPart.Position) then
+            self.lastFleeTargetReset = self.lastFleeTargetReset or 0
+            if tick() - self.lastFleeTargetReset > 5 then
+                self.fleePosition = getPositionOnEdgeOfCirlceAwayFrom(targetToFleeFrom.PrimaryPart.Position, 100)
+                self.lastFleeTargetReset = tick()
+            end
+            self.lastFleeing = true
+            return true
+        end
+    else
+        return self.lastFleeing
+    end
+    self.lastFleeing = false
+    return false
+end
+
+function TargetComponent:getFleePosition()
+    if (self.position - self.fleePosition).magnitude < 20 then
+        self:getFleeing(true)
+    end
+    return self.fleePosition
 end
 
 function TargetComponent:step(dt)

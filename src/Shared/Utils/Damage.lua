@@ -18,7 +18,7 @@ return function(target, damageInfo)
 
     local player = game:GetService("Players"):GetPlayerFromCharacter(target)
 
-    warn("remember the server application config thing for when youre doing the effect from server")
+    --warn("remember the server application config thing for when youre doing the effect from server")
 
     if player and not damageInfo.serverApplication then
         Messages:reproOnClients(player, "PlayDamageEffect", target, damageInfo.type)
