@@ -5,6 +5,7 @@ local FastSpawn = import "Shared/Utils/FastSpawn"
 local Messages = import "Shared/Utils/Messages"
 
 local loadOrder = {
+
 	"Client/Systems/Lighting",
 	"Client/Systems/Footsteps",
 	"Client/Systems/ClientSound",
@@ -28,6 +29,8 @@ local loadOrder = {
 	--"Client/Systems/Data"
 
 	"Shared/Systems/Particles",
+
+	"Client/Systems/CmdrClient",
 }
 
 local ui = {

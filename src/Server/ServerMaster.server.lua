@@ -3,6 +3,8 @@ local import = require(game.ReplicatedStorage.Shared.Import)
 local Messages = import "Shared/Utils/Messages"
 
 local loadOrder = {
+	"Server/Systems/CmdrServer",
+
 	"Shared/Systems/Particles",
 	"Shared/Systems/Data",
 	"Shared/Systems/Sounds",
