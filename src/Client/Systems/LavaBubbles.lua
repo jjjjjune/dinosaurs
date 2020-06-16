@@ -22,9 +22,17 @@ local function blink(lavaPart)
         anim.Parent = eye
         local track = eye.AnimationController:LoadAnimation(anim)
         track:Play()
+        Messages:send("PlaySoundOnClient",{
+            instance = game.ReplicatedStorage.Sounds["Mud"..tostring(math.random(1,3))],
+            part = eye
+        })
     else
         local track = eye.AnimationController:LoadAnimation(eye.GodEyeBlink)
         track:Play()
+        Messages:send("PlaySoundOnClient",{
+            instance = game.ReplicatedStorage.Sounds["Mud"..tostring(math.random(1,3))],
+            part = eye
+        })
     end
 end
 

@@ -37,6 +37,29 @@ function Particles:start()
 			particle:Emit(particle.Rate)
 		end
 	end)
+	Messages:hook("PlayParticleSystem", function(particleSystemName, position)
+		local attach = Instance.new("Attachment")
+		if typeof(position) ~= "Instance" then
+			attach.Parent = workspace.Terrain
+			attach.WorldPosition = position
+		else
+			attach.Parent = position
+		end
+
+		attach.Name = "ParticleSystem"
+
+		--CollectionService:AddTag(attach,"Particle")
+
+		local particleInstance = ParticlesFolder[particleSystemName]
+
+		for _, v in pairs(particleInstance:GetChildren()) do
+			local realParticle = v:Clone()
+			realParticle.Parent = attach
+			realParticle:Emit(realParticle.EmitNo.Value)
+		end
+
+		--game:GetService("Debris"):AddItem(attach, 3)
+	end)
 
 	Messages:hook("PlayParticle", function(particleName, amount, position)
 		local attach = Instance.new("Attachment")

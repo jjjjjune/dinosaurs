@@ -20,6 +20,10 @@ local function onCharAdded(player, character)
 
     character:WaitForChild("Health"):Destroy()
 
+    if character.HumanoidRootPart:FindFirstChild("Died") then
+        character.HumanoidRootPart.Died:Destroy()
+    end
+
     CollectionService:AddTag(character, "Character")
 
     local hitbox = Instance.new("Part")
