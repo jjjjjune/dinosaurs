@@ -54,8 +54,8 @@ function RespawnManager:start()
         local altar = workspace:FindFirstChild("Altar", true)
         character.PrimaryPart.RootPriority = 127
         wait()
-        character.PrimaryPart.CFrame = altar.PrimaryPart.CFrame * CFrame.new(0,2,0)
-        --Messages:send("CreateItem", "Banana", (altar.PrimaryPart.CFrame * CFrame.new(20,20,0)).p)
+        character.PrimaryPart.CFrame = altar.PrimaryPart.CFrame * CFrame.new(0,6,0)
+        Messages:send("CreateItem", "Taming Potion", (altar.PrimaryPart.CFrame * CFrame.new(20,20,0)).p)
     end)
     Messages:hook("PlayerAdded", function(player)
         local Gamemode = import "Server/Systems/Gamemode"

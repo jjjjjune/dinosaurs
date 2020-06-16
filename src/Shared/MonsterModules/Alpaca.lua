@@ -30,7 +30,7 @@ end
 function Alpaca:init(model)
     self.model = model
 
-    self.animationScaledWalkspeed = 10 -- this is about the speed at which the animation expects the lizzy to travel
+    self.animationScaledWalkspeed = 16 -- this is about the speed at which the animation expects the lizzy to travel
 
     self.idleComponent = IdleComponent.new()
     self.idleComponent:init(self.model)
@@ -161,10 +161,14 @@ function Alpaca:die()
 
     if not self.isDead then
         self.isDead = true
-        self.model.Torso.TextureID = "rbxassetid://5079825969"
         self.animationComponent:stopTrack("Idle")
         self.animationComponent:playTrack("Dead")
-        self.model.Head.RotVelocity = Vector3.new(math.random(), math.random(), math.random())*10
+        self.model.Head.RotVelocity = Vector3.new(math.random(), math.random(), math.random())*1
+        for _, v in pairs(self.model:GetChildren()) do
+            if v:IsA("BasePart") then
+                v.Massless = false
+            end
+        end
         self.model.HumanoidRootPart.BodyGyro:Destroy()
         self.model.HumanoidRootPart.BodyVelocity:Destroy()
         self.model.Torso.CanCollide = true

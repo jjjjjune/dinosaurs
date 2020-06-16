@@ -108,7 +108,7 @@ function Riding:start()
 
 		model.HumanoidRootPart.NameBillboard.Enabled = false
 		jumpEvent = UserInputService.JumpRequest:connect(function()
-			local hit, _ = CastRay(model.PrimaryPart.Position, Vector3.new(0,-7,0), {model, GetCharacter()})
+			local hit, _ = CastRay(model.PrimaryPart.Position, Vector3.new(0,(model:GetModelSize().Y+2) * -1,0), {model, GetCharacter()})
 			local isOnGround = hit ~= nil
 			if tick() - lastJump > .5 and isOnGround then
 				jump()

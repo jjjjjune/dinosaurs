@@ -97,8 +97,8 @@ local function onFootstep(part, foot, resultPosition, normal)
 end
 
 local function onFrameChange(character, rFoot, lFoot, lastLeftPosition, lastRightPosition)
-    local leftDir = Vector3.new(0,-1,0) * ((lFoot.Size.Y/2)+.25)
-    local rightDir = Vector3.new(0,-1,0)  * ((rFoot.Size.Y/2)+.25)
+    local leftDir = Vector3.new(0,-1,0) * ((lFoot.Size.Y/2)+1)
+    local rightDir = Vector3.new(0,-1,0)  * ((rFoot.Size.Y/2)+1)
     local didHitLeft, currentLeftPosition, normal2 = CastRay(lFoot.Position, leftDir, {character})
     local didHitRight, currentRightPosition, normal = CastRay(rFoot.Position, rightDir, {character})
     if character:FindFirstChild("Humanoid") then

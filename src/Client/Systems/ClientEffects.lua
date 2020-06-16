@@ -52,7 +52,9 @@ function ClientEffects:start()
 			wait(.2)
 			camShake:Shake(CameraShaker.Presets["Bump"])
 		end)
-		character:WaitForChild("HumanoidRootPart").Velocity = Vector3.new(0,100,0)
+		--[[local vel = CFrame.new(Vector3.new(0,0,0), Vector3.new(-3,12,0)).lookVector * Vector3.new(1,20,1) * 200
+		print("Velocity is", vel)
+		Messages:send("Knockback", vel, 1, true)--]]
     end)
 
 	game:GetService("RunService").RenderStepped:connect(oceanEffect)
