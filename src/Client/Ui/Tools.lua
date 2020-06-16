@@ -4,35 +4,20 @@ local ToolsUi = game.Players.LocalPlayer.PlayerGui:WaitForChild("Tools")
 
 local currentInventory = _G.Data.server.storedTools
 
-local order = {
-    "Weapon",
-    "RangedWeapon",
-    "Pickaxe",
-    "Utility",
-}
-
-local function getOrder(inventorySlot)
-    for i, v in pairs(order) do
-        if v == inventorySlot then
-            return i
-        end
-    end
-end
-
 local function skin(inventorySlot)
-    local data = currentInventory[inventorySlot.Name]
+    local data = currentInventory[tonumber(inventorySlot.Name)]
     local newFrame = inventorySlot:Clone()
     newFrame.Parent = inventorySlot.Parent
     newFrame.Visible = true
     local newCam = Instance.new("Camera")
     newCam.Parent = newFrame.ViewportFrame
     newCam.FieldOfView = 30
-    newFrame.LayoutOrder = getOrder(inventorySlot.Name)
+    newFrame.LayoutOrder = inventorySlot
     newFrame.Shadow.CurrentCamera = newCam
     newFrame.ViewportFrame.CurrentCamera = newCam
-    newFrame.NumberLabel.Text = getOrder(inventorySlot.Name)..""
+    newFrame.NumberLabel.Text = tostring(inventorySlot)
     newFrame.Button.Activated:connect(function()
-        Messages:sendServer("EquipStoredTool", inventorySlot.Name)
+        Messages:sendServer("EquipStoredTool", tonumber(inventorySlot.Name))
     end)
     if data and data.item then
         local itemPreview = game.ReplicatedStorage.Items[data.item]:Clone()
@@ -58,8 +43,8 @@ local function onPlayerDataSet(data)
     if not data.server or not data.server.storedTools then
         return
     end
-    for toolName, toolData in pairs(data.server.storedTools) do
-        skin(ToolsUi.Frame[toolName])
+    for slot, toolData in pairs(data.server.storedTools) do
+        skin(ToolsUi.Frame[tostring(slot)])
     end
     currentInventory = data.server.storedTools
     refreshTools()
@@ -80,10 +65,10 @@ function Tools:start()
     refreshTools()
     Messages:hook("PlayerDataSet", onPlayerDataSet)
     local keys = {
-        [Enum.KeyCode.One] = "Weapon",
-        [Enum.KeyCode.Two] = "RangedWeapon",
-        [Enum.KeyCode.Three] = "Pickaxe",
-        [Enum.KeyCode.Four] = "Utility"
+        [Enum.KeyCode.One] = 1,
+        [Enum.KeyCode.Two] = 2,
+        [Enum.KeyCode.Three] = 3,
+        [Enum.KeyCode.Four] = 4
     }
     game:GetService("UserInputService").InputBegan:connect(function(inputObject, gameProcessed)
         if not gameProcessed then

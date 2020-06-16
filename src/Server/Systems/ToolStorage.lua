@@ -3,14 +3,21 @@ local Messages = import "Shared/Utils/Messages"
 local ServerData = import "Server/Systems/ServerData"
 local CollectionService = game:GetService("CollectionService")
 
-local function storeTool(player, itemInstance)
+local function storeTool(player, itemInstance, desiredSlotNumber)
     local storeData = ServerData:getPlayerValue(player, "storedTools")
     local slotData
-    for category, data in pairs(storeData) do
-        if CollectionService:HasTag(itemInstance, category) then
-            slotData = data
+
+    if storeData[desiredSlotNumber] then
+        slotData = storeData[desiredSlotNumber]
+    else
+        for _, data in pairs(storeData) do
+            if not data.item then
+                slotData = data
+                break
+            end
         end
     end
+
     local prevItem = slotData.item
     Messages:send("DestroyItem", itemInstance)
     itemInstance:Destroy()
@@ -28,15 +35,24 @@ local function equipStoredTool(player, slotName)
     local storedTool = storeData[slotName]
     local foundStoredTool
     if not storedTool or storedTool.item == nil then
+        print("no stored tool")
         return
     end
     foundStoredTool = storedTool.item
     storedTool.item = nil
     ServerData:setPlayerValue(player, "storedTools", storeData)
+
+    local totalStoredTools = 0
+    for _, tool in pairs(storeData) do
+        if tool.name then
+            totalStoredTools = totalStoredTools + 1
+        end
+    end
+
     local foundStorableTool = false
     for _, possibleTool in pairs(player.Character:GetChildren()) do
-        if possibleTool:IsA("Model") and CollectionService:HasTag(possibleTool, slotName) then
-            storeTool(player, possibleTool)
+        if possibleTool:IsA("Model") and CollectionService:HasTag(possibleTool, "Item") and totalStoredTools < #storeData then
+            storeTool(player, possibleTool, slotName)
             foundStorableTool = true
         end
     end

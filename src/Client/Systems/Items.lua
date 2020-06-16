@@ -159,14 +159,14 @@ local function equipCarryItem(itemInstance)
     end, UseTexts[itemInstance.Name] or "USE")
     local throwOrPlaceText = (CollectionService:HasTag(itemInstance, "Building") and "PLACE") or "THROW"
     Messages:send("CreateContextualBind", "GRAB", nil, throwOrPlaceText)
-    if CollectionService:HasTag(itemInstance, "Tool") then
+    --if CollectionService:HasTag(itemInstance, "Tool") then
 
         Messages:send("CreateContextualBind", "STORE", function()
             Messages:send("OnStoreAction")
             -- the server will tell us what to do with respect to equipping/unequipping
         end, "STORE")
 
-    end
+    --end
 end
 
 local Items = {}

@@ -1,17 +1,26 @@
 local import = require(game.ReplicatedStorage.Shared.Import)
 local Messages = import "Shared/Utils/Messages"
+
+local ServerData = import "Server/Systems/ServerData"
+
 local CollectionService = game:GetService("CollectionService")
+
+local function emptyToolInventory(player, characterThatDied)
+    local storedTools = ServerData:getPlayerValue(player, "storedTools")
+    for slot, data in pairs(storedTools) do
+        if data.item and not data.equipped then
+            local items = import "Server/Systems/Items"
+            items.createItem(data.item, characterThatDied.PrimaryPart.Position)
+            data.item = nil
+        end
+    end
+    ServerData:setPlayerValue(player, "storedTools", storedTools)
+end
 
 local RespawnManager = {}
 
 function RespawnManager:start()
     Messages:hook("PlayerDied", function(player, characterThatDied)
-        if #game.Players:GetPlayers() == 1 then
-            wait(1)
-            warn("auto loading character cause server")
-            player:LoadCharacter()
-            return
-        end
         if characterThatDied.PrimaryPart then
             local items = import "Server/Systems/Items"
             local skull = items.createItem("Skull", characterThatDied.PrimaryPart.Position)
@@ -21,12 +30,15 @@ function RespawnManager:start()
             skullPlayer.Value = player
             CollectionService:AddTag(skull, "PlayerSkull")
             Messages:send("PlaySound", "Smoke", characterThatDied.PrimaryPart.Position)
-            Messages:send("PlayParticle", "DeathSmoke",  20, skull.PrimaryPart.Position)
+            --Messages:send("PlayParticle", "DeathSmoke",  20, skull.PrimaryPart.Position)
+            emptyToolInventory(player, characterThatDied)
             for _, part in pairs(characterThatDied:GetChildren()) do
                 if part:IsA("BasePart") then
                     part:Destroy()
                 end
             end
+            wait(1)
+            player:LoadCharacter()
         else
             -- fell off map or something?
             wait(1)

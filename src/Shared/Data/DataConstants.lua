@@ -16,10 +16,10 @@ Data.DEFAULT_SERVER_DATA = {
 
 Data.DEFAULT_SERVER_PLAYER_DATA = {
     storedTools = {
-        Pickaxe = {item = nil, equipped = false},
-        Weapon = {item = nil, equipped = false},
-        RangedWeapon = {item = nil, equipped = false},
-        Utility = {item = nil, equipped = false},
+        [1] = {item = nil, equipped = false},
+        [2] = {item = nil, equipped = false},
+        [3] = {item = nil, equipped = false},
+        [4] = {item = nil, equipped = false},
     },
 }
 
@@ -29,10 +29,10 @@ Data.TEST_SERVER_DATA = {
 
 Data.TEST_SERVER_PLAYER_DATA = {
     storedTools = {
-        Pickaxe = {item = nil, equipped = false},
-        Weapon = {item = nil, equipped = false},
-        RangedWeapon = {item = nil, equipped = false},
-        Utility = {item = nil, equipped = false},
+        [1] = {item = nil, equipped = false},
+        [2] = {item = nil, equipped = false},
+        [3] = {item = nil, equipped = false},
+        [4] = {item = nil, equipped = false},
     },
 }
 
