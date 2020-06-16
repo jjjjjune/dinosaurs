@@ -2,11 +2,13 @@ local import = require(game.ReplicatedStorage.Shared.Import)
 local Messages = import "Shared/Utils/Messages"
 
 local ServerData = import "Server/Systems/ServerData"
+local CastRay = import "Shared/Utils/CastRay"
 
 local CollectionService = game:GetService("CollectionService")
 local RunService = game:GetService("RunService")
 
 local ITEM_DESPAWN_TIME = 300 -- five mins
+local ITEM_FREEZE_TIME = 5
 
 local lastPositions = {}
 local lastInteractedOrInStorageTimer = {}
@@ -56,14 +58,47 @@ local function checkStorage()
     end
 end
 
+local function checkMoved(item)
+    if item:FindFirstChild("VehicleWeld") then -- already welded to something we should let it BE
+        lastInteractedOrInStorageTimer[item] = tick()
+        return
+    end
+    local position = item.PrimaryPart.Position
+    if not lastPositions[item] then
+        lastPositions[item] = position
+    else
+        local dist = (position - lastPositions[item]).magnitude
+        if dist > .5 then
+            lastInteractedOrInStorageTimer[item] = tick()
+            lastPositions[item] = position
+        else
+            if tick() - lastInteractedOrInStorageTimer[item] > ITEM_FREEZE_TIME then
+                if not item:FindFirstChild("FreezeWeld") then 
+                    local hit, pos = CastRay(position, Vector3.new(0,-5,0), {item})
+                    if hit and hit.Anchored then
+                        local freezeWeld = Instance.new("WeldConstraint", item)
+                        freezeWeld.Part0 = item.PrimaryPart
+                        freezeWeld.Part1 = hit
+                        freezeWeld.Name = "FreezeWeld"
+                    end
+                end
+            end
+        end
+    end
+end
+
 local function checkDespawn()
     for item, t in pairs(lastInteractedOrInStorageTimer) do
         if item.Parent ~= nil then
             if tick() - t > ITEM_DESPAWN_TIME then
                 if item:IsDescendantOf(workspace) then
                     item:Destroy()
+                else
+                    lastInteractedOrInStorageTimer[item] = tick()
                 end
                 lastInteractedOrInStorageTimer[item] = nil
+            else
+                checkMoved(item)
             end
         else
             lastInteractedOrInStorageTimer[item] = nil
@@ -113,6 +148,9 @@ local Storage = {}
 
 function Storage:start()
     CollectionService:GetInstanceAddedSignal("Item"):connect(onItemAdded)
+    for _, item in pairs(CollectionService:GetTagged("Item")) do
+        onItemAdded(item)
+    end
     Messages:hook("OnItemThrown", function(item)
         lastInteractedOrInStorageTimer[item] = tick()
     end)

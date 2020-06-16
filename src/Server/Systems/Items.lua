@@ -40,8 +40,11 @@ local function attemptCarryItem(player, item)
         return
     end
     local alive = character:FindFirstChild("Humanoid") and character.Humanoid.Health > 0
-    if not alive then 
+    if not alive then
         return
+    end
+    if item:FindFirstChild("FreezeWeld") then
+        item.FreezeWeld:Destroy()
     end
     Messages:send("PlaySound", "UiClick", character.Head, 200)
     character.PrimaryPart.RootPriority = 200

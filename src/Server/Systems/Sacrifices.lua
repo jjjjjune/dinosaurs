@@ -72,6 +72,10 @@ local function performStandardSeasonWeather(actualCurrentSeason)
         Messages:send("CreateWeather", "Snow", 30)
     elseif actualCurrentSeason == 1 then
         Messages:send("CreateWeather", "Rain", 30)
+    else
+        if math.random(1, 3) == 1 then
+            Messages:send("CreateWeather", "Rain", 30)
+        end
     end
 end
 
