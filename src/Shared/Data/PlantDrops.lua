@@ -1,9 +1,9 @@
 local PlantDrops ={}
 
-PlantDrops.Pine = {
-    {name = "Apple", min = 1, max = 2, chance = 50},
+PlantDrops["Thorn Vine"] = {
+    {name = "Thorn Apple", min = 1, max = 2, chance = 50},
     {name = "Log",min = 1, max = 2, chance = 75},
-    {name = "Pine Seed", min = 1, max = 2, chance = 55},
+    {name = "Thorn Vine Seed", min = 1, max = 2, chance = 55},
 }
 
 PlantDrops["Blue Mushroom"] = {

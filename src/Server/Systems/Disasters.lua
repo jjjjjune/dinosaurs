@@ -13,7 +13,7 @@ local allowedDisasters = {
 }
 
 local fruitBearingTrees = {
-    Pine = true,
+    ["Thorn Vine"] = true,
     Corn = true,
     Apple = true,
     Cactus = true,

@@ -142,6 +142,14 @@ local function bindCarry()
     end)
 end
 
+local function getUseText(itemInstance)
+    for tag, text in pairs(UseTexts) do
+        if CollectionService:HasTag(itemInstance, tag) then
+            return text
+        end
+    end 
+end
+
 local function equipCarryItem(itemInstance)
     itemModule = getItemModule(itemInstance)
     itemModule.clientEquip(itemInstance)
@@ -156,7 +164,7 @@ local function equipCarryItem(itemInstance)
             itemModule.clientUse(itemInstance)
             Messages:sendServer("UseItem", itemInstance)
         end
-    end, UseTexts[itemInstance.Name] or "USE")
+    end, getUseText(itemInstance) or "USE")
     local throwOrPlaceText = (CollectionService:HasTag(itemInstance, "Building") and "PLACE") or "THROW"
     Messages:send("CreateContextualBind", "GRAB", nil, throwOrPlaceText)
     --if CollectionService:HasTag(itemInstance, "Tool") then

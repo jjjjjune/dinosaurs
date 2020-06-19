@@ -1,13 +1,13 @@
 local Biome = {}
 
 Biome.plants = {
-    ["Tall Tree"] = 80,
-    ["Wood Tree"] = 5,
+    ["Tall Tree"] = 70,
+    ["Wood Tree"] = 10,
     ["Banana Tree"] = 10,
-    ["Pine"] = 5,
+    ["Thorn Vine"] = 10,
 }
 
-Biome.maxPlantsPerTile = 6
-Biome.minPlantsPerTile = 4
+Biome.maxPlantsPerTile = 11
+Biome.minPlantsPerTile = 6
 
 return Biome
