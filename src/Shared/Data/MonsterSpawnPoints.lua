@@ -1,7 +1,7 @@
 return {
     Lizard = {
         type = "Plant",
-        name = "Banana Tree",
+        name = "Thorn Vine",
     },
     Alpaca = {
         type = "Plant",
