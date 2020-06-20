@@ -180,50 +180,39 @@ local function getWeight(possibility)
     return weightScore
 end
 
-local function shannonEntropyForTile(tile)
-    --# Sums are over the weights of each remaining allowed tile type for the square whose entropy we are calculating.
-    local sum_of_weights = 0
-    local sum_of_weight_log_weights = 0
-    for _, opt in pairs (tile.possibilities) do
-        local weight = getWeight(opt)
-        sum_of_weights = sum_of_weights + weight
-        sum_of_weight_log_weights = sum_of_weight_log_weights + weight * math.log(weight)
-    end
-
-    return math.log(sum_of_weights) - (sum_of_weight_log_weights / sum_of_weights)
-end
-
 local function getLeastEntropicTileToCollapse()
     local lowestEntropy = 1000000
     local leastEntropicTile = nil
 	local entropies = {}
     for _, tile in pairs(allTiles) do
-        local thisEntropy = shannonEntropyForTile(tile)
+        local thisEntropy = #tile.possibilities--shannonEntropyForTile(tile)
 		entropies[tile] = thisEntropy
         if (thisEntropy < lowestEntropy) and not tile.collapseResult then -- let's not include collapsed tiles
             lowestEntropy = thisEntropy
 			leastEntropicTile = tile
         end
     end
-	local leastEntropies = {}
-	for tile, entropy in pairs(entropies) do
-		if entropy == lowestEntropy then
-			table.insert(leastEntropies, tile)
-		end
-	end
-    return (#leastEntropies > 0 and leastEntropies[math.random(1, #leastEntropies)]) or leastEntropicTile
+    return leastEntropicTile
 end
+
+
+local weightCache = {}
 
 local function getCollapseResult(possibilities)
 	local newPossibilities = {}
 	for _, poss in pairs(possibilities) do
 		local multiplier = 1
-		if game.ServerStorage.Example:FindFirstChild(poss) then
-			if game.ServerStorage.Example[poss]:FindFirstChild("Weight") then
-				multiplier = game.ServerStorage.Example[poss]["Weight"].Value
+		if weightCache[poss] then
+			multiplier = weightCache[poss]
+		else
+			if game.ServerStorage.Example:FindFirstChild(poss) then
+				if game.ServerStorage.Example[poss]:FindFirstChild("Weight") then
+					multiplier = game.ServerStorage.Example[poss]["Weight"].Value
+					weightCache[poss] = multiplier
+				end
 			end
 		end
-		for i = 1, math.max(1, multiplier*100) do
+		for i = 1, math.max(1, multiplier*100) do 
 			table.insert(newPossibilities, poss)
 		end
 	end
