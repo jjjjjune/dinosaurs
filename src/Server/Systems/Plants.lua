@@ -134,16 +134,21 @@ local function backUpPlants()
     local plants = {}
     for _, plant in pairs(CollectionService:GetTagged("Plant")) do
         if plant:IsDescendantOf(workspace) then
-            local primaryPart = plant.PrimaryPart
-            local pos = primaryPart.Position
-            local ox, oy, oz  = primaryPart.CFrame:toOrientation()
+			local primaryPart = plant.PrimaryPart
+			if not primaryPart then
+				-- todo: why does this happen
+				--print(plant.Name, " does not have primaryPart")
+			else
+				local pos = primaryPart.Position
+				local ox, oy, oz  = primaryPart.CFrame:toOrientation()
 
-            local info = {}
-            info.type = plant.Type.Value
-            info.phase = plant.Name
-            info.position = {x = round(pos.X, .15), y = round(pos.Y, .15), z = round(pos.Z, .15)}
-            info.orientation = {x = ox, y = oy, z = oz}
-            table.insert(plants, info)
+				local info = {}
+				info.type = plant.Type.Value
+				info.phase = plant.Name
+				info.position = {x = round(pos.X, .15), y = round(pos.Y, .15), z = round(pos.Z, .15)}
+				info.orientation = {x = ox, y = oy, z = oz}
+				table.insert(plants, info)
+			end
         end
     end
     ServerData:setValue("plants", plants)

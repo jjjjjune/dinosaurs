@@ -32,12 +32,20 @@ local function selectBiomePlant(plants)
     return t[math.random(1, #t)]
 end
 
+local function getBiome(tile)
+	if tile:FindFirstChild("Cave") then
+		return tile.Biome.Value.."Cave"
+	else
+		return tile.Biome.Value
+	end
+end
+
 local function createPlantForBiome(biome, allBiomeTiles, isFirstTime, maxPlantsAmount)
     local name = "Shared/Data/BiomeData/"..biome
     local data = import(name)
     local tile = allBiomeTiles[math.random(1, #allBiomeTiles)]
     local plantName = selectBiomePlant(data.plants)
-    local pos = GetValidPlantPos(tile, plantName, biome)
+    local pos, normal = GetValidPlantPos(tile, plantName, biome)
     if pos then
         local count = #biomeToPlantsMap[biome]
         if count < maxPlantsAmount then
@@ -46,11 +54,17 @@ local function createPlantForBiome(biome, allBiomeTiles, isFirstTime, maxPlantsA
             local phase = 1
             if isFirstTime then
                 phase = math.random(1, #(game.ServerStorage.PlantPhases[plantName]:GetChildren()))
-            end
-            local plant = Plants.createPlant(plantName, pos, phase, false)
+			end
+			local plant
+			if string.find(string.lower(biome), "cave") then
+				local cf = CFrame.new(pos, pos + normal) * CFrame.Angles(-math.pi/2, 0,0)
+				plant = Plants.createPlant(plantName, cf, phase, false)
+			else
+				plant = Plants.createPlant(plantName, pos, phase, false)
+			end
             plant.Biome.Value = biome
             table.insert(biomeToPlantsMap[biome], plant)
-        end
+		end
     end
 end
 
@@ -112,10 +126,11 @@ end
 local function performBiomeCheck(isFirstTime)
     local allBiomes = {}
 
-    -- going to have to change this to just look at all rendered tiles
-    for _, tile in pairs(CollectionService:GetTagged("Tile")) do
-        if not allBiomes[tile.Biome.Value] then
-            allBiomes[tile.Biome.Value] = true
+	-- going to have to change this to just look at all rendered tiles
+	for _, tile in pairs(CollectionService:GetTagged("Tile")) do
+		local biome = getBiome(tile)
+        if not allBiomes[biome] then
+            allBiomes[biome] = true
         end
     end
 
@@ -123,7 +138,7 @@ local function performBiomeCheck(isFirstTime)
         local allBiomeTiles = {}
         for i, tileFolder in pairs(workspace.Tiles:GetChildren()) do
             for _, tile in pairs(tileFolder:GetChildren()) do
-                if tile.Biome.Value == biome then
+                if getBiome(tile) == biome then
                     table.insert(allBiomeTiles, tile)
                 end
             end
@@ -147,7 +162,10 @@ function Biomes:start()
                 performBiomeCheck(false)
             end)
         end
-    end)
+	end)
+	delay(15, function()
+		performBiomeCheck(true)
+	end)
 end
 
 return Biomes

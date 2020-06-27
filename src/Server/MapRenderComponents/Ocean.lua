@@ -8,7 +8,7 @@ local GetWorldPositionFromMapPosition = import "Shared/Utils/GetWorldPositionFro
 
 local Ocean = {}
 
-local OCEAN_LOWER_AMOUNT = 20--200
+local OCEAN_LOWER_AMOUNT = 2000--200
 
 --600, 419.5, 600
 

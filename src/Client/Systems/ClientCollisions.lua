@@ -20,13 +20,28 @@ local function onHitSpikyThing(part)
 
 end
 
+local function onHitPoison(part)
+	Messages:send("PlayDamageEffect", game.Players.LocalPlayer.Character, "poison")
+    Messages:sendServer("ReportCollision", part.Parent)
+
+    local dir = Vector3.new(0,1,0)
+
+    Messages:send("Knockback", dir*50, .2)
+end
+
 local function onHitboxContact(part)
     if CollectionService:HasTag(part.Parent, "Spiky") then
         if tick() - lastContact > HIT_DEBOUNCE then
             onHitSpikyThing(part)
             lastContact = tick()
         end
-    end
+	end
+	if CollectionService:HasTag(part, "Poison") then
+		if tick() - lastContact > HIT_DEBOUNCE then
+            onHitPoison(part)
+            lastContact = tick()
+        end
+	end
     if CollectionService:HasTag(part.Parent, "FreshWater") then
         Messages:sendServer("ReportCollision", part.Parent)
     end

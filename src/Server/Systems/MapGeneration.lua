@@ -10,6 +10,11 @@ local permutationDirections = {"Left", "Right", "Forward", "Backward"}
 local allTiles = {}
 local tileNameToRotationMap = {}
 
+local function random(min, max)
+    local randomObj = Random.new()
+    return randomObj:NextInteger(min, max)
+end
+
 local function getPermutation(model, direction)
 	local new = model:Clone()
     local originalCF = new.PrimaryPart.CFrame
@@ -212,11 +217,11 @@ local function getCollapseResult(possibilities)
 				end
 			end
 		end
-		for i = 1, math.max(1, multiplier*100) do 
+		for i = 1, math.max(1, multiplier*100) do
 			table.insert(newPossibilities, poss)
 		end
 	end
-	return newPossibilities[math.random(1, #newPossibilities)]
+	return newPossibilities[random(1, #newPossibilities)]
 end
 
 local function collapse(tile, lastTile)
@@ -254,7 +259,11 @@ local function getUpdatedPossibilities(toTile, fromTile)
     local allowedModuleNames = {}
 
     for _, moduleName in pairs(fromTile.possibilities) do
-        local module = possibilitiesMap[moduleName] or error("No module found")
+        local module = possibilitiesMap[moduleName]
+        if not module then
+            print(moduleName)
+            error("No module found")
+        end
         allowedModuleNames[module[fromDirection]] = true
     end
 
@@ -318,11 +327,27 @@ local function run(tiles)
     end
 end
 
+local function conditionsMet(tiles)
+	local totalCaveEntrances = 0
+	for x = 1, #tiles do
+		for y = 1, #tiles[x] do
+			for z = 1, #tiles[x][y] do
+				local tile = tiles[x][y][z]
+				if string.find(string.lower(tile.collapseResult), "caveintoslope") then
+					totalCaveEntrances = totalCaveEntrances + 1
+				end
+			end
+		end
+	end
+	print("total cave entrances: ", totalCaveEntrances)
+	return totalCaveEntrances > 6
+end
+
 local function getWfcGridOfSize(xsize, ysize, zsize)
     tiles = {}
     finalTiles = {}
 
-	local randZ = math.random(1, zsize)
+	local randZ = random(1, zsize)
 
     for x = 1, xsize do
 		tiles[x] = {}
@@ -351,51 +376,75 @@ local function getWfcGridOfSize(xsize, ysize, zsize)
     local slopeTypes = {"slope", "slopealt1", "slopealt2"}
 
 	local tile = tiles[halfx+1][ysize-2][halfz]
-    local slopeString = slopeTypes[math.random(1, #slopeTypes)]
+    local slopeString = slopeTypes[random(1, #slopeTypes)]
     local poss = slopeString.."Backward"
     tile.possibilities = {poss}
 	updateTileNeighborsRecursive(tile)
 
 	local tile = tiles[halfx-1][ysize-2][halfz]
-    local slopeString = slopeTypes[math.random(1, #slopeTypes)]
+    local slopeString = slopeTypes[random(1, #slopeTypes)]
     local poss = slopeString.."Forward"
     tile.possibilities = {poss}
 	updateTileNeighborsRecursive(tile)
 
 	local tile = tiles[halfx][ysize-2][halfz-1]
-    local slopeString = slopeTypes[math.random(1, #slopeTypes)]
+    local slopeString = slopeTypes[random(1, #slopeTypes)]
     local poss = slopeString.."Right"
     tile.possibilities = {poss}
 	updateTileNeighborsRecursive(tile)
 
 	local tile = tiles[halfx][ysize-2][halfz+1]
-    local slopeString = slopeTypes[math.random(1, #slopeTypes)]
+    local slopeString = slopeTypes[random(1, #slopeTypes)]
     local poss = slopeString.."Left"
     tile.possibilities = {poss}
 	updateTileNeighborsRecursive(tile)
 
-	-- corners
+	for z1 = 2, zsize-1 do
+		local tile = tiles[1][1][z1]
+		local slopeString = slopeTypes[random(1, #slopeTypes)]
+		local poss = slopeString.."Forward"
+		tile.possibilities = {poss}
+		updateTileNeighborsRecursive(tile)
+	end
 
-	local tile = tiles[xsize][1][1]
-	tile.possibilities = {"cornerBackward"}
-	updateTileNeighborsRecursive(tile)
+	for z1 = 2, zsize-1 do
+		local tile = tiles[xsize][1][z1]
+		local slopeString = slopeTypes[random(1, #slopeTypes)]
+		local poss = slopeString.."Backward"
+		tile.possibilities = {poss}
+		updateTileNeighborsRecursive(tile)
+	end
 
-	local tile = tiles[xsize][1][zsize]
-	tile.possibilities = {"cornerLeft"}
-	updateTileNeighborsRecursive(tile)
+	for x1 = 2, xsize-1 do
+		local tile = tiles[x1][1][1]
+		local slopeString = slopeTypes[random(1, #slopeTypes)]
+		local poss = slopeString.."Right"
+		tile.possibilities = {poss}
+		updateTileNeighborsRecursive(tile)
+	end
 
-	local tile = tiles[1][1][1]
-	tile.possibilities = {"cornerRight"}
-	updateTileNeighborsRecursive(tile)
+	for x1 = 2, xsize-1 do
+		local tile = tiles[x1][1][zsize]
+		local slopeString = slopeTypes[random(1, #slopeTypes)]
+		local poss = slopeString.."Left"
+		tile.possibilities = {poss}
+		updateTileNeighborsRecursive(tile)
+	end
 
-	local tile = tiles[1][1][zsize]
-	tile.possibilities = {"cornerForward"}
-	updateTileNeighborsRecursive(tile)
+	for x1 = 2, xsize - 2 do
+		for z1 = 2, zsize - 2 do
+			local tile = tiles[x1][1][z1]
+			tile.possibilities = {"groundForward"}
+			updateTileNeighborsRecursive(tile)
+		end
+	end
 
     run(tiles)
 
-    tiles[halfx][ysize-1][halfz].collapseResult = {"starttileForward"}
-    tiles[halfx][ysize-1][halfz].possibilities = {"starttileForward"}
+    tiles[halfx][ysize-1][halfz].collapseResult = "starttileForward"
+	tiles[halfx][ysize-1][halfz].possibilities = {"starttileForward"}
+
+	assert(conditionsMet(tiles), "conditions not met")
 
     return tiles
 end
@@ -404,14 +453,15 @@ local function backUpMap(allTiles)
     local ServerData = import "Server/Systems/ServerData"
     local map = {}
     for _, tile in pairs(allTiles) do
-        local noise = Perlin(tile.x/9,tile.z/9)
-        table.insert(map, {
+		local noise = Perlin(tile.x/9,tile.z/9)
+		local tileData = {
             name = tile.possibilities[1],
             x = tile.x,
             y = tile.y,
             z = tile.z,
-            biome =  (noise > .55 and  "Desert") or "Rainforest",
-        })
+            biome = "Rainforest", -- (noise > .55 and  "Desert") or
+		}
+        table.insert(map, tileData)
     end
     ServerData:setValue("tileMap", map)
 end
@@ -430,13 +480,14 @@ function MapGeneration:loadFromSerializedMap(map, isFirstTime)
 end
 
 function MapGeneration:generateInitialMap()
-    local xsize = 9
-    local ysize = 5
-    local zsize = 9
+    local xsize = 16
+    local ysize = 7
+    local zsize = 16
 
     local grid
     repeat
-        local status, error = pcall(function()
+		local status, error = pcall(function()
+			allTiles = {}
             grid = getWfcGridOfSize(xsize,ysize,zsize)
         end)
         if error then

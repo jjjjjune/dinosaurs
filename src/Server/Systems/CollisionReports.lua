@@ -19,7 +19,10 @@ function CollisionReports:start()
             if object and object.PrimaryPart and (object.PrimaryPart.Position - player.Character.PrimaryPart.Position).magnitude < 50 then
                 if CollectionService:HasTag(object, "Spiky") then
                     Damage(player.Character, {damage = 10, type = "normal"})
-                end
+				end
+				if CollectionService:HasTag(object, "Poison") then
+					Damage(player.Character, {damage = 10, type = "poison"})
+				end
             end
         end
     end)

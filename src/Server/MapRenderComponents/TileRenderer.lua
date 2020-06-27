@@ -18,6 +18,8 @@ function TileRenderer:supplyMapTileObjects(mapTileObjects, tileNameToRotationMap
         if cellName ~= "skyForward" and cellName ~= "skyRight" and cellName ~= "skyBackward" and cellName ~= "skyLeft" then
             local rotation = self.tileNameToRotationMap[cellName] or CFrame.Angles(0,0,0)
 
+            local oldName = cellName
+
             cellName = string.gsub(cellName, "Forward", "")
             cellName = string.gsub(cellName, "Backward", "")
             cellName = string.gsub(cellName, "Left", "")
@@ -38,7 +40,16 @@ function TileRenderer:supplyMapTileObjects(mapTileObjects, tileNameToRotationMap
             local biomeValue = Instance.new("StringValue", newTile)
 
             biomeValue.Name = "Biome"
-            biomeValue.Value = biome
+			biomeValue.Value = biome
+
+			if string.find(string.lower(cellName), "cave") then
+				local cave = Instance.new("BoolValue", newTile)
+				cave.Name = "Cave"
+				cave.Value = true
+			end
+
+            local x = Instance.new("StringValue", newTile)
+            x.Name = oldName
 
             CollectionService:AddTag(newTile, "Tile")
 
