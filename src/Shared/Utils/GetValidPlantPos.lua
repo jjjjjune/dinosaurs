@@ -32,50 +32,9 @@ local function canPlantGoOn(hit, tile, biome)
     return basicCheck3
 end
 
-local function isDotValid(dot)
-   -- print(dot)
-    --return dot > 0 and dot < 2
-    return true
-end
-
-local function isAreaGood(position, size, ysize, biome, tile)
-    -- in every corner of this direction, we check if a downwards ray will hit a valid point
-    local isGood = true
-    -- size = size/2
-    -- local start1 = position + Vector3.new(size, ysize,size)
-    -- local start2 = position + Vector3.new(-size, ysize, size)
-    -- local start3 = position + Vector3.new(-size, ysize, -size)
-    -- local start4 = position + Vector3.new(size, ysize,- size)
-
-    -- local dir = Vector3.new(0,-(ysize+2),0)
-
-    -- local posses = {start1,start2,start3,start4}
-    -- for index, startPos in pairs(posses) do
-    --     local hit, pos, normal = CastRay(startPos, dir)
-    --     local dot = Vector3.new(0,1,0):Dot(normal)
-
-    --     if not hit then
-    --         isGood = false
-    --         --print("hit nothing")
-    --     else
-    --         if not isDotValid(dot) then
-    --             isGood = false
-    --             --print("invalid dot")
-    --         else
-    --             if not canPlantGoOn(hit, nil, biome) then
-    --                 --print("hit cannot go on ", index, hit and hit.Name)
-    --                 isGood = false
-    --             end
-    --         end
-    --     end
-    -- end
-
-    return isGood
-end
-
 local grassesCache = {}
 
-local function getGrassesFor(tile, biome)
+local function getValidSurfacesFor(tile, biome)
 	if grassesCache[tile] and grassesCache[tile][biome] then
 		local grasses = {}
 		for grass, _ in pairs(grassesCache[tile][biome]) do
@@ -100,9 +59,9 @@ local function getGrassesFor(tile, biome)
 end
 
 return function(tile, plantName, biome)
-	local grasses = getGrassesFor(tile, biome)
+	local surfaces = getValidSurfacesFor(tile, biome)
 
-	if #grasses == 0 then
+	if #surfaces == 0 then
 		return
 	end
 
@@ -111,9 +70,8 @@ return function(tile, plantName, biome)
     local model = plantFolder[numChildren..""]
     local size = (model).PrimaryPart.Size.X
     local ysize = model:GetModelSize().Y
-    -- roughly the base size of dis
 
-    local grass = grasses[math.random(1, #grasses)]
+    local grass = surfaces[math.random(1, #surfaces)]
 	local rayStartPos = randomPointOnPartSurface(grass)
     local tries = 0
     local hit, pos, normal
@@ -121,23 +79,23 @@ return function(tile, plantName, biome)
     repeat
         hit, pos, normal = CastRay(rayStartPos + Vector3.new(0,ysize,0), Vector3.new(0,(-ysize) - 4,0))
         dot = Vector3.new(0,1,0):Dot(normal)
-		tries = tries + 1
+        tries = tries + 1
+
 		local condition1 = hit
 		local condition2 = hit and canPlantGoOn(hit, tile, biome)
-		local condition3 = isDotValid(dot)
-		local condition4 = isAreaGood(pos, size, ysize, biome, tile)
-		if not (condition1 and condition2 and condition3 and condition4) then
-            grass = grasses[math.random(1, #grasses)]
+
+		if not (condition1 and condition2) then
+            grass = surfaces[math.random(1, #surfaces)]
             rayStartPos = randomPointOnPartSurface(grass)
             hit = nil
         end
+
         if tries%5 == 0 then
             wait()
         end
     until
         tries > 40 or (hit)
     if tries > 40 then
-        --print("timed out!")
         return
     end
 

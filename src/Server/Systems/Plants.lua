@@ -51,11 +51,11 @@ local function setPhase(plantModel, phaseNumber)
     cf = cf * CFrame.new(0,newModel.PrimaryPart.Size.Y/2,0)
     newModel:SetPrimaryPartCFrame(cf)
     plantModel:Destroy()
-    newModel.Parent = workspace
     local phase = Instance.new("IntValue", newModel)
     phase.Name = "Phase"
     phase.Value = phaseNumber
-    CollectionService:AddTag(newModel, "Plant")
+	CollectionService:AddTag(newModel, "Plant")
+	newModel.Parent = workspace
     return newModel
 end
 
