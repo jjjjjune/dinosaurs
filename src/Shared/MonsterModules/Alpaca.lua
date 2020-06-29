@@ -14,6 +14,11 @@ local Alpaca = {}
 Alpaca.__index = Alpaca
 
 function Alpaca:step()
+	if not self.PrimaryPart then
+		self.mainThread:disconnect()
+		self.model:Destroy()
+		return
+	end
     local target = self.targetComponent:getTarget()
     local fleeing = self.targetComponent:getFleeing()
     if fleeing then

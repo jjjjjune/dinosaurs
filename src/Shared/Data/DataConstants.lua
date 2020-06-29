@@ -10,7 +10,8 @@ Data.TEST_DATA = {
 }
 
 Data.DEFAULT_SERVER_DATA = {
-    players = {},
+	players = {},
+	rockSpawners = {},
     seasonsSurvived = 1,
 }
 

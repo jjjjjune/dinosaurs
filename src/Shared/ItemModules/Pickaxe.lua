@@ -37,7 +37,7 @@ local function getHitPosition(player, rock)
     local goal = rock.PrimaryPart.Position
     local hit, pos = CastRay(start, (goal - start).unit * 10)
     if hit then
-        return pos 
+        return pos
     end
     return goal
 end

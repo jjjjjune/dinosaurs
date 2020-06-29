@@ -4,11 +4,19 @@ local Messages = import "Shared/Utils/Messages"
 
 local CollectionService = game:GetService("CollectionService")
 
+local cellSize = 120
+
 local hasRendered = false
+
+local highestY = 0
 
 local TileRenderer = {}
 
 TileRenderer.generatedTiles = {}
+
+function TileRenderer.getCellYLevelOfPosition(pos)
+	return math.floor(pos.Y/cellSize)
+end
 
 function TileRenderer:supplyMapTileObjects(mapTileObjects, tileNameToRotationMap, firstGen)
     self.mapTileObjects = mapTileObjects
@@ -51,9 +59,13 @@ function TileRenderer:supplyMapTileObjects(mapTileObjects, tileNameToRotationMap
             local x = Instance.new("StringValue", newTile)
             x.Name = oldName
 
-            CollectionService:AddTag(newTile, "Tile")
+			CollectionService:AddTag(newTile, "Tile")
 
-            newTile:SetPrimaryPartCFrame(CFrame.new(tileInfo.x*120,tileInfo.y*120,tileInfo.z*120))
+			if tileInfo.y > highestY then
+				highestY = tileInfo.y -- sorry
+			end
+
+            newTile:SetPrimaryPartCFrame(CFrame.new(tileInfo.x*cellSize,tileInfo.y*cellSize,tileInfo.z*cellSize))
             newTile:SetPrimaryPartCFrame(newTile.PrimaryPart.CFrame * rotation)
 
             if newTile.Name == "starttile" then

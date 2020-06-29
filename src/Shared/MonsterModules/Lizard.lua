@@ -15,6 +15,11 @@ local Lizard = {}
 Lizard.__index = Lizard
 
 function Lizard:step()
+	if not self.PrimaryPart then
+		self.mainThread:disconnect()
+		self.model:Destroy()
+		return
+	end
     if not self.attackComponent.attacking then
         local target = self.targetComponent:getTarget()
         if target and target.PrimaryPart then

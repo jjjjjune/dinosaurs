@@ -14,7 +14,7 @@ local function getClosestItemOfName(position, name)
     local closestDistance = MIN_FIND_DISTANCE
     local closestItem
     for _, item in pairs(CollectionService:GetTagged("Item")) do
-        if item.Name == name and isValid(item) then 
+        if item.Name == name and isValid(item) then
             local itemPos = item.PrimaryPart and item.PrimaryPart.Position
             if itemPos then
                 local dist = (position - itemPos).magnitude
@@ -39,7 +39,7 @@ local function getClosestEnemyOfSet(position, set)
                 isValid = not CollectionService:HasTag(character, "Corpse")
             end
         end
-        if isValid then 
+        if isValid then
             local itemPos = character.PrimaryPart and character.PrimaryPart.Position
             if itemPos then
                 local dist = (position - itemPos).magnitude
@@ -121,7 +121,6 @@ function TargetComponent:getFleeing(forceRecalc)
     self.lastFleeing = self.lastFleeing or false
     local timeSinceLastFleeCalculation = tick() - self.lastFleeCalculation
     if timeSinceLastFleeCalculation > 1 or forceRecalc then
-        print("new flee calc")
         self.lastFleeCalculation = tick()
         local fleeFrom = {}
         for _, enemyTag in pairs(self.fleeFromTags) do
