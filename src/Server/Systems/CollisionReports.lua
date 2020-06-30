@@ -20,8 +20,11 @@ function CollisionReports:start()
                 if CollectionService:HasTag(object, "Spiky") then
                     Damage(player.Character, {damage = 10, type = "normal"})
 				end
-				if CollectionService:HasTag(object, "Poison") then
-					Damage(player.Character, {damage = 10, type = "poison"})
+			else
+				if object then
+					if CollectionService:HasTag(object, "Poison") then
+						Damage(player.Character, {damage = 10, type = "poison"})
+					end
 				end
             end
         end

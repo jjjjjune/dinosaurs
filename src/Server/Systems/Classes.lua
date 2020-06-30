@@ -7,7 +7,6 @@ local PlayerClassesFolder = import "ServerStorage/PlayerClasses"
 local possibleClasses = {"Gatherer"} -- , "Warrior"
 
 local function setClass(character, className)
-	print("setting class", character, className)
     local classAsset = PlayerClassesFolder[className]
     for _, value in pairs(classAsset.Humanoid:GetChildren()) do
         if value:IsA("NumberValue") then
@@ -23,13 +22,12 @@ local function setClass(character, className)
                 v:Destroy()
             end
         end
-    end
-    if character:FindFirstChild("Shirt") then
-        character.Shirt:Destroy()
-    end
-    if character:FindFirstChild("Pants") then
-        character.Pants:Destroy()
-    end
+	end
+	for _, v in pairs(character:GetChildren()) do
+		if v.Name == "Shirt" or v.Name == "Pants" then
+			v:Destroy()
+		end
+	end
 end
 
 local Classes = {}

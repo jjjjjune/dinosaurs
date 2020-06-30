@@ -63,6 +63,8 @@ for _, path in ipairs(ui) do
 	system:start(player.PlayerGui)
 end
 
+import("Client/Systems/XboxSelectionClient"):start()
+
 Messages.fireQueue()
 
 local init = import "Client/Systems/ClientInit"
