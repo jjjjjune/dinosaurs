@@ -111,7 +111,11 @@ function Alpaca:init(model)
         self.touchComponent:step(dt)
         self.rideableComponent:step(dt)
 
-        self:step(dt)
+		self:step(dt)
+
+		if not self.model.PrimaryPart then
+			return
+		end
 
         local speed = (self.model.PrimaryPart.Velocity*Vector3.new(1,0,1)).magnitude
         local speedPercent = math.max(.01, speed/self.animationScaledWalkspeed)

@@ -4,9 +4,10 @@ local Players = game:GetService("Players")
 
 local PlayerClassesFolder = import "ServerStorage/PlayerClasses"
 
-local possibleClasses = {"Citizen", "Gatherer"} -- , "Warrior"
+local possibleClasses = {"Gatherer"} -- , "Warrior"
 
 local function setClass(character, className)
+	print("setting class", character, className)
     local classAsset = PlayerClassesFolder[className]
     for _, value in pairs(classAsset.Humanoid:GetChildren()) do
         if value:IsA("NumberValue") then

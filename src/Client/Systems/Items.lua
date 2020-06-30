@@ -67,13 +67,13 @@ local function attemptThrowItem() -- the fact that this is for both normal items
                 if velocity.magnitude > 1 then
                     Messages:send("PlaySoundOnClient",{
                         instance = game.ReplicatedStorage.Sounds.HeavyWhoosh,
-                        part = character.Head, 
+                        part = character.Head,
                         volume = (possibleItem.PrimaryPart.Velocity.Magnitude > 2 and .1) or .05
                     })
                 else
                     Messages:send("PlaySoundOnClient",{
                         instance = game.ReplicatedStorage.Sounds.SoftPlacement,
-                        part = character.Head, 
+                        part = character.Head,
                         volume = .15
                     })
                 end
@@ -86,7 +86,7 @@ local function attemptThrowItem() -- the fact that this is for both normal items
             possibleItem:WaitForChild("ServerWeld")
             possibleItem.ServerWeld:Destroy()
             possibleItem.Parent = workspace
-            if not CollectionService:HasTag(possibleItem, "Building") then 
+            if not CollectionService:HasTag(possibleItem, "Building") then
                 possibleItem.PrimaryPart.CFrame = character.HumanoidRootPart.CFrame * CFrame.new(0,0,-4)
                 possibleItem.PrimaryPart.Velocity = velocity * 1
             else
@@ -147,7 +147,7 @@ local function getUseText(itemInstance)
         if CollectionService:HasTag(itemInstance, tag) then
             return text
         end
-    end 
+    end
 end
 
 local function equipCarryItem(itemInstance)
@@ -194,7 +194,7 @@ function Items:start()
         bindCarry()
     end)
     Messages:hook("OnStoreAction", function()
-        if carryItemInstance and carryItemInstance.Parent ~= nil then
+        if carryItemInstance and carryItemInstance.Parent ~= nil and not CollectionService:HasTag(carryItemInstance, "Building") then
             unequipCarryItem("STORE BIND")
             Messages:send("StoreTool", carryItemInstance)
             bindCarry()

@@ -22,11 +22,6 @@ Recipes.Workbench = {
         default = true,
     },
     {
-        product = "Apple",
-        ingredient = "Blue Mushroom",
-        default = true,
-    },
-    {
         product = "Workbench",
         ingredient = "Log",
         default = true,
