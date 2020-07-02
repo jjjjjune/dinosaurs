@@ -7,11 +7,16 @@ local RunService = game:GetService("RunService")
 
 local PlayerGui = game.Players.LocalPlayer.PlayerGui
 local TooltipGeneric = PlayerGui:WaitForChild("Tooltips"):WaitForChild("TooltipGeneric")
+local ItemNameLabel = PlayerGui.Tooltips:WaitForChild("ItemNameLabel")
+local ItemNameLabelShadow = PlayerGui.Tooltips:WaitForChild("ItemNameLabelShadow")
 
 local GetCharacterPosition = import "Shared/Utils/GetCharacterPosition"
 
+local lastTarget
+
 local currentTargets = {}
 local tooltipFrames = {}
+local hiddenTooltips = {}
 
 local function skin(tooltipFrame, actionName)
     local bindInfo = ActionBinds[actionName]
@@ -30,6 +35,27 @@ local function connectEvents(tooltip, actionName)
     end)
 end
 
+local function displayItemName()
+	local foundFrame
+	for actionFrame, frame in pairs(tooltipFrames) do
+		if frame and frame.Visible == true then
+			foundFrame = true
+		end
+	end
+	local target = lastTarget
+	if foundFrame and target then
+		local vector, onScreen = workspace.CurrentCamera:WorldToScreenPoint(target.PrimaryPart.Position)
+		ItemNameLabel.Visible = true
+		ItemNameLabel.Text = target.Name
+		ItemNameLabelShadow.Text = target.Name
+		ItemNameLabel.Position = UDim2.new(0, vector.X, 0, vector.Y - 32)
+		ItemNameLabelShadow.Position = UDim2.new(0, vector.X, 0, vector.Y - 31)
+	else
+		ItemNameLabel.Visible = false
+		ItemNameLabelShadow.Visible = false
+	end
+end
+
 local function getTooltipButton(actionName)
     if not tooltipFrames[actionName] then
         local newTooltipUi = TooltipGeneric:Clone()
@@ -41,7 +67,7 @@ local function getTooltipButton(actionName)
 end
 
 local function skinTooltipsToDevice()
-    local device = GetDevice()
+	local device = GetDevice()
     for _, tooltip in pairs(tooltipFrames) do
         local bindInfo = ActionBinds[tooltip.Name]
         if device == "Desktop" then
@@ -66,29 +92,38 @@ local Tooltips = {}
 
 function Tooltips:start()
     Messages:hook("ShowTooltip", function(actionName, worldPosition, target)
-        local button = getTooltipButton(actionName)
+		local button = getTooltipButton(actionName)
+		if hiddenTooltips[actionName] then
+			button.Visible = false
+
+			return
+		end
+
         button.Visible = true
         local vector, onScreen = workspace.CurrentCamera:WorldToScreenPoint(worldPosition)
         local foundSameTarget = false
         for ac, actionTarget in pairs(currentTargets) do
             if actionTarget == target and ac ~= actionName then
-                foundSameTarget = true
+                foundSameTarget = ac
             end
         end
         if not foundSameTarget then
             currentTargets[actionName] = target
             button.Position = UDim2.new(0, vector.X, 0, vector.Y)
-        else
-            button.Position = UDim2.new(0, vector.X + 36, 0, vector.Y)
-        end
-        local characterPosition = GetCharacterPosition()
-        if characterPosition then
-            if (characterPosition - worldPosition).magnitude < 8 then
-                setButtonTransparency(button, .6)
-            else
-                setButtonTransparency(button, 0)
-            end
-        end
+		else
+			local otherButton = tooltipFrames[foundSameTarget]
+			otherButton.Position = otherButton.Position - UDim2.new(0,18,0,0)
+            button.Position = UDim2.new(0, vector.X + 18, 0, vector.Y)
+		end
+		lastTarget = target
+        -- local characterPosition = GetCharacterPosition()
+        -- if characterPosition then
+        --     if (characterPosition - worldPosition).magnitude < 8 then
+        --         setButtonTransparency(button, .6)
+        --     else
+        --         setButtonTransparency(button, 0)
+        --     end
+        -- end
     end)
     Messages:hook("HideTooltip", function(actionName)
         currentTargets[actionName] = nil
@@ -98,7 +133,7 @@ function Tooltips:start()
     Messages:hook("PlayPressedEffect", function(actionName)
         local button = getTooltipButton(actionName)
         for _, v in pairs(button:GetChildren()) do
-            if not v:FindFirstChild("Tweening") then 
+            if not v:FindFirstChild("Tweening") then
                 local tweening = Instance.new("BoolValue", v)
                 tweening.Name = "Tweening"
                 v:TweenPosition(v.Position + UDim2.new(0,0,0,4), "Out", "Quad", .1, false, function()
@@ -111,9 +146,19 @@ function Tooltips:start()
         --[[Messages:send("PlaySoundOnClient",{
             instance = game.ReplicatedStorage.UiSounds.Select,
         })--]]
-    end)
+	end)
+	Messages:hook("SetTooltipHidden", function(actionName, isHidden)
+		hiddenTooltips[actionName] = not isHidden
+		if isHidden then
+			local button = getTooltipButton(actionName)
+			if button then
+				button.Visible = false
+			end
+		end
+	end)
     RunService.RenderStepped:connect(function()
-        skinTooltipsToDevice()
+		skinTooltipsToDevice()
+		displayItemName()
     end)
 end
 

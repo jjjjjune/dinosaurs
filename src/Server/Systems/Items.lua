@@ -93,8 +93,8 @@ local function throw(player, item, desiredCF, target)
         welded = true
     end
     delay(6, function()
-        if item:IsDescendantOf(game) and item.PrimaryPart:CanSetNetworkOwnership() then 
-            local netOwner = item.PrimaryPart:GetNetworkOwner() 
+        if item:IsDescendantOf(game) and item.PrimaryPart:CanSetNetworkOwnership() then
+            local netOwner = item.PrimaryPart:GetNetworkOwner()
             if netOwner == nil or netOwner == player then
                 item.PrimaryPart:SetNetworkOwnershipAuto()
             end

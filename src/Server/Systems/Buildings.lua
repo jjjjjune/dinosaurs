@@ -2,13 +2,14 @@ local import = require(game.ReplicatedStorage.Shared.Import)
 local Messages = import "Shared/Utils/Messages"
 local CollectionService = game:GetService("CollectionService")
 
+local ServerData = import "Server/Systems/ServerData"
+
 local function round(n, mult)
     mult = mult or 1
     return math.floor((n + mult/2)/mult) * mult
 end
 
 local function backupBuildings()
-    local ServerData = import "Server/Systems/ServerData"
     local buildings = {}
     for _, building in pairs(CollectionService:GetTagged("Building")) do
         if building:IsDescendantOf(workspace) then
@@ -102,7 +103,13 @@ function Buildings:start()
             backupBuildings()
         end
     end)
-    loadBuildings()
+	loadBuildings()
+	CollectionService:GetInstanceAddedSignal("Building"):connect(function(building)
+		ServerData:generateIdForInstanceOfType(building, "B")
+	end)
+	for _, building in pairs(CollectionService:GetTagged("Building")) do
+		ServerData:generateIdForInstanceOfType(building, "B")
+	end
 end
 
 return Buildings

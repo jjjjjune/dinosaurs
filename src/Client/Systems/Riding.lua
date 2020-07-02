@@ -11,7 +11,7 @@ local RunService = game:GetService("RunService")
 local lastNormal = Vector3.new()
 
 local JUMP_TIME = .2
-local JUMP_FORCE = 7000
+local JUMP_FORCE = 8000
 
 local lastJump = 0
 
@@ -59,10 +59,12 @@ local function move(dt, mountModel, dir)
 		x = math.deg(x)
 		y = math.deg(y)
 		z = math.deg(z)
-		local isOnFlatGround = (math.abs(x) <= 1) and (math.abs(z) <= 1)
+		local isOnFlatGround = (math.abs(x) <= 10) and (math.abs(z) <= 10)
 		if isOnFlatGround then
+			print("yea on flat ground")
 			mountModel.PrimaryPart.BodyVelocity.Velocity = dir * mountModel.Speed.Value
 		else
+			print("issa slope")
 			mountModel.PrimaryPart.BodyVelocity.Velocity = mountModel.PrimaryPart.CFrame.lookVector * mountModel.Speed.Value
 		end
 	end
@@ -94,6 +96,14 @@ function Riding:start()
 		rideableEntity.Mount:FireServer()
 	end)
 	Messages:hook("Mounted", function(model)
+		Messages:send("DisableAction", "INTERACT")
+		Messages:send("SetTooltipHidden", "INTERACT", false)
+
+		Messages:send("CreateContextualBind", "INTERACT", function()
+			model.Mount:FireServer()
+			Messages:send("DestroyContextualBind", "INTERACT")
+		end, "DISMOUNT")
+
 		workspace.CurrentCamera.CameraSubject = model.PrimaryPart
 
 		GetCharacter().Humanoid:ChangeState(Enum.HumanoidStateType.Physics)
@@ -118,6 +128,8 @@ function Riding:start()
 		end)
 	end)
 	Messages:hook("Dismounted", function()
+		Messages:send("SetTooltipHidden", "INTERACT", true)
+		Messages:send("EnableAction", "INTERACT")
 		Messages:send("StopAnimationClient", "Ride")
 		if rideConnection then
 			rideConnection:disconnect()

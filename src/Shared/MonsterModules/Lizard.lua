@@ -15,7 +15,7 @@ local Lizard = {}
 Lizard.__index = Lizard
 
 function Lizard:step()
-	if not self.PrimaryPart then
+	if not self.model.PrimaryPart then
 		self.mainThread:disconnect()
 		self.model:Destroy()
 		return

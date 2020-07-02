@@ -73,7 +73,7 @@ local function checkMoved(item)
             lastPositions[item] = position
         else
             if tick() - lastInteractedOrInStorageTimer[item] > ITEM_FREEZE_TIME then
-                if not item:FindFirstChild("FreezeWeld") then 
+                if not item:FindFirstChild("FreezeWeld") and not item:FindFirstChild("GameRope") then
                     local hit, pos = CastRay(position, Vector3.new(0,-5,0), {item})
                     if hit and hit.Anchored then
                         local freezeWeld = Instance.new("WeldConstraint", item)

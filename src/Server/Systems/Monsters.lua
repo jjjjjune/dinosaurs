@@ -27,12 +27,17 @@ local function getComponent(monster)
 	end
 end
 
+local function onMonsterAdded(monster)
+	ServerData:generateIdForInstanceOfType(monster, "M")
+end
+
 local function spawnMonster(monsterName, position)
 	local monster = game.ServerStorage.Monsters[monsterName]:Clone()
 	monster.PrimaryPart.CFrame = CFrame.new(position)
 	monster.Parent = workspace
 	local component = getComponent(monster).new()
 	component:init(monster)
+	onMonsterAdded(monster)
 end
 
 local function shouldSpawnNewMonster(monsterName)
@@ -146,6 +151,7 @@ function Monsters:start()
 	Messages:hook("FirstMapRenderComplete", function()
 		loadMonsters()
 	end)
+	Messages:hook("SpawnMonster", spawnMonster)
 end
 
 return Monsters

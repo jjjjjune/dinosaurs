@@ -1,19 +1,19 @@
 -- Teleport.lua, inside your commands folder as defined above.
 return {
-	Name = "spawnitem";
+	Name = "spawnmonster";
 	Aliases = {"si"};
-	Description = "Spawns an item.";
+	Description = "Spawns a monster.";
 	Group = "Admin";
 	Args = {
 		{
 			Type = "string";
-			Name = "Item name";
-			Description = "The name of the item";
+			Name = "monster name";
+			Description = "The name of the monster";
 		},
 		{
 			Type = "player";
 			Name = "player";
-			Description = "player to spawn the item at"
+			Description = "player to spawn it at"
 		},
 	};
 }

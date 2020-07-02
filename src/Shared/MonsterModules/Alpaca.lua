@@ -14,7 +14,7 @@ local Alpaca = {}
 Alpaca.__index = Alpaca
 
 function Alpaca:step()
-	if not self.PrimaryPart then
+	if not self.model.PrimaryPart then
 		self.mainThread:disconnect()
 		self.model:Destroy()
 		return
@@ -35,7 +35,7 @@ end
 function Alpaca:init(model)
     self.model = model
 
-    self.animationScaledWalkspeed = 16 -- this is about the speed at which the animation expects the lizzy to travel
+    self.animationScaledWalkspeed = 22 -- this is about the speed at which the animation expects the animal to travel
 
     self.idleComponent = IdleComponent.new()
     self.idleComponent:init(self.model)
@@ -55,12 +55,12 @@ function Alpaca:init(model)
     self.movementComponent = MovementComponent.new()
     self.movementComponent:init(self.model, {
         jumpDebounce = 2,
-        speed = 28,
+        speed = 21,
         closenessThreshold = 11,
         jumpLength = .5,
         rideableComponent = self.rideableComponent,
         animationComponent = self.animationComponent,
-        jumpVelocity = 800000
+        jumpVelocity = 850000
     })
 
     self.targetComponent = TargetComponent.new()

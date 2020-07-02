@@ -53,6 +53,24 @@ end
 
 local ServerData = {}
 
+function ServerData:generateIdForInstanceOfType(instance, type)
+	if instance:FindFirstChild("ID") then
+		return
+	else
+		local idValue = Instance.new("StringValue", instance)
+		idValue.Name = "ID"
+	end
+	local valueString = type
+	if not self:getValue("ID"..type) then
+		self:setValue("ID"..type, 0)
+	end
+	local n = self:getValue("ID"..type)
+	valueString = valueString..n+1
+	self:setValue("ID"..type, n+1)
+	instance.ID.Value = valueString
+end
+
+
 function ServerData:updated()
 
 end

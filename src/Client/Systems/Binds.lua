@@ -9,6 +9,7 @@ local RunService = game:GetService("RunService")
 local boundActionTags = {}
 local tagsCache = {}
 local lastFoundTagItem = {}
+local disabledActions = {}
 
 local MIN_FIND_DISTANCE = 10
 
@@ -172,7 +173,7 @@ function Binds.bindTagToAction(collectionServiceTag, actionName, callback)
         boundActionTags[actionName].events[collectionServiceTag] = {}
         boundActionTags[actionName].events[collectionServiceTag][1] = CollectionService:GetInstanceAddedSignal(collectionServiceTag):connect(
             function(instance)
-                if instance:IsDescendantOf(workspace) then 
+                if instance:IsDescendantOf(workspace) then
                     table.insert(tagsTable, instance)
                 end
             end
@@ -194,14 +195,22 @@ end
 function Binds:start()
     RunService.RenderStepped:connect(function()
         bindStep()
-    end)
+	end)
+	Messages:hook("EnableAction", function(actionName)
+		disabledActions[actionName] = nil
+	end)
+	Messages:hook("DisableAction", function(actionName)
+		disabledActions[actionName] = true
+	end)
     for actionName, bindInfo in pairs(ActionBinds) do
         Binds.actionActivatedCallbacks[actionName] = function()
             performActionCallbackForAction(actionName)
         end
         ContextActionService:BindAction(actionName.."Callback", function(contextActionName, inputState, inputObject)
-            if inputState == Enum.UserInputState.Begin then
-                performActionCallbackForAction(actionName)
+			if inputState == Enum.UserInputState.Begin then
+				if not disabledActions[actionName] then
+					performActionCallbackForAction(actionName)
+				end
             end
         end, false, bindInfo.pcBind, bindInfo.gamepadBind)
     end
