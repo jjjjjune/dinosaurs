@@ -68,7 +68,8 @@ function Alpaca:init(model)
     self.targetComponent.wantItem = "Banana"
     self.targetComponent.wantedEnemyTags = {}
     self.targetComponent:init(self.model, {
-        giveUpTargetTime = 10,
+		giveUpTargetTime = 10,
+		rideableComponent = self.rideableComponent,
     })
 
     self.touchComponent = TouchComponent.new()

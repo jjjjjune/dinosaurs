@@ -82,9 +82,23 @@ local function playThrowSound(velocity, character, possibleItem)
 	end
 end
 
+-- local function getAttachedItemsToIgnore(item)
+-- 	local itemsToIgnore = {}
+-- 	if item:FindFirstChild("ObjectWeld") then
+-- 		local weldedItem = item.ObjectWeld.Part1.Parent
+-- 		for _, v in pairs((getAttachedItemsToIgnore(weldedItem, itemsToIgnore))) do
+-- 			table.insert(itemsToIgnore, v)
+-- 		end
+-- 	end
+
+-- 	return (itemsToIgnore)
+-- end
+
 local function getPlaceableSurface(item)
-	local hit, pos = CastRay(item.PrimaryPart.Position, Vector3.new(0,-5,0), {item, game.Players.LocalPlayer.Character})
-	if (hit) and (CollectionService:HasTag(hit.Parent, "Building") or CollectionService:HasTag(hit.Parent, "Monster") or CollectionService:HasTag(hit.Parent, "Item")) then
+	local character = GetCharacter()
+	local start = character.HumanoidRootPart.CFrame * CFrame.new(0,4,-4)
+	local hit, pos = CastRay(start.p, Vector3.new(0,-8,0), {item, game.Players.LocalPlayer.Character})
+	if (hit) and (CollectionService:HasTag(hit.Parent, "Building") or CollectionService:HasTag(hit.Parent, "Monster")) then
 		if hit.Anchored == false then
 			return hit, pos
 		end

@@ -11,7 +11,7 @@ local RunService = game:GetService("RunService")
 local lastNormal = Vector3.new()
 
 local JUMP_TIME = .2
-local JUMP_FORCE = 8000
+local JUMP_FORCE = 7500
 
 local lastJump = 0
 
@@ -61,10 +61,8 @@ local function move(dt, mountModel, dir)
 		z = math.deg(z)
 		local isOnFlatGround = (math.abs(x) <= 10) and (math.abs(z) <= 10)
 		if isOnFlatGround then
-			print("yea on flat ground")
 			mountModel.PrimaryPart.BodyVelocity.Velocity = dir * mountModel.Speed.Value
 		else
-			print("issa slope")
 			mountModel.PrimaryPart.BodyVelocity.Velocity = mountModel.PrimaryPart.CFrame.lookVector * mountModel.Speed.Value
 		end
 	end

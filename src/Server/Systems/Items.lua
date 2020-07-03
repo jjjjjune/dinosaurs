@@ -3,6 +3,23 @@ local Messages = import "Shared/Utils/Messages"
 local CollectionService = game:GetService("CollectionService")
 local TagsToModulesMap = import "Shared/Data/TagsToModulesMap"
 
+-- local collideMap = {}
+
+-- local function getAttachedItems(item)
+-- 	local itemsToIgnore = {}
+-- 	local ignored = {}
+-- 	if item:FindFirstChild("ObjectWeld") then
+--         local weldedItem = item.ObjectWeld.Part1.Parent
+-- 		if not ignored[item] then
+-- 			ignored[item] = true
+--             for _, v in pairs((getAttachedItems(weldedItem, itemsToIgnore))) do
+--                 table.insert(itemsToIgnore, v)
+--             end
+--         end
+-- 	end
+-- 	return (itemsToIgnore)
+-- end
+
 local function prepare(item)
     if CollectionService:HasTag(item, "Building") then
         if not item.PrimaryPart:FindFirstChild("WeldConstraint") then
@@ -35,7 +52,19 @@ local function attemptCarryItem(player, item)
                 foundItem = true
             end
         end
-    end
+	end
+	for _, v in pairs(item:GetChildren()) do
+		if v:IsA("BasePart") then
+			v.CanCollide = false
+		end
+	end
+	-- for _, item in pairs(getAttachedItems(item)) do
+	-- 	for _, v in pairs(item:GetChildren()) do
+	-- 		if v:IsA("BasePart") then
+	-- 			v.CanCollide = false
+	-- 		end
+	-- 	end
+	-- end
     if foundItem == true then
         return
     end
@@ -65,12 +94,6 @@ local function attemptCarryItem(player, item)
     serverWeld.Part1 = item.PrimaryPart
     serverWeld.Name = "ServerWeld"
     Messages:sendClient(player, "SetCarryItem", item)
-    for _, v in pairs(item:GetChildren()) do
-        if v:IsA("BasePart") then
-            v.CanCollide = false
-            v.Anchored = false
-        end
-    end
 end
 
 local function throw(player, item, desiredCF, target)
@@ -79,10 +102,17 @@ local function throw(player, item, desiredCF, target)
     end
     item.Parent = workspace
     for _, v in pairs(item:GetChildren()) do
-        if v:IsA("BasePart") then
+		if v:IsA("BasePart") then
             v.CanCollide = true
         end
-    end
+	end
+	-- for _, item in pairs(getAttachedItems(item)) do
+	-- 	for _, v in pairs(item:GetChildren()) do
+	-- 		if v:IsA("BasePart") then
+	-- 			v.CanCollide = true
+	-- 		end
+	-- 	end
+	-- end
     Messages:reproOnClients(player, "PlaySound", "HeavyWhoosh", item.PrimaryPart.Position)
     local welded = false
     if CollectionService:HasTag(item, "Building") and desiredCF then
@@ -90,6 +120,7 @@ local function throw(player, item, desiredCF, target)
     end
 	if target and target.Anchored == false and not target.Parent:FindFirstChild("Humanoid") then
 		print("welding")
+		desiredCF = desiredCF * CFrame.new(0, item.PrimaryPart.Size.Y/2, 0)
 		local ConstraintManager = import "Server/Systems/ConstraintManager"
 		ConstraintManager.createObjectWeld(item, target.Parent, desiredCF.p)
 		welded = true

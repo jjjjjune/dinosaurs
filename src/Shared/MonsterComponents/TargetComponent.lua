@@ -117,6 +117,7 @@ function TargetComponent:getValidEnemy()
 end
 
 function TargetComponent:getFleeing(forceRecalc)
+	if self.model.Tamed.Value == true then return end
     self.lastFleeCalculation = self.lastFleeCalculation or tick()
     self.lastFleeing = self.lastFleeing or false
     local timeSinceLastFleeCalculation = tick() - self.lastFleeCalculation
@@ -187,7 +188,8 @@ end
 
 function TargetComponent:init(model, props)
     self.model = model
-    self.giveUpTargetTime = props.giveUpTargetTime
+	self.giveUpTargetTime = props.giveUpTargetTime
+	self.rideableComponent = props.rideableComponent
 end
 
 function TargetComponent.new()
