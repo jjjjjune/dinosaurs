@@ -7,6 +7,7 @@ local ActionBinds = import "Shared/Data/ActionBinds"
 local ContextActionService = game:GetService("ContextActionService")
 local TagsToModulesMap = import "Shared/Data/TagsToModulesMap"
 local UseTexts = import "Shared/Data/UseTexts"
+local CastRay = import "Shared/Utils/CastRay"
 
 local itemModule
 local carryItemInstance
@@ -57,56 +58,85 @@ local function attemptCarryItem(item)
     return true
 end
 
+local function playThrowSound(velocity, character, possibleItem)
+
+	if not CollectionService:HasTag(possibleItem, "Building") then
+		if velocity.magnitude > 1 then
+			Messages:send("PlaySoundOnClient",{
+				instance = game.ReplicatedStorage.Sounds.HeavyWhoosh,
+				part = character.Head,
+				volume = (possibleItem.PrimaryPart.Velocity.Magnitude > 2 and .1) or .05
+			})
+		else
+			Messages:send("PlaySoundOnClient",{
+				instance = game.ReplicatedStorage.Sounds.SoftPlacement,
+				part = character.Head,
+				volume = .15
+			})
+		end
+	else
+		Messages:send("PlaySoundOnClient",{
+			instance = game.ReplicatedStorage.Sounds.ClickHigh,
+			part = character.Head,
+		})
+	end
+end
+
+local function getPlaceableSurface(item)
+	local hit, pos = CastRay(item.PrimaryPart.Position, Vector3.new(0,-5,0), {item, game.Players.LocalPlayer.Character})
+	if (hit) and (CollectionService:HasTag(hit.Parent, "Building") or CollectionService:HasTag(hit.Parent, "Monster") or CollectionService:HasTag(hit.Parent, "Item")) then
+		if hit.Anchored == false then
+			return hit, pos
+		end
+	end
+end
+
 local function attemptThrowItem() -- the fact that this is for both normal items and buildings
     -- is one of the most unfortunate aspects of this code base so far
     local character = GetCharacter()
     for _, possibleItem in pairs(character:GetChildren()) do
-        if CollectionService:HasTag(possibleItem, "Item") or CollectionService:HasTag(possibleItem, "Building") then
-            local velocity = character.HumanoidRootPart.Velocity
-            if not CollectionService:HasTag(possibleItem, "Building") then
-                if velocity.magnitude > 1 then
-                    Messages:send("PlaySoundOnClient",{
-                        instance = game.ReplicatedStorage.Sounds.HeavyWhoosh,
-                        part = character.Head,
-                        volume = (possibleItem.PrimaryPart.Velocity.Magnitude > 2 and .1) or .05
-                    })
-                else
-                    Messages:send("PlaySoundOnClient",{
-                        instance = game.ReplicatedStorage.Sounds.SoftPlacement,
-                        part = character.Head,
-                        volume = .15
-                    })
-                end
+		if CollectionService:HasTag(possibleItem, "Item") or CollectionService:HasTag(possibleItem, "Building") then
+			local item = possibleItem
+			local velocity = character.HumanoidRootPart.Velocity
+			playThrowSound(velocity, character, item)
+
+            item:WaitForChild("ServerWeld")
+            item.ServerWeld:Destroy()
+			item.Parent = workspace
+
+            if not CollectionService:HasTag(item, "Building") then
+                item.PrimaryPart.CFrame = character.HumanoidRootPart.CFrame * CFrame.new(0,0,-4)
+				item.PrimaryPart:GetRootPart().Velocity = velocity * 1.5
             else
-                Messages:send("PlaySoundOnClient",{
-                    instance = game.ReplicatedStorage.Sounds.ClickHigh,
-                    part = character.Head,
-                })
-            end
-            possibleItem:WaitForChild("ServerWeld")
-            possibleItem.ServerWeld:Destroy()
-            possibleItem.Parent = workspace
-            if not CollectionService:HasTag(possibleItem, "Building") then
-                possibleItem.PrimaryPart.CFrame = character.HumanoidRootPart.CFrame * CFrame.new(0,0,-4)
-                possibleItem.PrimaryPart.Velocity = velocity * 1
-            else
-                for _, v in pairs(possibleItem:GetDescendants()) do
+                for _, v in pairs(item:GetDescendants()) do
                     if v:IsA("BasePart") then
                         v.Velocity = Vector3.new()
                     end
                 end
-            end
-            local holdAnimation = "Carry"
-            if possibleItem:FindFirstChild("HoldAnimation") then
+			end
+
+			local holdAnimation = "Carry"
+
+            if item:FindFirstChild("HoldAnimation") then
                 holdAnimation = possibleItem.HoldAnimation.Value
-            end
-            Messages:send("StopAnimationClient", holdAnimation)
-            if CollectionService:HasTag(possibleItem, "Building") then
-                local Building = import "Client/Systems/Building"
-                possibleItem:SetPrimaryPartCFrame(Building.placementCF)
-                Messages:sendServer("Throw", possibleItem, Building.placementCF, Building.placementTarget)
-            else
-                Messages:sendServer("Throw", possibleItem)
+			end
+
+			Messages:send("StopAnimationClient", holdAnimation)
+
+            if CollectionService:HasTag(item, "Building") then
+				local BuildingSystem = import "Client/Systems/Building"
+
+				item:SetPrimaryPartCFrame(BuildingSystem.placementCF)
+
+                Messages:sendServer("Throw", item, BuildingSystem.placementCF, BuildingSystem.placementTarget)
+			else
+				local hit, pos = getPlaceableSurface(item)
+				if hit then
+					possibleItem.PrimaryPart:GetRootPart().Velocity = Vector3.new()
+					Messages:sendServer("Throw", item, CFrame.new(pos), hit)
+				else
+					Messages:sendServer("Throw", item)
+				end
             end
         end
     end

@@ -76,10 +76,8 @@ local function checkMoved(item)
                 if not item:FindFirstChild("FreezeWeld") and not item:FindFirstChild("GameRope") then
                     local hit, pos = CastRay(position, Vector3.new(0,-5,0), {item})
                     if hit and hit.Anchored then
-                        local freezeWeld = Instance.new("WeldConstraint", item)
-                        freezeWeld.Part0 = item.PrimaryPart
-                        freezeWeld.Part1 = hit
-                        freezeWeld.Name = "FreezeWeld"
+						local ConstraintManager = import "Server/Systems/ConstraintManager"
+						ConstraintManager.freezeWeld(item, hit)
                     end
                 end
             end
@@ -154,7 +152,13 @@ function Storage:start()
     Messages:hook("OnItemThrown", function(item)
         lastInteractedOrInStorageTimer[item] = tick()
     end)
-    loadSerializedItems()
+	loadSerializedItems()
+	CollectionService:GetInstanceAddedSignal("Item"):connect(function(item)
+		ServerData:generateIdForInstanceOfType(item, "I")
+	end)
+	for _, item in pairs(CollectionService:GetTagged("Item")) do
+		ServerData:generateIdForInstanceOfType(item, "I")
+	end
 end
 
 return Storage

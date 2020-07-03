@@ -142,7 +142,7 @@ local function isWithin(position, part)
     local realY2 = part.Position.Y + 3
     if position.X > x1 and position.X < x2 then
         if position.Z > y1 and position.Z < y2 then
-            if position.Y > realY1 and position.Y < realY2 then 
+            if position.Y > realY1 and position.Y < realY2 then
                 return true
             end
         end
@@ -153,8 +153,10 @@ local function fillSkyReceptacles()
     for _, water in pairs(CollectionService:GetTagged("FreshWater")) do
         if water:IsDescendantOf(workspace) then
             local hit, pos = CastRay(water.Water.Position, Vector3.new(0,10,0))
-            if not hit then
-                fillContainer(water)
+			if not hit then
+				if water.Amount.Value < water.Amount.MaxValue then
+					fillContainer(water)
+				end
             end
         end
     end

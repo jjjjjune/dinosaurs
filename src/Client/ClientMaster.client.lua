@@ -45,6 +45,7 @@ local ui = {
 	"Client/Ui/SacrificeUi",
 	"Client/Ui/Crafting",
 	"Client/Ui/Notifications",
+	"Client/Ui/ItemPlacementHelper"
 }
 
 for _, path in ipairs(loadOrder) do

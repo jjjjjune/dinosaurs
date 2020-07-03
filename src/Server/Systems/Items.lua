@@ -43,9 +43,8 @@ local function attemptCarryItem(player, item)
     if not alive then
         return
     end
-    if item:FindFirstChild("FreezeWeld") then
-        item.FreezeWeld:Destroy()
-    end
+	local ConstraintManager = import "Server/Systems/ConstraintManager"
+	ConstraintManager.destroyAllWelds(item)
     Messages:send("PlaySound", "UiClick", character.Head, 200)
     character.PrimaryPart.RootPriority = 200
     item.Parent = character
@@ -86,11 +85,14 @@ local function throw(player, item, desiredCF, target)
     end
     Messages:reproOnClients(player, "PlaySound", "HeavyWhoosh", item.PrimaryPart.Position)
     local welded = false
-    if CollectionService:HasTag(item, "Building") then
-        item:SetPrimaryPartCFrame(desiredCF)
+    if CollectionService:HasTag(item, "Building") and desiredCF then
+		item:SetPrimaryPartCFrame(desiredCF)
     end
-    if target and target.Anchored == false and CollectionService:HasTag(target, "Buildable") then
-        welded = true
+	if target and target.Anchored == false and not target.Parent:FindFirstChild("Humanoid") then
+		print("welding")
+		local ConstraintManager = import "Server/Systems/ConstraintManager"
+		ConstraintManager.createObjectWeld(item, target.Parent, desiredCF.p)
+		welded = true
     end
     delay(6, function()
         if item:IsDescendantOf(game) and item.PrimaryPart:CanSetNetworkOwnership() then
@@ -115,7 +117,7 @@ local function throwAllPlayerItems(player)
     local character = player.Character
     for _, p in pairs(character:GetChildren()) do
         if CollectionService:HasTag(p, "Item") or CollectionService:HasTag(p, "Building")then
-                throw(player, p)
+                throw(player, p, nil, nil)
             break
         end
     end
@@ -189,10 +191,10 @@ function Items:start()
     end)
     Messages:hook("Throw", function(player, item, desiredCF, target)
         if item.Parent == player.Character then
-            throw(player, item, desiredCF)
+            throw(player, item, desiredCF, target)
         end
         Messages:send("OnItemThrown", item)
-    end)
+	end)
 end
 
 return Items
