@@ -29,9 +29,17 @@ local function closeCrafting()
 		craftBoundMenu:Destroy()
 		craftBoundMenu = nil
 	end
+
+	Messages:send("PlaySoundOnClient",{
+		instance = game.ReplicatedStorage.Sounds.NewUITwoPartClick,
+	})
+
 	game:GetService("GuiService").SelectedObject = nil
+
 	CraftingUi.Visible = false
+
 	ContextActionService:UnbindAction("close menu")
+	ContextActionService:UnbindAction("select button")
 end
 
 local function selectButton()
@@ -123,6 +131,15 @@ local function openCrafting(stationType, station)
 		craftBoundMenu.SelectionChanged:connect(function(oldButton,newButton)
 			game:GetService("GuiService").SelectedObject = newButton
 			selectedButton = newButton
+			if oldButton ~= newButton then
+				Messages:send("PlaySoundOnClient",{
+					instance = game.ReplicatedStorage.Sounds.NewUIScroll1,
+				})
+			else
+				Messages:send("PlaySoundOnClient",{
+					instance = game.ReplicatedStorage.Sounds.NewUIScroll2,
+				})
+			end
 		end)
 		craftBoundMenu:SetSelection(buttons[1])
 	end
