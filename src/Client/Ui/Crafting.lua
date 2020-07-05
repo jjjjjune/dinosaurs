@@ -90,7 +90,7 @@ local function openCrafting(stationType, station)
 			else
 				folderName = "Items"
 			end
-		end
+	end
 
 		frame.CanvasSize = frame.CanvasSize + UDim2.new(0,0,0,craftFrame.AbsoluteSize.Y + 10)
 

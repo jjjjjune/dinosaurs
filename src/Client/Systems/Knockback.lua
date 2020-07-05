@@ -20,7 +20,6 @@ function Knockback:start()
 			if tick() - knockbackStart < knockbackLength then
 				local gravityTranslation = dt*workspace.Gravity
 				knockbackVelocity = Vector3.new(knockbackVelocity.X, math.max(0, knockbackVelocity.Y - gravityTranslation), knockbackVelocity.Z)
-				print(knockbackVelocity)
 				if knockbackVelocity.Y <= 0 then
 					hrp.Velocity = Vector3.new(knockbackVelocity.X, hrp.Velocity.Y, knockbackVelocity.Z)
 				else

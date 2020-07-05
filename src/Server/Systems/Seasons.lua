@@ -8,7 +8,7 @@ local GameConstants = import "Shared/Data/GameConstants"
 
 local currentSeason = 1
 local seasonsSurvived = 0
-local seasonLength = 1
+local seasonLength = GameConstants.SEASON_LENGTH
 local lastSeasonChange = tick()
 
 local isNight = false
@@ -19,8 +19,6 @@ end
 
 local function advanceSeason()
 	currentSeason = currentSeason + 1
-
-	seasonLength = GameConstants.SEASON_LENGTH
 
 	if currentSeason > #SeasonsData then
 		currentSeason = 1

@@ -73,7 +73,7 @@ local function checkMoved(item)
             lastPositions[item] = position
         else
             if tick() - lastInteractedOrInStorageTimer[item] > ITEM_FREEZE_TIME then
-                if not item:FindFirstChild("FreezeWeld") and not item:FindFirstChild("GameRope") then
+				if not item:FindFirstChild("FreezeWeld") and not item:FindFirstChild("GameRope") then
                     local hit, pos = CastRay(position, Vector3.new(0,-5,0), {item})
                     if hit and hit.Anchored then
 						local ConstraintManager = import "Server/Systems/ConstraintManager"
@@ -146,8 +146,10 @@ local Storage = {}
 
 function Storage:start()
     CollectionService:GetInstanceAddedSignal("Item"):connect(onItemAdded)
-    for _, item in pairs(CollectionService:GetTagged("Item")) do
-        onItemAdded(item)
+	for _, item in pairs(CollectionService:GetTagged("Item")) do
+		if item:IsDescendantOf(workspace) then
+			onItemAdded(item)
+		end
     end
     Messages:hook("OnItemThrown", function(item)
         lastInteractedOrInStorageTimer[item] = tick()

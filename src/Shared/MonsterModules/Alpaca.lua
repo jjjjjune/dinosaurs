@@ -79,7 +79,9 @@ function Alpaca:init(model)
     self.tameableComponent:init(self.model)
 
     self.drops = {
-        {name = "Skull", min = 1, max = 2, chance = 45},
+		{name = "Skull", min = 1, max = 2, chance = 45},
+		{name = "Bone", min = 1, max = 2, chance = 45},
+		{name = "Raw Meat", min = 1, max = 2, chance = 35},
     }
 
     self.hitNoises = {
@@ -105,14 +107,13 @@ function Alpaca:init(model)
     end)
 
     self.mainThread = game:GetService("RunService").Stepped:connect(function(t, dt)
+		self:step(dt)
 
         self.movementComponent:step(dt)
         self.targetComponent:step(dt)
         self.idleComponent:step(dt)
         self.touchComponent:step(dt)
         self.rideableComponent:step(dt)
-
-		self:step(dt)
 
 		if not self.model.PrimaryPart then
 			return

@@ -76,6 +76,7 @@ local disasters = {
 }
 
 local function createDisaster(currentSeason)
+	print("creat edisaster")
     local disaster = allowedDisasters[currentSeason][math.random(1, #allowedDisasters[currentSeason])]
     disasters[disaster]()
 end

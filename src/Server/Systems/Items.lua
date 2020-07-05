@@ -2,6 +2,7 @@ local import = require(game.ReplicatedStorage.Shared.Import)
 local Messages = import "Shared/Utils/Messages"
 local CollectionService = game:GetService("CollectionService")
 local TagsToModulesMap = import "Shared/Data/TagsToModulesMap"
+local CastRay = import "Shared/Utils/CastRay"
 
 -- local collideMap = {}
 
@@ -57,6 +58,10 @@ local function attemptCarryItem(player, item)
 		if v:IsA("BasePart") then
 			v.CanCollide = false
 		end
+	end
+	if CollectionService:HasTag(item, "Building") then
+		local ConstraintManager = import "Server/Systems/ConstraintManager"
+		ConstraintManager.removeRopesAttachedTo(item)
 	end
 	-- for _, item in pairs(getAttachedItems(item)) do
 	-- 	for _, v in pairs(item:GetChildren()) do
@@ -133,7 +138,7 @@ local function throw(player, item, desiredCF, target)
             end
         end
     end)
-    if CollectionService:HasTag(item, "Building") then
+    if CollectionService:HasTag(item, "Building") and not CollectionService:HasTag(item, "Unanchored") then
         if not welded then
             for _, v in pairs(item:GetDescendants()) do
                 if v:IsA("BasePart") then
@@ -168,7 +173,6 @@ local function getItemModule(itemInstance)
     return itemModule
 end
 
-
 local Items = {}
 
 function Items.createItem(itemName, position)
@@ -178,9 +182,11 @@ function Items.createItem(itemName, position)
         else
             itemModel = game.ReplicatedStorage.Buildings[itemName]:Clone()
         end
-    end
-    itemModel.PrimaryPart = itemModel.Base
-    itemModel:SetPrimaryPartCFrame(CFrame.new(position))
+	end
+	itemModel.PrimaryPart = itemModel.Base
+	local hit, pos = CastRay(position, Vector3.new(0,-4,0))
+
+    itemModel:SetPrimaryPartCFrame(CFrame.new(pos))
     itemModel.Parent = workspace
     --Messages:send("PlaySound", "Pop", position)
     return itemModel

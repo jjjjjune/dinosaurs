@@ -24,10 +24,45 @@ local seasonIcons = {
     "SNOWFLAKE",
 }
 
+local function getSacrificeValue(item)
+	local value = 1
+	local mod = 1
+	if CollectionService:HasTag(item, "Seed") then
+		value = 3
+	end
+	if CollectionService:HasTag(item, "Food") then
+		value = 2
+	end
+	if CollectionService:HasTag(item, "Ore") then
+		value = 2
+	end
+	if CollectionService:HasTag(item, "Gem") then
+		value = 6
+	end
+	if currentSeason == 1 then
+		if CollectionService:HasTag(item, "Seed") then
+			mod = 2
+		end
+	elseif currentSeason == 2 then
+		if CollectionService:HasTag(item, "Fruit") then
+			mod = 2
+		end
+	elseif currentSeason == 3 then
+		if CollectionService:HasTag(item, "Dead") then
+			mod = 2
+		end
+	elseif currentSeason == 4 then
+		if CollectionService:HasTag(item, "Hide") then
+			mod = 2
+		end
+	end
+	return value*mod
+end
+
 local function onSacrificedItem(item, pit)
 
     local itemName = item.Name
-    local sacrificePoints = 1
+    local sacrificePoints = getSacrificeValue(item)
 
     local lavaPos = Vector3.new(item.PrimaryPart.Position.X, pit.Lava.Position.Y, item.PrimaryPart.Position.Z)
 
@@ -145,7 +180,8 @@ function Sacrifices:start()
     CollectionService:GetInstanceAddedSignal("Altar"):connect(function(altar)
         initializeAltar(altar)
     end)
-    Messages:hook("SeasonSetTo", function(newSeason)
+	Messages:hook("SeasonSetTo", function(newSeason)
+		print("season set to")
         evaluateSeason()
         currentSeason = newSeason
         current = 0

@@ -20,6 +20,7 @@ local loadOrder = {
 	"Client/Systems/Knockback",
 	"Client/Systems/Combat",
 	"Client/Systems/Riding",
+	"Client/Systems/BuildMode",
 
 	"Client/Systems/ClientCollisions",
 

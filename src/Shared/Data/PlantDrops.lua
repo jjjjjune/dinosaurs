@@ -18,12 +18,12 @@ PlantDrops["Wood Tree"] = {
 PlantDrops["Banana Tree"] = {
     {name = "Log",min = 1, max = 2, chance = 45},
     {name = "Banana", min = 1, max = 2, chance = 50},
-    {name = "Banana Seed", min = 0, max = 1, chance = 55},
+    {name = "Banana Seed", min = 1, max = 2, chance = 65},
 }
 
 PlantDrops["Yucca"] = {
     {name = "Log",min = 1, max = 2, chance = 45},
-    {name = "Yucca Seed", min = 1, max = 2, chance = 25},
+    {name = "Yucca Seed", min = 1, max = 2, chance = 55},
 }
 
 PlantDrops["Cactus"] = {
