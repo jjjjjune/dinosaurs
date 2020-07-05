@@ -11,9 +11,8 @@ local FootstepsFolder = import "ReplicatedStorage/Footsteps"
 local RunService = game:GetService("RunService")
 
 local FOOTSTEP_RADIUS = 300
-local FOOT_STEP_DISTANCE = 5
 local soundDebounce = .2
-local lastSound = time()
+local lastSounds = {}
 
 local footstepConnections = {}
 
@@ -66,10 +65,10 @@ local function getMaterial(part)
 end
 
 local function onFootstep(part, foot, resultPosition, normal)
-    if time() - lastSound < soundDebounce then
+    if time() - lastSounds[foot.Parent] < soundDebounce then
         return
     else
-        lastSound = time()
+        lastSounds[foot.Parent] = time()
     end
     local material = getMaterial(part)
     local sounds = materialToSoundMap[material]
@@ -78,7 +77,7 @@ local function onFootstep(part, foot, resultPosition, normal)
         instance = chosenSoundInstance,
         part = foot
     })
-    if material == "snow" or material == "sand" or material == "dirt" then 
+    if material == "snow" or material == "sand" or material == "dirt" then
         local footstepPart = Instance.new("Part")
         footstepPart.Size = Vector3.new(0, .5 + math.random(), .5 + math.random())
         footstepPart.Anchored = true
@@ -105,15 +104,16 @@ local function onFrameChange(character, rFoot, lFoot, lastLeftPosition, lastRigh
         if character.Humanoid:GetState() == Enum.HumanoidStateType.Physics then
             return lastLeftPosition, lastRightPosition
         end
-    end
+	end
+	local distance = 5
     if didHitLeft then
-        if ((currentLeftPosition) - lastLeftPosition).magnitude > FOOT_STEP_DISTANCE then
+        if ((currentLeftPosition) - lastLeftPosition).magnitude > distance then
             onFootstep(didHitLeft, lFoot, currentLeftPosition, normal)
             lastLeftPosition = currentLeftPosition
         end
     end
     if didHitRight then
-        if (currentRightPosition - lastRightPosition).magnitude > FOOT_STEP_DISTANCE then
+        if (currentRightPosition - lastRightPosition).magnitude > distance then
             onFootstep(didHitRight, rFoot, currentRightPosition, normal2)
             lastRightPosition = currentRightPosition
         end
@@ -123,6 +123,9 @@ local function onFrameChange(character, rFoot, lFoot, lastLeftPosition, lastRigh
 end
 
 local function bindFootsteps(character)
+	if not lastSounds[character] then
+		lastSounds[character] = 0
+	end
     local rFoot, lFoot
     if character:FindFirstChild("Humanoid") then
         rFoot = character:WaitForChild("RightFoot")
