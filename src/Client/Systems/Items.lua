@@ -178,12 +178,20 @@ local function bindCarry()
         if attemptCarryItem(item) then
            carryItem(item)
         end
-    end)
+    end,
+	function()
+		local BuildMode = import "Client/Systems/BuildMode"
+		return not BuildMode.isBuilding
+	end)
     Binds.bindTagToAction("Building", "GRAB", function(item)
         if attemptCarryItem(item) then
            carryItem(item)
         end
-    end)
+	end,
+	function()
+		local BuildMode = import "Client/Systems/BuildMode"
+		return BuildMode.isBuilding
+	end)
 end
 
 local function getUseText(itemInstance)

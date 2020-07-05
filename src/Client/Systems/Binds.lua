@@ -71,9 +71,16 @@ local function handleActionUi(actionName, boundData)
     local charPosition = GetCharacterPosition()
     local lowestDist = 1000
     if position then
-        for _, tag in pairs(boundData.tags) do
-            local item, dist = getClosestItemOfTag(position, tag)
-            if item and dist < lowestDist then
+		for _, tag in pairs(boundData.tags) do
+			local ignore = false
+			local auth = boundData.auths[tag]
+			if auth then
+				if not auth() then
+					ignore = true
+				end
+			end
+			local item, dist = getClosestItemOfTag(position, tag)
+            if item and dist < lowestDist and not ignore then
                 lowestDist = dist
                 foundTarget = item
                 foundPosition = item.PrimaryPart.Position
@@ -158,18 +165,20 @@ function Binds.unbindTagFromAction(collectionServiceTag, actionName)
     tagsCache[collectionServiceTag] = nil
 end
 
-function Binds.bindTagToAction(collectionServiceTag, actionName, callback)
+function Binds.bindTagToAction(collectionServiceTag, actionName, callback, authFunction)
     if not boundActionTags[actionName] then
         boundActionTags[actionName] = {
             tags = {},
             events = {},
-            callbacks = {}
+			callbacks = {},
+			auths = {}
         }
     end
     if not tagsCache[collectionServiceTag] then
         tagsCache[collectionServiceTag] = getTagged(collectionServiceTag)
         local tagsTable = tagsCache[collectionServiceTag]
-        boundActionTags[actionName].callbacks[collectionServiceTag] = callback
+		boundActionTags[actionName].callbacks[collectionServiceTag] = callback
+		boundActionTags[actionName].auths[collectionServiceTag] = authFunction
         boundActionTags[actionName].events[collectionServiceTag] = {}
         boundActionTags[actionName].events[collectionServiceTag][1] = CollectionService:GetInstanceAddedSignal(collectionServiceTag):connect(
             function(instance)
