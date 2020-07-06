@@ -62,7 +62,9 @@ local function getValidSpawnPoint(monsterName)
 		local plants = {}
 		for _, plant in pairs(CollectionService:GetTagged("Plant")) do
 			if plant:IsDescendantOf(workspace) and plant.Type.Value == spawnInfo.name then
-				table.insert(plants, plant)
+				if plant.PrimaryPart and plant.PrimaryPart.Position.Y > workspace.Effects.Water.Position.Y then
+					table.insert(plants, plant)
+				end
 			end
 		end
 		if #plants > 0 then

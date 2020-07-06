@@ -26,7 +26,7 @@ local function startBuilding(buildingModel)
     CollectionService:AddTag(GetCharacter(), "RayIgnore")
     for _, v in pairs(placementModel:GetChildren()) do
         if v:IsA("BasePart") then
-            v.CanCollide = false
+			v.CanCollide = false
             v.Anchored = true
         end
     end
@@ -34,10 +34,24 @@ local function startBuilding(buildingModel)
         if x:IsA("JointInstance") or x:IsA("WeldConstraint") then
             x:Destroy()
         end
-    end
+	end
+	if buildingModel and buildingModel.PrimaryPart then
+		for _, v in pairs(buildingModel.PrimaryPart:GetConnectedParts(true)) do
+			if v:IsA("BasePart") and CollectionService:HasTag(v.Parent, "Item") then
+				CollectionService:AddTag(v.Parent, "RayIgnore")
+			end
+		end
+	end
 end
- 
+
 local function endBuilding(buildingModel)
+	if buildingModel and buildingModel.PrimaryPart then
+		for _, v in pairs(buildingModel.PrimaryPart:GetConnectedParts(true)) do
+			if v:IsA("BasePart") and CollectionService:HasTag(v.Parent, "Item") then
+				CollectionService:RemoveTag(v.Parent, "RayIgnore")
+			end
+		end
+	end
     placementModel:Destroy()
     placementModel = nil
     CollectionService:RemoveTag(GetCharacter(), "RayIgnore")

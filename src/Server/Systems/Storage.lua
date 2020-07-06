@@ -7,8 +7,8 @@ local CastRay = import "Shared/Utils/CastRay"
 local CollectionService = game:GetService("CollectionService")
 local RunService = game:GetService("RunService")
 
-local ITEM_DESPAWN_TIME = 10 -- five mins
-local ITEM_FREEZE_TIME = 5
+local ITEM_DESPAWN_TIME = 300 -- five mins
+local ITEM_FREEZE_TIME = 2
 
 local lastPositions = {}
 local lastMoved = {}
@@ -78,6 +78,7 @@ local function checkMoved(item)
 						for _, v in pairs(item:GetChildren()) do
 							if v:IsA("BasePart") then
 								v.Anchored = true
+								v.CanCollide = false
 							end
 						end
                     end

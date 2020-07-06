@@ -38,7 +38,13 @@ local function prepare(item)
                 v.Anchored = false
             end
         end
-    end
+	end
+	-- do i really want to do this..
+	for _, v in pairs(item.PrimaryPart:GetConnectedParts(true)) do
+		if v:IsA("BasePart") then
+			v.Anchored = false
+		end
+	end
 end
 
 local function attemptCarryItem(player, item)
@@ -144,6 +150,7 @@ local function throw(player, item, desiredCF, target)
             for _, v in pairs(item:GetDescendants()) do
                 if v:IsA("BasePart") then
 					v.Anchored = true
+					v.CanCollide = true
 					v.Velocity = Vector3.new()
 					v.RotVelocity = Vector3.new()
                 end
@@ -189,7 +196,7 @@ function Items.createItem(itemName, position)
 	itemModel.PrimaryPart = itemModel.Base
 	local hit, pos = CastRay(position, Vector3.new(0,-4,0))
 
-    itemModel:SetPrimaryPartCFrame(CFrame.new(pos))
+    itemModel:SetPrimaryPartCFrame(CFrame.new(pos + Vector3.new(0, itemModel.PrimaryPart.Size.Y/2, 0)))
     itemModel.Parent = workspace
     --Messages:send("PlaySound", "Pop", position)
     return itemModel
