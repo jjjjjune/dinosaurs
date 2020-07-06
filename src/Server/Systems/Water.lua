@@ -177,7 +177,11 @@ function Water:start()
     Messages:hook("DrinkWater", drinkWater)
     Messages:hook("TakeFromContainer",takeFromContainer)
     Messages:hook("FillContainer",fillContainer)
-    CollectionService:GetInstanceAddedSignal("FreshWater"):connect(function(freshWater)
+	CollectionService:GetInstanceAddedSignal("FreshWater"):connect(function(freshWater)
+		local altName = Instance.new("StringValue", freshWater)
+		altName.Name = "AlternateName"
+		altName.Value = "Water"
+
         updateWaterAppearance(freshWater)
         allWater[freshWater] = true
     end)

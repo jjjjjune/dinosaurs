@@ -160,7 +160,11 @@ local function preparePlants()
         for _, phaseModel in pairs(plantFolder:GetChildren()) do
             local typeValue = Instance.new("StringValue", phaseModel)
             typeValue.Name = "Type"
-            typeValue.Value = plantFolder.Name
+			typeValue.Value = plantFolder.Name
+
+			local altName = Instance.new("StringValue", phaseModel)
+			altName.Name = "AlternateName"
+			altName.Value = plantFolder.Name
         end
     end
     for _, plant in pairs(CollectionService:GetTagged("Plant")) do

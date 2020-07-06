@@ -17,6 +17,7 @@ local lastTarget
 local currentTargets = {}
 local tooltipFrames = {}
 local hiddenTooltips = {}
+local altNames = {}
 
 local function skin(tooltipFrame, actionName)
     local bindInfo = ActionBinds[actionName]
@@ -35,6 +36,20 @@ local function connectEvents(tooltip, actionName)
     end)
 end
 
+local function getName(target)
+	if altNames[target] then
+		return altNames[target]
+	else
+		if target:FindFirstChild("AlternateName") \then
+			altNames[target] = target.AlternateName.Value
+			return altNames[target]
+		else
+			altNames[target] = target.Name
+			return altNames[target]
+		end
+	end
+end
+
 local function displayItemName()
 	local foundFrame
 	for actionFrame, frame in pairs(tooltipFrames) do
@@ -46,8 +61,8 @@ local function displayItemName()
 	if foundFrame and target then
 		local vector, onScreen = workspace.CurrentCamera:WorldToScreenPoint(target.PrimaryPart.Position)
 		ItemNameLabel.Visible = true
-		ItemNameLabel.Text = target.Name
-		ItemNameLabelShadow.Text = target.Name
+		ItemNameLabel.Text = getName(target)
+		ItemNameLabelShadow.Text = getName(target)
 		ItemNameLabel.Position = UDim2.new(0, vector.X, 0, vector.Y - 32)
 		ItemNameLabelShadow.Position = UDim2.new(0, vector.X, 0, vector.Y - 31)
 	else

@@ -177,12 +177,13 @@ function Alpaca:die()
         self.model.Head.RotVelocity = Vector3.new(math.random(), math.random(), math.random())*1
         for _, v in pairs(self.model:GetChildren()) do
             if v:IsA("BasePart") then
-                v.Massless = false
+				v.Massless = false
+				v.CustomPhysicalProperties = PhysicalProperties.new(Enum.Material.Metal)
             end
         end
         self.model.HumanoidRootPart.BodyGyro:Destroy()
         self.model.HumanoidRootPart.BodyVelocity:Destroy()
-        self.model.Torso.CanCollide = true
+		self.model.Torso.CanCollide = true
     else
         self:makeDropItems()
 

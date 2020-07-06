@@ -118,8 +118,15 @@ local function performActionCallbackForAction(actionName)
         for _, tag in pairs(tagBindInfo.tags) do
             if lastFoundTagItem[tag] then
                 foundItem = lastFoundTagItem[tag]
-            end
-            if foundItem and (foundItem.PrimaryPart.Position - GetCharacterPosition()).magnitude < closestDist then
+			end
+			local ignore = false
+			local auth = tagBindInfo.auths[tag]
+			if auth then
+				if not auth() then
+					ignore = true
+				end
+			end
+            if foundItem and (foundItem.PrimaryPart.Position - GetCharacterPosition()).magnitude < closestDist and not ignore then
                 closestDist = (foundItem.PrimaryPart.Position - GetCharacterPosition()).magnitude
                 closestTagItem = foundItem
                 closestTag = tag

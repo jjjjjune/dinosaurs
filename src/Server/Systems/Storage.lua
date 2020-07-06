@@ -7,7 +7,7 @@ local CastRay = import "Shared/Utils/CastRay"
 local CollectionService = game:GetService("CollectionService")
 local RunService = game:GetService("RunService")
 
-local ITEM_DESPAWN_TIME = 300 -- five mins
+local ITEM_DESPAWN_TIME = 10 -- five mins
 local ITEM_FREEZE_TIME = 5
 
 local lastPositions = {}
@@ -59,7 +59,7 @@ local function checkStorage()
 end
 
 local function checkMoved(item)
-    if item:FindFirstChild("VehicleWeld") then -- already welded to something we should let it BE
+    if item:FindFirstChild("ObjectWeld") then -- already welded to something we should let it BE
         lastInteractedOrInStorageTimer[item] = tick()
         return
     end
@@ -68,7 +68,7 @@ local function checkMoved(item)
         lastPositions[item] = position
     else
         local dist = (position - lastPositions[item]).magnitude
-        if dist > .5 then
+        if dist > 2 then
             lastInteractedOrInStorageTimer[item] = tick()
             lastPositions[item] = position
         else
@@ -88,7 +88,7 @@ end
 local function checkDespawn()
     for item, t in pairs(lastInteractedOrInStorageTimer) do
         if item.Parent ~= nil then
-            if tick() - t > ITEM_DESPAWN_TIME then
+            if tick() - t > ITEM_DESPAWN_TIME and not CollectionService:HasTag(item, "Building") then
                 if item:IsDescendantOf(workspace) then
                     item:Destroy()
                 else

@@ -198,7 +198,14 @@ function Lizard:die()
         self.model.Head.RotVelocity = Vector3.new(math.random(), math.random(), math.random())*10
         self.model.HumanoidRootPart.BodyGyro:Destroy()
         self.model.HumanoidRootPart.BodyVelocity:Destroy()
-        self.model.Torso.CanCollide = true
+		self.model.Torso.CanCollide = true
+
+		for _, v in pairs(self.model:GetChildren()) do
+            if v:IsA("BasePart") then
+				v.Massless = false
+				v.CustomPhysicalProperties = PhysicalProperties.new(Enum.Material.Metal)
+            end
+        end
     else
         self:makeDropItems()
 
