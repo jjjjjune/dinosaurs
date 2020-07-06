@@ -56,6 +56,7 @@ local function attemptCarryItem(player, item)
 	end
 	for _, v in pairs(item:GetChildren()) do
 		if v:IsA("BasePart") then
+			v.Anchored = false
 			v.CanCollide = false
 		end
 	end
@@ -142,7 +143,9 @@ local function throw(player, item, desiredCF, target)
         if not welded then
             for _, v in pairs(item:GetDescendants()) do
                 if v:IsA("BasePart") then
-                    v.Anchored = true
+					v.Anchored = true
+					v.Velocity = Vector3.new()
+					v.RotVelocity = Vector3.new()
                 end
             end
         end

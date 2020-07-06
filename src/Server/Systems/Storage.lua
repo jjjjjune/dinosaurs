@@ -11,6 +11,7 @@ local ITEM_DESPAWN_TIME = 10 -- five mins
 local ITEM_FREEZE_TIME = 5
 
 local lastPositions = {}
+local lastMoved = {}
 local lastInteractedOrInStorageTimer = {}
 local lastStorageCheck = tick()
 
@@ -38,12 +39,8 @@ local function isInStorage(item)
 			end
 		end
 	end
-	if item.PrimaryPart and item.PrimaryPart.Anchored == false then
-		for _, v in pairs(item.Base:GetConnectedParts()) do -- if an item is connected to an animal or player, it will no longer despawn
-			if v.Parent ~= item then
-				return true
-			end
-		end
+	if item:FindFirstChild("ObjectWeld") then -- items with object welds are regarded as in storage
+		return true
 	end
 	return false
 end
@@ -59,28 +56,33 @@ local function checkStorage()
 end
 
 local function checkMoved(item)
-    if item:FindFirstChild("ObjectWeld") then -- already welded to something we should let it BE
-        lastInteractedOrInStorageTimer[item] = tick()
-        return
-    end
-    local position = item.PrimaryPart.Position
+	local position = item.PrimaryPart.Position
+	if not lastMoved[item] then
+		lastMoved[item] = tick()
+	end
     if not lastPositions[item] then
         lastPositions[item] = position
     else
         local dist = (position - lastPositions[item]).magnitude
-        if dist > 2 then
+		if dist > 2 then
+			lastMoved[item] = tick()
             lastInteractedOrInStorageTimer[item] = tick()
             lastPositions[item] = position
-        else
-            if tick() - lastInteractedOrInStorageTimer[item] > ITEM_FREEZE_TIME then
+		else
+			if lastMoved[item] and tick() - lastMoved[item] > ITEM_FREEZE_TIME then
 				if not item:FindFirstChild("FreezeWeld") and not item:FindFirstChild("GameRope") then
                     local hit, pos = CastRay(position, Vector3.new(0,-5,0), {item})
                     if hit and hit.Anchored then
 						local ConstraintManager = import "Server/Systems/ConstraintManager"
 						ConstraintManager.freezeWeld(item, hit)
+						for _, v in pairs(item:GetChildren()) do
+							if v:IsA("BasePart") then
+								v.Anchored = true
+							end
+						end
                     end
                 end
-            end
+			end
         end
     end
 end
@@ -88,7 +90,7 @@ end
 local function checkDespawn()
     for item, t in pairs(lastInteractedOrInStorageTimer) do
         if item.Parent ~= nil then
-            if tick() - t > ITEM_DESPAWN_TIME and not CollectionService:HasTag(item, "Building") then
+            if tick() - t > ITEM_DESPAWN_TIME and (not CollectionService:HasTag(item, "Building")) then
                 if item:IsDescendantOf(workspace) then
                     item:Destroy()
                 else
@@ -159,7 +161,9 @@ function Storage:start()
 		ServerData:generateIdForInstanceOfType(item, "I")
 	end)
 	for _, item in pairs(CollectionService:GetTagged("Item")) do
-		ServerData:generateIdForInstanceOfType(item, "I")
+		if item:IsDescendantOf(workspace) then
+			ServerData:generateIdForInstanceOfType(item, "I")
+		end
 	end
 end
 

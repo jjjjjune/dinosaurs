@@ -102,25 +102,33 @@ end
 
 function Tool.serverUse(player, item)
     Messages:reproOnClients(player, "PlaySound", "Swing2", item.PrimaryPart.Position)
-    local rock = getClosestRock(player)
-    if rock then
-        local pos = getHitPosition(player, rock)
-        local health = rock:FindFirstChild("Health")
-        if health and health.Value == 1 then
-            Messages:reproOnClients(player, "PlayParticle", "HitSparks", 40, pos)
-            Messages:reproOnClients(player, "PlaySoundOnClient",{
-                instance = game.ReplicatedStorage.Sounds.HitPan2,
-                part = item.PrimaryPart,
-            })
-        else
-            Messages:reproOnClients(player, "HitSparks", 10, pos)
-            Messages:reproOnClients(player, "PlaySoundOnClient",{
-                instance = game.ReplicatedStorage.Sounds.HitPan,
-                part = item.PrimaryPart,
-            })
-        end
-        Messages:send("DamageRock", player, rock, item)
-    end
+	local rock = getClosestRock(player)
+	delay(.3, function()
+		if rock then
+			local pos = getHitPosition(player, rock)
+			local health = rock:FindFirstChild("Health")
+			if (not health) or (health and health.Value > 1) then
+				if not health then
+					print("no health therefore val is 5")
+				else
+					print("health and the value is ", health.Value)
+				end
+				Messages:reproOnClients(player, "HitSparks", 10, pos)
+				Messages:reproOnClients(player, "PlaySoundOnClient",{
+					instance = game.ReplicatedStorage.Sounds.HitPan,
+					part = item.PrimaryPart,
+				})
+			else
+				print("to us this is the last hit", health.Value)
+				Messages:reproOnClients(player, "PlayParticle", "HitSparks", 40, pos)
+				Messages:reproOnClients(player, "PlaySoundOnClient",{
+					instance = game.ReplicatedStorage.Sounds.HitPan2,
+					part = item.PrimaryPart,
+				})
+			end
+			Messages:send("DamageRock", player, rock, item)
+		end
+	end)
 end
 
 function Tool.clientEquip(item)

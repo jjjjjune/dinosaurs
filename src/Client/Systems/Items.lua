@@ -124,7 +124,8 @@ local function attemptThrowItem() -- the fact that this is for both normal items
             else
                 for _, v in pairs(item:GetDescendants()) do
                     if v:IsA("BasePart") then
-                        v.Velocity = Vector3.new()
+						v.Velocity = Vector3.new()
+						v.RotVelocity = Vector3.new()
                     end
                 end
 			end

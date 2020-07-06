@@ -65,16 +65,15 @@ local function damageRock(player, rock, item)
         local health = Instance.new("IntConstrainedValue", rock)
         health.Name = "Health"
         health.MaxValue = 5
-        health.Value = 5
-    else
-        rock.Health.Value = rock.Health.Value - 1
-        if rock.Health.Value == 0 then
-            wait(.2) -- this is for studio because 0 ping
-            chop(rock)
-            rock.Health.Value = rock.Health.MaxValue
-            onMined(rock)
-        end
-    end
+		health.Value = 5
+	end
+	rock.Health.Value = rock.Health.Value - 1
+	if rock.Health.Value == 0 then
+		wait(.2) -- this is for studio because 0 ping
+		chop(rock)
+		rock.Health.Value = rock.Health.MaxValue
+		onMined(rock)
+	end
     Messages:reproOnClients(player, "PlayDamageEffect", rock)
 end
 

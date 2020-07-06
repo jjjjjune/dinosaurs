@@ -40,7 +40,7 @@ local function getName(target)
 	if altNames[target] then
 		return altNames[target]
 	else
-		if target:FindFirstChild("AlternateName") \then
+		if target:FindFirstChild("AlternateName") then
 			altNames[target] = target.AlternateName.Value
 			return altNames[target]
 		else
