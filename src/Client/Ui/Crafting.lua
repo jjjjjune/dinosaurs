@@ -143,6 +143,10 @@ local function openCrafting(stationType, station)
 		end)
 		craftBoundMenu:SetSelection(buttons[1])
 	end
+
+	Messages:send("PlaySoundOnClient",{
+		instance = game.ReplicatedStorage.Sounds.NewUiClickHigh,
+	})
 end
 
 local RadialProgress = {}

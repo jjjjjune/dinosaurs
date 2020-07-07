@@ -46,6 +46,7 @@ local loadOrder = {
 	"Server/Systems/Knockback",
 	"Server/Systems/Combat",
 	"Server/Systems/ConstraintManager",
+	"Server/Systems/EntityWaitManager",
 }
 
 for _, path in ipairs(loadOrder) do

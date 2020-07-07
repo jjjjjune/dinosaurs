@@ -163,9 +163,6 @@ function Biomes:start()
             end)
         end
 	end)
-	delay(15, function()
-		performBiomeCheck(true)
-	end)
 end
 
 return Biomes

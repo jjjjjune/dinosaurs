@@ -29,9 +29,9 @@ local function getPlaceableSurface(item)
 	local start = character.HumanoidRootPart.CFrame * CFrame.new(0,4,-4)
 	local hit, pos = CastRay(start.p, Vector3.new(0,-8,0), {item, game.Players.LocalPlayer.Character})
 	if (hit) and (CollectionService:HasTag(hit.Parent, "Building") or CollectionService:HasTag(hit.Parent, "Monster")) then
-		--if hit.Anchored == false then
+		if hit.Anchored == false then
 			return hit, pos
-		--end
+		end
 	end
 end
 

@@ -122,7 +122,11 @@ local function loadMonsters()
             local model = game.ServerStorage.Monsters[monster.name]:Clone()
             local pos = monster.position
             local posCF = CFrame.new(Vector3.new(pos.x, pos.y, pos.z))
-            model:SetPrimaryPartCFrame(posCF)
+			model:SetPrimaryPartCFrame(posCF)
+
+			local ID = Instance.new("StringValue", model)
+			ID.Name = "ID"
+			ID.Value = monster.ID
 
             for propName, value in pairs(monster) do
                 if model:FindFirstChild(propName) then

@@ -66,6 +66,13 @@ local function loadBuildings()
             local posCF = CFrame.new(Vector3.new(pos.x, pos.y, pos.z))
             model:SetPrimaryPartCFrame(posCF*rotCF)
 
+			if building.ID then
+				local ID = Instance.new("StringValue", model)
+				ID.Name = "ID"
+				ID.Value = building.ID
+			end
+
+
             for propName, value in pairs(building) do
                 if model:FindFirstChild(propName) then
                     if model[propName]:IsA("ValueBase") then

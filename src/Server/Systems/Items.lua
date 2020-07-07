@@ -70,27 +70,28 @@ local function attemptCarryItem(player, item)
 		local ConstraintManager = import "Server/Systems/ConstraintManager"
 		ConstraintManager.removeRopesAttachedTo(item)
 	end
-	-- for _, item in pairs(getAttachedItems(item)) do
-	-- 	for _, v in pairs(item:GetChildren()) do
-	-- 		if v:IsA("BasePart") then
-	-- 			v.CanCollide = false
-	-- 		end
-	-- 	end
-	-- end
+
     if foundItem == true then
         return
-    end
+	end
+
     local alive = character:FindFirstChild("Humanoid") and character.Humanoid.Health > 0
     if not alive then
         return
-    end
+	end
+
 	local ConstraintManager = import "Server/Systems/ConstraintManager"
 	ConstraintManager.destroyAllWelds(item)
-    Messages:send("PlaySound", "UiClick", character.Head, 200)
-    character.PrimaryPart.RootPriority = 200
+
+	Messages:send("PlaySound", "UiClick", character.Head, 200)
+
+	character.PrimaryPart.RootPriority = 200
+
     item.Parent = character
-    item.PrimaryPart.RootPriority = 10 -- for later when you're throwing
-    prepare(item)
+	item.PrimaryPart.RootPriority = 10 -- for later when you're throwing
+
+	prepare(item)
+
     item.PrimaryPart:SetNetworkOwner(player)
     local targetPart = player.Character.Head
     if item:FindFirstChild("AttachPart") then
@@ -111,32 +112,30 @@ end
 local function throw(player, item, desiredCF, target)
     if item:FindFirstChild("ServerWeld") then
         item.ServerWeld:Destroy()
-    end
-    item.Parent = workspace
+	end
+
+	item.Parent = workspace
+
     for _, v in pairs(item:GetChildren()) do
 		if v:IsA("BasePart") then
             v.CanCollide = true
         end
 	end
-	-- for _, item in pairs(getAttachedItems(item)) do
-	-- 	for _, v in pairs(item:GetChildren()) do
-	-- 		if v:IsA("BasePart") then
-	-- 			v.CanCollide = true
-	-- 		end
-	-- 	end
-	-- end
-    Messages:reproOnClients(player, "PlaySound", "HeavyWhoosh", item.PrimaryPart.Position)
+
+	Messages:reproOnClients(player, "PlaySound", "HeavyWhoosh", item.PrimaryPart.Position)
+
     local welded = false
     if CollectionService:HasTag(item, "Building") and desiredCF then
 		item:SetPrimaryPartCFrame(desiredCF)
-    end
+	end
+
 	if target and target.Anchored == false and not target.Parent:FindFirstChild("Humanoid") then
-		print("welding")
 		desiredCF = desiredCF * CFrame.new(0, item.PrimaryPart.Size.Y/2, 0)
 		local ConstraintManager = import "Server/Systems/ConstraintManager"
 		ConstraintManager.createObjectWeld(item, target.Parent, desiredCF.p)
 		welded = true
-    end
+	end
+
     delay(6, function()
         if item:IsDescendantOf(game) and item.PrimaryPart:CanSetNetworkOwnership() then
             local netOwner = item.PrimaryPart:GetNetworkOwner()
@@ -144,7 +143,8 @@ local function throw(player, item, desiredCF, target)
                 item.PrimaryPart:SetNetworkOwnershipAuto()
             end
         end
-    end)
+	end)
+
     if CollectionService:HasTag(item, "Building") and not CollectionService:HasTag(item, "Unanchored") then
         if not welded then
             for _, v in pairs(item:GetDescendants()) do
@@ -185,7 +185,7 @@ end
 
 local Items = {}
 
-function Items.createItem(itemName, position)
+function Items.createItem(itemName, position, presumedId)
    local itemModel do
         if game.ReplicatedStorage.Items:FindFirstChild(itemName) then
             itemModel = game.ReplicatedStorage.Items[itemName]:Clone()
@@ -196,9 +196,14 @@ function Items.createItem(itemName, position)
 	itemModel.PrimaryPart = itemModel.Base
 	local hit, pos = CastRay(position, Vector3.new(0,-4,0))
 
-    itemModel:SetPrimaryPartCFrame(CFrame.new(pos + Vector3.new(0, itemModel.PrimaryPart.Size.Y/2, 0)))
-    itemModel.Parent = workspace
-    --Messages:send("PlaySound", "Pop", position)
+	itemModel:SetPrimaryPartCFrame(CFrame.new(pos + Vector3.new(0, itemModel.PrimaryPart.Size.Y/2, 0)))
+	if presumedId then
+		local ID = Instance.new("StringValue", itemModel)
+		ID.Name = "ID"
+		ID.Value = presumedId
+	end
+	itemModel.Parent = workspace
+
     return itemModel
 end
 
@@ -221,8 +226,8 @@ function Items:start()
         end
         item:Destroy()
     end)
-    Messages:hook("CreateItem", function(itemName, position)
-        Items.createItem(itemName, position)
+    Messages:hook("CreateItem", function(itemName, position, id)
+        Items.createItem(itemName, position, id)
     end)
     Messages:hook("PlayerDied", function(player, character)
         throwAllPlayerItems(player)

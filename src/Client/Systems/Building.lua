@@ -64,8 +64,8 @@ function Building.step()
         setCharTransparency()
         local camera = Workspace.CurrentCamera
         local mouse = game.Players.LocalPlayer:GetMouse()
-        local mHit, mPos, mNormal = CastRay(mouse.UnitRay.Origin, mouse.UnitRay.Direction)
-        local hit,  pos, normal = CastRay(camera.CFrame.p, (mPos - camera.CFrame.p).unit*300)
+        local mHit, mPos, mNormal = CastRay(mouse.UnitRay.Origin, mouse.UnitRay.Direction, {GetCharacter()})
+        local hit,  pos, normal = CastRay(camera.CFrame.p, (mPos - camera.CFrame.p).unit*300,{GetCharacter()})
         if hit then
             local character = GetCharacter()
             placementModel.Name = "What"

@@ -55,6 +55,23 @@ local function checkStorage()
     end
 end
 
+local function checkFreezeWeld(item, position)
+	local ConstraintManager = import "Server/Systems/ConstraintManager"
+	if not item:FindFirstChild("FreezeWeld") and not item:FindFirstChild("GameRope") and not CollectionService:HasTag(item, "Building") and not ConstraintManager.hasAnyRopesAttached(item) then
+		local hit, pos = CastRay(position, Vector3.new(0,-5,0), {item})
+		if hit and hit.Anchored then
+			local ConstraintManager = import "Server/Systems/ConstraintManager"
+			ConstraintManager.freezeWeld(item, hit)
+			for _, v in pairs(item:GetChildren()) do
+				if v:IsA("BasePart") then
+					v.Anchored = true
+					v.CanCollide = false
+				end
+			end
+		end
+	end
+end
+
 local function checkMoved(item)
 	local position = item.PrimaryPart.Position
 	if not lastMoved[item] then
@@ -70,19 +87,7 @@ local function checkMoved(item)
             lastPositions[item] = position
 		else
 			if lastMoved[item] and tick() - lastMoved[item] > ITEM_FREEZE_TIME then
-				if not item:FindFirstChild("FreezeWeld") and not item:FindFirstChild("GameRope") then
-                    local hit, pos = CastRay(position, Vector3.new(0,-5,0), {item})
-                    if hit and hit.Anchored then
-						local ConstraintManager = import "Server/Systems/ConstraintManager"
-						ConstraintManager.freezeWeld(item, hit)
-						for _, v in pairs(item:GetChildren()) do
-							if v:IsA("BasePart") then
-								v.Anchored = true
-								v.CanCollide = false
-							end
-						end
-                    end
-                end
+				checkFreezeWeld(item, position)
 			end
         end
     end
@@ -107,18 +112,89 @@ local function checkDespawn()
     end
 end
 
+local function getEntityByID(ID)
+	local entities = {}
+	for _, v in pairs(CollectionService:GetTagged("Monster")) do
+		table.insert(entities, v)
+	end
+	for _, v in pairs(CollectionService:GetTagged("Item")) do
+		table.insert(entities, v)
+	end
+	for _, v in pairs(CollectionService:GetTagged("Building")) do
+		table.insert(entities, v)
+	end
+	for _, v in pairs(entities) do
+		if v:IsDescendantOf(workspace) then
+			if v.ID.Value == ID then
+				return v
+			end
+		end
+	end
+end
+
 local function backupItems()
+	print("backing up items")
     local items = {}
     for _, item in pairs(CollectionService:GetTagged("Item")) do
-        if not item:IsDescendantOf(game.ReplicatedStorage) then
+        if item:IsDescendantOf(workspace) then
             local pos = item.PrimaryPart.Position
             local info = {}
             info.name = item.Name
-            info.position = {x = round(pos.X, .15), y = round(pos.Y, .15), z = round(pos.Z, .15)}
+			info.position = {x = round(pos.X, .15), y = round(pos.Y, .15), z = round(pos.Z, .15)}
+
+			if item:FindFirstChild("ID") then
+				info.id = item.ID.Value
+			else
+				print("WE DID NOT FIND AN ID IN", item.Name)
+			end
+
+			if item:FindFirstChild("RopedTo") then
+				local offsetPos0 = item.GameRope.Attachment0.Position
+				local offsetPos1 = item.GameRope.Attachment1.Position
+				local entity = getEntityByID(item.RopedTo.Value)
+				local offset = item.PrimaryPart.CFrame:ToObjectSpace(entity.PrimaryPart.CFrame).p
+				info.ropedTo = item.RopedTo.Value
+				info.offset = {x = round(offset.X, .15), y = round(offset.Y, .15), z = round(offset.Z, .15)}
+				info.ropePosOffset0 = {x = round(offsetPos0.X, .15), y = round(offsetPos0.Y, .15), z = round(offsetPos0.Z, .15)}
+				info.ropePosOffset1 = {x = round(offsetPos1.X, .15), y = round(offsetPos1.Y, .15), z = round(offsetPos1.Z, .15)}
+			elseif item:FindFirstChild("FrozenTo") then
+				info.frozenTo = item.FrozenTo.Value
+				local entity = getEntityByID(item.FrozenTo.Value)
+				local offset = item.PrimaryPart.CFrame:ToObjectSpace(entity.PrimaryPart.CFrame).p
+				info.offset = {x = round(offset.X, .15), y = round(offset.Y, .15), z = round(offset.Z, .15)}
+			elseif item:FindFirstChild("ObjectWeldedTo") then
+				info.objectWeldedTo = item.ObjectWeldedTo.Value
+				local entity = getEntityByID(item.ObjectWeldedTo.Value)
+				local offset = item.PrimaryPart.CFrame:ToObjectSpace(entity.PrimaryPart.CFrame).p
+				info.offset = {x = round(offset.X, .15), y = round(offset.Y, .15), z = round(offset.Z, .15)}
+			end
             table.insert(items, info)
         end
     end
     ServerData:setValue("items", items)
+end
+
+local function createItemWithAttachData(entity, itemData)
+	local Items = import "Server/Systems/Items"
+	local pos = Vector3.new(itemData.position.x, itemData.position.y, itemData.position.z)
+	local offset = CFrame.new(itemData.offset.x, itemData.offset.y, itemData.offset.z)
+
+	print("ID OF WHAT WE ARTE LOADING IS", itemData.id)
+
+	local physicalItem = Items.createItem(itemData.name, pos, itemData.id)
+	physicalItem:SetPrimaryPartCFrame(entity.PrimaryPart.CFrame * offset)
+
+	local ConstraintManager = import "Server/Systems/ConstraintManager"
+
+	if itemData.ropedTo then
+		local ropePos0 = physicalItem.PrimaryPart.Position + Vector3.new(itemData.ropePosOffset0.x, itemData.ropePosOffset0.y, itemData.ropePosOffset0.z)
+		local ropePos1 = entity.PrimaryPart.Position + Vector3.new(itemData.ropePosOffset1.x, itemData.ropePosOffset1.y, itemData.ropePosOffset1.z)
+		ConstraintManager.createRopeBetween(nil, physicalItem, ropePos0, entity, ropePos1)
+	elseif itemData.objectWeldedTo then
+		ConstraintManager.createObjectWeld(physicalItem, entity, physicalItem.PrimaryPart.Position)
+	elseif itemData.frozenTo then
+		ConstraintManager.freezeWeld(physicalItem, entity.PrimaryPart)
+	end
 end
 
 local function step()
@@ -133,9 +209,16 @@ end
 local function loadSerializedItems()
     local items = ServerData:getValue("items")
     if items then
-        for _, item in pairs(items) do
-            local pos = Vector3.new(item.position.x, item.position.y, item.position.z)
-            Messages:send("CreateItem", item.name, pos)
+		for _, item in pairs(items) do
+			if item.ropedTo or item.frozenTo or item.objectWeldedTo then
+				local waitID = item.ropedTo or item.frozenTo or item.objectWeldedTo
+				Messages:send("WaitForEntityWithID", waitID, function(entity)
+					createItemWithAttachData(entity, item, item.id)
+				end)
+			else
+				local pos = Vector3.new(item.position.x, item.position.y, item.position.z)
+				Messages:send("CreateItem", item.name, pos, item.id)
+			end
         end
     end
     RunService.Stepped:connect(function()
@@ -157,15 +240,19 @@ function Storage:start()
     Messages:hook("OnItemThrown", function(item)
         lastInteractedOrInStorageTimer[item] = tick()
     end)
-	loadSerializedItems()
 	CollectionService:GetInstanceAddedSignal("Item"):connect(function(item)
-		ServerData:generateIdForInstanceOfType(item, "I")
+		if item:IsDescendantOf(workspace) then
+			ServerData:generateIdForInstanceOfType(item, "I")
+		end
 	end)
 	for _, item in pairs(CollectionService:GetTagged("Item")) do
 		if item:IsDescendantOf(workspace) then
 			ServerData:generateIdForInstanceOfType(item, "I")
 		end
 	end
+	Messages:hook("MapDoneGenerating", function()
+		loadSerializedItems()
+	end)
 end
 
 return Storage

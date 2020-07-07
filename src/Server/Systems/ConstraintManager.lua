@@ -10,11 +10,21 @@ local ConstraintManager = {}
 	create rope
 	create building weld
 	create player weld
-]]
+	]]
+
+function ConstraintManager.hasAnyRopesAttached(item)
+	for _, rope in pairs(ropes) do
+		if rope.baseObject == item or rope.attachObject == item then
+			return true
+		end
+	end
+	return false
+end
 
 function ConstraintManager.freezeWeld(item, hit)
 	for _, rope in pairs(ropes) do
 		if rope.baseObject == item or rope.attachObject == item then
+			warn(item, " is already roped and cant be le freezd")
 			return
 		end
 	end
@@ -22,14 +32,21 @@ function ConstraintManager.freezeWeld(item, hit)
 	freezeWeld.Part0 = item.PrimaryPart
 	freezeWeld.Part1 = hit
 	freezeWeld.Name = "FreezeWeld"
+
+	if hit.Parent:FindFirstChild("ID") then
+		local frozenTo = Instance.new("StringValue", item)
+		frozenTo.Value = hit.Parent.ID.Value
+		frozenTo.Name = "FrozenTo"
+	end
 end
 
 function ConstraintManager.destroyAllWelds(object)
 	if object:FindFirstChild("FreezeWeld") then
-		object.FreezeWeld:Destroy()
+		ConstraintManager.unfreeze(object)
 	end
 	if object:FindFirstChild("ObjectWeld") then
 		object.ObjectWeld:Destroy()
+		object.ObjectWeldedTo:Destroy()
 	end
 end
 
@@ -39,6 +56,10 @@ function ConstraintManager.createObjectWeld(attaching, attachTo, intendedPositio
 	objectWeld.Name = "ObjectWeld"
 	objectWeld.Part0 = attaching.PrimaryPart
 	objectWeld.Part1 = attachTo.PrimaryPart
+
+	local objectWeldedTo = Instance.new("StringValue", attaching)
+	objectWeldedTo.Name = "ObjectWeldedTo"
+	objectWeldedTo.Value = attachTo.ID.Value
 end
 
 function ConstraintManager.unfreeze(object)
@@ -46,13 +67,21 @@ function ConstraintManager.unfreeze(object)
 	if weld then
 		weld:Destroy()
 	end
+	if object:FindFirstChild("FrozenTo") then
+		object.FrozenTo:Destroy()
+	end
+	for _, v in pairs(object:GetChildren()) do
+		if v:IsA("BasePart") then
+			v.CanCollide = true
+			v.Anchored = false
+		end
+	end
 end
 
 function ConstraintManager.canBeRoped(object)
 	if (not object.PrimaryPart) or
-		object.PrimaryPart.Anchored or
 		not object:FindFirstChild("ID") or
-		object:FindFirstChild("PlayerWeld", true)
+		object:FindFirstChild("ServerWeld", true)
 	then
 		return false
 	end
@@ -111,6 +140,7 @@ function ConstraintManager.createRopeBetween(creator, object1, object1Pos, objec
 	local ropeData = Instance.new("StringValue")
 	ropeData.Name = "RopedTo"
 	ropeData.Value = object2.ID.Value
+	ropeData.Parent = object1
 
 	table.insert(ropes, ropeObject)
 
@@ -122,6 +152,7 @@ function ConstraintManager.removeRopesAttachedTo(object)
 		local rope = ropes[i]
 		if rope.baseObject == object or rope.attachObject == object then
 			ConstraintManager.clearRopeData(object)
+			rope.instance.Enabled = false
 			rope.instance:Destroy()
 			table.remove(ropes, i)
 		end

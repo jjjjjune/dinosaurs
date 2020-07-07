@@ -26,7 +26,7 @@ local function pressButton(button)
 	end)
 
 	Messages:send("PlaySoundOnClient",{
-		instance = game.ReplicatedStorage.Sounds.ClickHigh
+		instance = game.ReplicatedStorage.Sounds.NewUIBonk
 	})
 end
 
