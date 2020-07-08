@@ -4,6 +4,8 @@ local Messages = import "Shared/Utils/Messages"
 local ServerData = import "Server/Systems/ServerData"
 local CastRay = import "Shared/Utils/CastRay"
 
+local SaveableObjectManager = import "Server/Systems/SaveableObjectManager"
+
 local CollectionService = game:GetService("CollectionService")
 local RunService = game:GetService("RunService")
 
@@ -133,45 +135,43 @@ local function getEntityByID(ID)
 end
 
 local function backupItems()
-	print("backing up items")
-    local items = {}
-    for _, item in pairs(CollectionService:GetTagged("Item")) do
-        if item:IsDescendantOf(workspace) then
-            local pos = item.PrimaryPart.Position
-            local info = {}
-            info.name = item.Name
-			info.position = {x = round(pos.X, .15), y = round(pos.Y, .15), z = round(pos.Z, .15)}
+    -- local items = {}
+    -- for _, item in pairs(CollectionService:GetTagged("Item")) do
+    --     if item:IsDescendantOf(workspace) then
+    --         local pos = item.PrimaryPart.Position
+    --         local info = {}
+    --         info.name = item.Name
+	-- 		info.position = {x = round(pos.X, .15), y = round(pos.Y, .15), z = round(pos.Z, .15)}
 
-			if item:FindFirstChild("ID") then
-				info.id = item.ID.Value
-			else
-				print("WE DID NOT FIND AN ID IN", item.Name)
-			end
+	-- 		if item:FindFirstChild("ID") then
+	-- 			info.id = item.ID.Value
+	-- 		end
 
-			if item:FindFirstChild("RopedTo") then
-				local offsetPos0 = item.GameRope.Attachment0.Position
-				local offsetPos1 = item.GameRope.Attachment1.Position
-				local entity = getEntityByID(item.RopedTo.Value)
-				local offset = item.PrimaryPart.CFrame:ToObjectSpace(entity.PrimaryPart.CFrame).p
-				info.ropedTo = item.RopedTo.Value
-				info.offset = {x = round(offset.X, .15), y = round(offset.Y, .15), z = round(offset.Z, .15)}
-				info.ropePosOffset0 = {x = round(offsetPos0.X, .15), y = round(offsetPos0.Y, .15), z = round(offsetPos0.Z, .15)}
-				info.ropePosOffset1 = {x = round(offsetPos1.X, .15), y = round(offsetPos1.Y, .15), z = round(offsetPos1.Z, .15)}
-			elseif item:FindFirstChild("FrozenTo") then
-				info.frozenTo = item.FrozenTo.Value
-				local entity = getEntityByID(item.FrozenTo.Value)
-				local offset = item.PrimaryPart.CFrame:ToObjectSpace(entity.PrimaryPart.CFrame).p
-				info.offset = {x = round(offset.X, .15), y = round(offset.Y, .15), z = round(offset.Z, .15)}
-			elseif item:FindFirstChild("ObjectWeldedTo") then
-				info.objectWeldedTo = item.ObjectWeldedTo.Value
-				local entity = getEntityByID(item.ObjectWeldedTo.Value)
-				local offset = item.PrimaryPart.CFrame:ToObjectSpace(entity.PrimaryPart.CFrame).p
-				info.offset = {x = round(offset.X, .15), y = round(offset.Y, .15), z = round(offset.Z, .15)}
-			end
-            table.insert(items, info)
-        end
-    end
-    ServerData:setValue("items", items)
+	-- 		if item:FindFirstChild("RopedTo") then
+	-- 			local offsetPos0 = item.GameRope.Attachment0.Position
+	-- 			local offsetPos1 = item.GameRope.Attachment1.Position
+	-- 			local entity = getEntityByID(item.RopedTo.Value)
+	-- 			local offset = entity.PrimaryPart.CFrame:ToObjectSpace(item.PrimaryPart.CFrame).p
+	-- 			info.ropedTo = item.RopedTo.Value
+	-- 			info.offset = {x = round(offset.X, .15), y = round(offset.Y, .15), z = round(offset.Z, .15)}
+	-- 			info.ropePosOffset0 = {x = round(offsetPos0.X, .15), y = round(offsetPos0.Y, .15), z = round(offsetPos0.Z, .15)}
+	-- 			info.ropePosOffset1 = {x = round(offsetPos1.X, .15), y = round(offsetPos1.Y, .15), z = round(offsetPos1.Z, .15)}
+	-- 		elseif item:FindFirstChild("FrozenTo") then
+	-- 			info.frozenTo = item.FrozenTo.Value
+	-- 			local entity = getEntityByID(item.FrozenTo.Value)
+	-- 			local offset = entity.PrimaryPart.CFrame:ToObjectSpace(item.PrimaryPart.CFrame).p
+	-- 			info.offset = {x = round(offset.X, .15), y = round(offset.Y, .15), z = round(offset.Z, .15)}
+	-- 		elseif item:FindFirstChild("ObjectWeldedTo") then
+	-- 			info.objectWeldedTo = item.ObjectWeldedTo.Value
+	-- 			local entity = getEntityByID(item.ObjectWeldedTo.Value)
+	-- 			local offset = entity.PrimaryPart.CFrame:ToObjectSpace(item.PrimaryPart.CFrame).p
+	-- 			info.offset = {x = round(offset.X, .15), y = round(offset.Y, .15), z = round(offset.Z, .15)}
+	-- 		end
+    --         table.insert(items, info)
+    --     end
+    -- end
+	-- ServerData:setValue("items", items)
+	SaveableObjectManager.saveTag("Item")
 end
 
 local function createItemWithAttachData(entity, itemData)
@@ -191,7 +191,10 @@ local function createItemWithAttachData(entity, itemData)
 		local ropePos1 = entity.PrimaryPart.Position + Vector3.new(itemData.ropePosOffset1.x, itemData.ropePosOffset1.y, itemData.ropePosOffset1.z)
 		ConstraintManager.createRopeBetween(nil, physicalItem, ropePos0, entity, ropePos1)
 	elseif itemData.objectWeldedTo then
-		ConstraintManager.createObjectWeld(physicalItem, entity, physicalItem.PrimaryPart.Position)
+		print("had opbject weld, creating object weld")
+		print("offset was", offset.x, offset.y, offset.z)
+		local cf = entity.PrimaryPart.CFrame * CFrame.new(itemData.offset.x, itemData.offset.y, itemData.offset.z)
+		ConstraintManager.createObjectWeld(physicalItem, entity,cf.p)
 	elseif itemData.frozenTo then
 		ConstraintManager.freezeWeld(physicalItem, entity.PrimaryPart)
 	end
@@ -207,20 +210,21 @@ local function step()
 end
 
 local function loadSerializedItems()
-    local items = ServerData:getValue("items")
-    if items then
-		for _, item in pairs(items) do
-			if item.ropedTo or item.frozenTo or item.objectWeldedTo then
-				local waitID = item.ropedTo or item.frozenTo or item.objectWeldedTo
-				Messages:send("WaitForEntityWithID", waitID, function(entity)
-					createItemWithAttachData(entity, item, item.id)
-				end)
-			else
-				local pos = Vector3.new(item.position.x, item.position.y, item.position.z)
-				Messages:send("CreateItem", item.name, pos, item.id)
-			end
-        end
-    end
+    -- local items = ServerData:getValue("items")
+    -- if items then
+	-- 	for _, item in pairs(items) do
+	-- 		if item.ropedTo or item.frozenTo or item.objectWeldedTo then
+	-- 			local waitID = item.ropedTo or item.frozenTo or item.objectWeldedTo
+	-- 			Messages:send("WaitForEntityWithID", waitID, function(entity)
+	-- 				createItemWithAttachData(entity, item, item.id)
+	-- 			end)
+	-- 		else
+	-- 			local pos = Vector3.new(item.position.x, item.position.y, item.position.z)
+	-- 			Messages:send("CreateItem", item.name, pos, item.id)
+	-- 		end
+    --     end
+	-- end
+	SaveableObjectManager.loadTag("Item")
     RunService.Stepped:connect(function()
         step()
     end)

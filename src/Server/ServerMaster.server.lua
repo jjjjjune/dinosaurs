@@ -21,6 +21,7 @@ local loadOrder = {
 	"Server/Systems/Plants",
 	"Server/Systems/Seasons",
 	"Server/Systems/Animations",
+	"Server/Systems/SaveableObjectManager",
 	"Server/Systems/Items",
 	"Server/Systems/Weather",
 	"Server/Systems/Stats",
