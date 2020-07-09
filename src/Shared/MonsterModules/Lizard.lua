@@ -207,8 +207,9 @@ function Lizard:die()
             end
         end
     else
-        self:makeDropItems()
-
+		local ConstraintManager = import "Server/Systems/ConstraintManager"
+		ConstraintManager.removeAllRelevantConstraints(self.model)
+		self:makeDropItems()
         self.model:Destroy()
     end
 end

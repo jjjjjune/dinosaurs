@@ -9,7 +9,7 @@ local FastSpawn = import "Shared/Utils/FastSpawn"
 local CollectionService = game:GetService("CollectionService")
 local RunService = game:GetService("RunService")
 
-local BURN_TIME_TO_DESTROY_OBJECT = 60
+local BURN_TIME_TO_DESTROY_OBJECT = 2
 
 local PLAYER_BURN_DAMAGE = 20
 
@@ -188,8 +188,12 @@ local function manageBurningObject(tableObject, elapsedTime)
             if CollectionService:HasTag(object, "Item") then
                 Messages:send("DestroyItem", object)
             else
-                -- plant or building
-                object:Destroy()
+				-- plant or building
+				if CollectionService:HasTag(object, "Building") then
+					Messages:send("DestroyBuilding", object)
+				elseif CollectionService:HasTag(object, "Plant") then
+					Messages:send("DestroyPlant", object)
+				end
             end
             return false
         end

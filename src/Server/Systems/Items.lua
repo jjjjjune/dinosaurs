@@ -185,7 +185,7 @@ end
 
 local Items = {}
 
-function Items.createItem(itemName, position, presumedId)
+function Items.createItem(itemName, position, presumedId, rotationCF)
    local itemModel do
         if game.ReplicatedStorage.Items:FindFirstChild(itemName) then
             itemModel = game.ReplicatedStorage.Items[itemName]:Clone()
@@ -197,6 +197,9 @@ function Items.createItem(itemName, position, presumedId)
 	local hit, pos = CastRay(position, Vector3.new(0,-4,0))
 
 	itemModel:SetPrimaryPartCFrame(CFrame.new(pos + Vector3.new(0, itemModel.PrimaryPart.Size.Y/2, 0)))
+	if rotationCF then
+		itemModel:SetPrimaryPartCFrame(itemModel.PrimaryPart.CFrame * rotationCF)
+	end
 	if presumedId then
 		local ID = Instance.new("StringValue", itemModel)
 		ID.Name = "ID"
@@ -223,11 +226,13 @@ function Items:start()
             local player = game.Players:GetPlayerFromCharacter(item.Parent)
             throwAllPlayerItems(player)
             Messages:sendClient(player, "Unequip")
-        end
+		end
+		local ConstraintManager = import "Server/Systems/ConstraintManager"
+		ConstraintManager.removeAllRelevantConstraints(item)
         item:Destroy()
     end)
-    Messages:hook("CreateItem", function(itemName, position, id)
-        Items.createItem(itemName, position, id)
+    Messages:hook("CreateItem", function(itemName, position, id, rotation)
+        Items.createItem(itemName, position, id, rotation)
     end)
     Messages:hook("PlayerDied", function(player, character)
         throwAllPlayerItems(player)

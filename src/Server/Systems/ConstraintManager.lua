@@ -3,14 +3,12 @@ local import = require(game.ReplicatedStorage.Shared.Import)
 local Messages = import "Shared/Utils/Messages"
 
 local ropes = {}
+local freezeWelds = {}
+local objectWelds = {}
+
+
 
 local ConstraintManager = {}
-
---[[
-	create rope
-	create building weld
-	create player weld
-	]]
 
 function ConstraintManager.hasAnyRopesAttached(item)
 	for _, rope in pairs(ropes) do
@@ -19,6 +17,11 @@ function ConstraintManager.hasAnyRopesAttached(item)
 		end
 	end
 	return false
+end
+
+function ConstraintManager.destroyConstraintFromData(data)
+	data.instance:Destroy()
+	data.valueInstance:Destroy()
 end
 
 function ConstraintManager.freezeWeld(item, hit)
@@ -37,6 +40,13 @@ function ConstraintManager.freezeWeld(item, hit)
 		local frozenTo = Instance.new("StringValue", item)
 		frozenTo.Value = hit.Parent.ID.Value
 		frozenTo.Name = "FrozenTo"
+
+		table.insert(freezeWelds, {
+			baseObject = hit.Parent,
+			attachObject = item,
+			instance = freezeWeld,
+			valueInstance = frozenTo,
+		})
 	end
 end
 
@@ -50,8 +60,11 @@ function ConstraintManager.destroyAllWelds(object)
 	end
 end
 
-function ConstraintManager.createObjectWeld(attaching, attachTo, intendedPosition)
+function ConstraintManager.createObjectWeld(attaching, attachTo, intendedPosition, intendedOrientation)
 	attaching:SetPrimaryPartCFrame(CFrame.new(intendedPosition))
+	if intendedOrientation then
+		attaching:SetPrimaryPartCFrame(attaching.PrimaryPart.CFrame * intendedOrientation)
+	end
 	local objectWeld = Instance.new("WeldConstraint", attaching)
 	objectWeld.Name = "ObjectWeld"
 	objectWeld.Part0 = attaching.PrimaryPart
@@ -60,6 +73,13 @@ function ConstraintManager.createObjectWeld(attaching, attachTo, intendedPositio
 	local objectWeldedTo = Instance.new("StringValue", attaching)
 	objectWeldedTo.Name = "ObjectWeldedTo"
 	objectWeldedTo.Value = attachTo.ID.Value
+
+	table.insert(objectWelds, {
+		baseObject = attachTo,
+		attachObject = attaching,
+		instance = objectWeld,
+		valueInstance = objectWeldedTo,
+	})
 end
 
 function ConstraintManager.unfreeze(object)
@@ -109,8 +129,26 @@ function ConstraintManager.removeDuplicateRopes(object1, object2)
 	end
 end
 
+function ConstraintManager.removeAllRelevantConstraints(object)
+	local tabs = {objectWelds, ropes, freezeWelds}
+	for _, tab in pairs(tabs) do
+		for i = #tab, 1, -1 do
+			local constraint = tab[i]
+			if constraint.baseObject == object or constraint.attachObject == object or constraint.valueInstance.Value == object then
+				constraint.instance:Destroy()
+				constraint.valueInstance:Destroy()
+				table.remove(tab, i)
+			end
+		end
+	end
+end
+
 function ConstraintManager.createRopeBetween(creator, object1, object1Pos, object2, object2Pos)
 	if not (ConstraintManager.canBeRoped(object1) and ConstraintManager.canBeRoped(object2)) then
+		return
+	end
+
+	if object1:FindFirstChild("GameRope") then
 		return
 	end
 
@@ -130,17 +168,18 @@ function ConstraintManager.createRopeBetween(creator, object1, object1Pos, objec
 	gameRope.Attachment0 = attach0
 	gameRope.Attachment1 = attach1
 
+	local ropeData = Instance.new("StringValue")
+	ropeData.Name = "RopedTo"
+	ropeData.Value = object2.ID.Value
+	ropeData.Parent = object1
+
 	local ropeObject = {
 		creator = creator,
 		baseObject = object1,
 		attachObject = object2,
 		instance = gameRope,
+		valueInstance = ropeData,
 	}
-
-	local ropeData = Instance.new("StringValue")
-	ropeData.Name = "RopedTo"
-	ropeData.Value = object2.ID.Value
-	ropeData.Parent = object1
 
 	table.insert(ropes, ropeObject)
 

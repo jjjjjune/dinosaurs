@@ -86,9 +86,16 @@ local function loadBuildings()
     end
 end
 
+local function destroyBuilding(object)
+	local ConstraintManager = import "Server/Systems/ConstraintManager"
+	ConstraintManager.removeAllRelevantConstraints(object)
+	object:Destroy()
+end
+
 local Buildings = {}
 
 function Buildings:start()
+	Messages:hook("DestroyBuilding", destroyBuilding)
     Messages:hook("MapDoneGenerating", function(isFirstTime)
         if isFirstTime then
             local folder = game.ServerStorage.StartTileBuildings

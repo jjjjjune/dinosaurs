@@ -154,6 +154,12 @@ local function backUpPlants()
     ServerData:setValue("plants", plants)
 end
 
+local function destroyPlant(object)
+	local ConstraintManager = import "Server/Systems/ConstraintManager"
+	ConstraintManager.removeAllRelevantConstraints(object)
+	object:Destroy()
+end
+
 local function preparePlants()
     local plantPhases = game.ServerStorage.PlantPhases
     for _, plantFolder in pairs(plantPhases:GetChildren()) do
@@ -185,7 +191,8 @@ function Plants:start()
     preparePlants()
     Messages:hook("SeasonSetTo",function(newSeason)
         onSeasonChanged(newSeason)
-    end)
+	end)
+	Messages:hook("DestroyPlant", destroyPlant)
     CollectionService:GetInstanceAddedSignal("Grass"):connect(colorGrass)
     loadSavedPlants()
     Messages:hook("GrowAllPlants", growAllPlants)

@@ -184,9 +184,10 @@ function Alpaca:die()
         self.model.HumanoidRootPart.BodyGyro:Destroy()
         self.model.HumanoidRootPart.BodyVelocity:Destroy()
 		self.model.Torso.CanCollide = true
-    else
+	else
+		local ConstraintManager = import "Server/Systems/ConstraintManager"
+		ConstraintManager.removeAllRelevantConstraints(self.model)
         self:makeDropItems()
-
         self.model:Destroy()
     end
 end

@@ -1,6 +1,7 @@
 local import = require(game.ReplicatedStorage.Shared.Import)
 
 local Messages = import "Shared/Utils/Messages"
+local ConstraintManager = import "Server/Systems/ConstraintManager"
 
 local CollectionService = game:GetService("CollectionService")
 
@@ -30,7 +31,7 @@ end
 
 local function resolutionize(n, resolution)
 	n = round(n, resolution)
-	return math.floor(n/resolution)
+	return math.ceil(n/resolution)
 end
 
 local function deresolutionize(n, resolution)
@@ -40,6 +41,10 @@ end
 local function getPositionalAndRotationalData(tag, object)
 	local pos = object.PrimaryPart.Position
 	local ox, oy, oz  = object.PrimaryPart.CFrame:toOrientation()
+
+	ox = math.deg(ox)
+	oy = math.deg(oy)
+	oz = math.deg(oz)
 
 	local data = {}
 
@@ -97,18 +102,31 @@ local function getAttachmentData(object)
 		data.r1x = resolutionize(offsetPos1.X, OFFSET_RESOLUTION)
 		data.r1y = resolutionize(offsetPos1.Y, OFFSET_RESOLUTION)
 		data.r1z = resolutionize(offsetPos1.Z, OFFSET_RESOLUTION)
+		if not entity then
+			ConstraintManager.removeAllRelevantConstraints(object.RopedTo.Value)
+			return {}
+		end
 	elseif object:FindFirstChild("FrozenTo") then
 		data.ft = object.FrozenTo.Value
 		entity = getEntityByID(object.FrozenTo.Value)
+		if not entity then
+			ConstraintManager.removeAllRelevantConstraints(object.RopedTo.Value)
+			return {}
+		end
 	elseif object:FindFirstChild("ObjectWeldedTo") then
 		data.ot = object.ObjectWeldedTo.Value
 		entity = getEntityByID(object.ObjectWeldedTo.Value)
+		if not entity then
+			ConstraintManager.removeAllRelevantConstraints(object.RopedTo.Value)
+			return {}
+		end
 	else
 		-- item is attached to nothing, no need to store any of this
 		return {}
 	end
 
 	offset = entity.PrimaryPart.CFrame:ToObjectSpace(object.PrimaryPart.CFrame).p
+
 	data._x = resolutionize(offset.X, OFFSET_RESOLUTION)
 	data._y = resolutionize(offset.Y, OFFSET_RESOLUTION)
 	data._z = resolutionize(offset.Z, OFFSET_RESOLUTION)
@@ -132,20 +150,39 @@ end
 local function createItemWithAttachData(entity, itemData)
 	local Items = import "Server/Systems/Items"
 
-	local offset = CFrame.new(itemData._x, itemData._y, itemData._z)
+	local offset = CFrame.new(
+		deresolutionize(itemData._x, OFFSET_RESOLUTION),
+		deresolutionize(itemData._y, OFFSET_RESOLUTION),
+		deresolutionize(itemData._z, OFFSET_RESOLUTION)
+	)
 
+	local rotationCF = CFrame.fromOrientation(
+		math.rad(deresolutionize(itemData.ox, ROTATION_RESOLUTION_ITEM)),
+		math.rad(deresolutionize(itemData.oy, ROTATION_RESOLUTION_ITEM)),
+		math.rad(deresolutionize(itemData.oz, ROTATION_RESOLUTION_ITEM))
+	)
+
+	print("the rotation cf ios ", rotationCF)
 	local physicalItem = Items.createItem(itemData.n, Vector3.new(), itemData.i)
-	physicalItem:SetPrimaryPartCFrame(entity.PrimaryPart.CFrame * offset)
-
-	local ConstraintManager = import "Server/Systems/ConstraintManager"
+	physicalItem:SetPrimaryPartCFrame(entity.PrimaryPart.CFrame * offset * rotationCF)
 
 	if itemData.rt then
-		local ropePos0 = physicalItem.PrimaryPart.Position + Vector3.new(itemData.r0x, itemData.r0y, itemData.r0z)
-		local ropePos1 = entity.PrimaryPart.Position + Vector3.new(itemData.r1x, itemData.r1y, itemData.r1z)
+		local deResPos0 = Vector3.new(
+		deresolutionize(itemData.r0x, OFFSET_RESOLUTION),
+		deresolutionize(itemData.r0y, OFFSET_RESOLUTION),
+		deresolutionize(itemData.r0z, OFFSET_RESOLUTION))
+
+		local deResPos1 = Vector3.new(
+		deresolutionize(itemData.r1x, OFFSET_RESOLUTION),
+		deresolutionize(itemData.r1y, OFFSET_RESOLUTION),
+		deresolutionize(itemData.r1z, OFFSET_RESOLUTION))
+
+		local ropePos0 = physicalItem.PrimaryPart.Position + deResPos0
+		local ropePos1 = entity.PrimaryPart.Position + deResPos1
 		ConstraintManager.createRopeBetween(nil, physicalItem, ropePos0, entity, ropePos1)
 	elseif itemData.ot then
-		local cf = entity.PrimaryPart.CFrame * CFrame.new(itemData._x, itemData._y, itemData._z)
-		ConstraintManager.createObjectWeld(physicalItem, entity,cf.p)
+		local cf = entity.PrimaryPart.CFrame * offset
+		ConstraintManager.createObjectWeld(physicalItem, entity,cf.p, rotationCF)
 	elseif itemData.ft then
 		ConstraintManager.freezeWeld(physicalItem, entity.PrimaryPart)
 	end
@@ -159,14 +196,16 @@ local function loadObject(tag, objectData)
 		rotationResolution = ROTATION_RESOLUTION_OTHER
 	end
 
+	local rotation = CFrame.fromOrientation(deresolutionize(objectData.ox, rotationResolution),
+		deresolutionize(objectData.oy, rotationResolution),
+		deresolutionize(objectData.oz, rotationResolution)
+	)
+
 	local cf = CFrame.new(
 		deresolutionize(objectData.px, POSITION_RESOLUTION),
 		deresolutionize(objectData.py, POSITION_RESOLUTION),
 		deresolutionize(objectData.pz, POSITION_RESOLUTION)
-	) * CFrame.fromOrientation(deresolutionize(objectData.ox, rotationResolution),
-		deresolutionize(objectData.oy, rotationResolution),
-		deresolutionize(objectData.oz, rotationResolution)
-	)
+	) * rotation
 
 	if objectData._x then
 		local waitID = objectData.rt or objectData.ft or objectData.ot
@@ -176,7 +215,9 @@ local function loadObject(tag, objectData)
 			end)
 		end
 	else
-		Messages:send("CreateItem", objectData.n, cf.p, objectData.i)
+		print("creating with rotation", rotation)
+		print("components were", objectData.ox, objectData.oy, objectData.oz)
+		Messages:send("CreateItem", objectData.n, cf.p, objectData.i, rotation)
 	end
 end
 
