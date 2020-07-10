@@ -154,31 +154,6 @@ function ConstraintManager.createRopeBetween(creator, object1, object1Pos, objec
 		return
 	end
 
-	local x = object1:Clone()
-
-	for _, v in pairs(x:GetChildren()) do
-		if v:IsA("BasePart") then
-			v.Anchored = true
-			v.Transparency = .5
-			v.CanCollide = false
-		end
-	end
-
-	CollectionService:RemoveTag(x, "Item")
-	x.Parent = workspace
-
-	local x = object2:Clone()
-
-	for _, v in pairs(x:GetChildren()) do
-		if v:IsA("BasePart") then
-			v.Anchored = true
-			v.Transparency = .5
-			v.CanCollide = false
-		end
-	end
-	CollectionService:RemoveTag(x, "Item")
-	x.Parent = workspace
-
 	ConstraintManager.unfreeze(object1)
 	ConstraintManager.unfreeze(object2)
 	ConstraintManager.removeDuplicateRopes(object1, object2)

@@ -6,9 +6,9 @@ local ConstraintManager = import "Server/Systems/ConstraintManager"
 local CollectionService = game:GetService("CollectionService")
 
 local POSITION_RESOLUTION = .1
-local ROTATION_RESOLUTION_ITEM = 15
-local ROTATION_RESOLUTION_OTHER = 1
-local OFFSET_RESOLUTION = .15
+local ROTATION_RESOLUTION_ITEM = 45
+local ROTATION_RESOLUTION_OTHER = 5
+local OFFSET_RESOLUTION = .25
 
 local function join(a, b)
 	local new = {}
@@ -31,7 +31,7 @@ end
 
 local function resolutionize(n, resolution)
 	n = round(n, resolution)
-	return math.floor(n/resolution)
+	return (n/resolution)
 end
 
 local function deresolutionize(n, resolution)
@@ -171,7 +171,10 @@ local function createItemWithAttachData(entity, itemData)
 
 	local Items = import "Server/Systems/Items"
 	local physicalItem = Items.createItem(itemData.n, Vector3.new(), itemData.i)
-	physicalItem:SetPrimaryPartCFrame(entity.PrimaryPart.CFrame * offset * rotationCF)
+
+	local cf = entity.PrimaryPart.CFrame * offset * rotationCF
+
+	physicalItem:SetPrimaryPartCFrame(cf)
 
 	-- for _, v in pairs(physicalItem:GetChildren()) do
 
@@ -187,6 +190,20 @@ local function createItemWithAttachData(entity, itemData)
 		deresolutionize(itemData.r1x, OFFSET_RESOLUTION),
 		deresolutionize(itemData.r1y, OFFSET_RESOLUTION),
 		deresolutionize(itemData.r1z, OFFSET_RESOLUTION))
+
+		local rotation = CFrame.fromOrientation(math.rad(deresolutionize(itemData.ox, ROTATION_RESOLUTION_ITEM)),
+			math.rad(deresolutionize(itemData.oy, ROTATION_RESOLUTION_ITEM)),
+			math.rad(deresolutionize(itemData.oz, ROTATION_RESOLUTION_ITEM))
+		)
+
+		local cf = CFrame.new(
+			deresolutionize(itemData.px, POSITION_RESOLUTION),
+			deresolutionize(itemData.py, POSITION_RESOLUTION),
+			deresolutionize(itemData.pz, POSITION_RESOLUTION)
+		) * rotation
+
+		physicalItem:SetPrimaryPartCFrame(cf) -- for ropes we don't want to use the relative position because it can result in a lot of innacuracy
+		-- (because the item rotation isn't stored at a high resolution the CF can be off by a lot)
 
 		local ropePos0 = physicalItem.PrimaryPart.Position + deResPos0
 		local ropePos1 = entity.PrimaryPart.Position + deResPos1
@@ -247,9 +264,9 @@ local function loadObject(tag, objectData)
 		rotationResolution = ROTATION_RESOLUTION_OTHER
 	end
 
-	local rotation = CFrame.fromOrientation(deresolutionize(objectData.ox, rotationResolution),
-		deresolutionize(objectData.oy, rotationResolution),
-		deresolutionize(objectData.oz, rotationResolution)
+	local rotation = CFrame.fromOrientation(math.rad(deresolutionize(objectData.ox, rotationResolution)),
+		math.rad(deresolutionize(objectData.oy, rotationResolution)),
+		math.rad(deresolutionize(objectData.oz, rotationResolution))
 	)
 
 	local cf = CFrame.new(
