@@ -16,18 +16,22 @@ function Rope.clientUse(item)
 			if Rope.object1 then
 				print("second")
 				Rope.object2 = object
-				Rope.object2Pos = pos
+				Rope.object2Pos = pos - object.PrimaryPart.Position
 
-				Messages:sendServer("CreateRopeBetween", Rope.object1, Rope.object1Pos, Rope.object2, Rope.object2Pos)
+				Messages:sendServer("CreateRopeBetween",
+					Rope.object1,
+					Rope.object1.PrimaryPart.Position + Rope.object1Pos,
+					Rope.object2, Rope.object2.PrimaryPart.Position + Rope.object2Pos
+				)
 				Rope.object1 = nil
 				Rope.object2 = nil
 			else
 				print("first")
 				Rope.object1 = object
-				Rope.object1Pos = pos
+				Rope.object1Pos =  pos - object.PrimaryPart.Position
 			end
 		else
-			print('has nothing')
+			print('has nothing', object.Name, hit)
 		end
 	end
 end

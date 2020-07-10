@@ -27,7 +27,8 @@ local function heatStep()
                         local pos = item.PrimaryPart.Position
                         item:Destroy()
                         local items = import "Server/Systems/Items"
-                        items.createItem(product, pos)
+						local newItem = items.createItem(product, pos)
+						newItem.Parent = workspace
                         Messages:send("PlaySound", "Smoke", pos)
                         Messages:send("PlayParticle", "DeathSmoke", 20, pos)
                     else

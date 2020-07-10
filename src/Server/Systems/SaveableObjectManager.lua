@@ -6,9 +6,9 @@ local ConstraintManager = import "Server/Systems/ConstraintManager"
 local CollectionService = game:GetService("CollectionService")
 
 local POSITION_RESOLUTION = .1
-local ROTATION_RESOLUTION_ITEM = 45
+local ROTATION_RESOLUTION_ITEM = 15
 local ROTATION_RESOLUTION_OTHER = 1
-local OFFSET_RESOLUTION = .25
+local OFFSET_RESOLUTION = .15
 
 local function join(a, b)
 	local new = {}
@@ -31,7 +31,7 @@ end
 
 local function resolutionize(n, resolution)
 	n = round(n, resolution)
-	return math.ceil(n/resolution)
+	return math.floor(n/resolution)
 end
 
 local function deresolutionize(n, resolution)
@@ -53,7 +53,7 @@ local function getPositionalAndRotationalData(tag, object)
 	data.pz = resolutionize(pos.z, POSITION_RESOLUTION)
 
 	local rotationResolution = ROTATION_RESOLUTION_ITEM
-	if tag == "Building" then
+	if tag == "Building" or tag == "SaveableMapEntity" then
 		rotationResolution = ROTATION_RESOLUTION_OTHER
 	end
 
@@ -75,9 +75,12 @@ local function getEntityByID(ID)
 	for _, v in pairs(CollectionService:GetTagged("Building")) do
 		table.insert(entities, v)
 	end
+	for _, v in pairs(CollectionService:GetTagged("SaveableMapEntity")) do
+		table.insert(entities, v)
+	end
 	for _, v in pairs(entities) do
 		if v:IsDescendantOf(workspace) then
-			if v.ID.Value == ID then
+			if v:FindFirstChild("ID") and v.ID.Value == ID then
 				return v
 			end
 		end
@@ -139,6 +142,11 @@ local function getObjectSaveData(tag, object)
 	if tag == "Item" then
 		data = join(data, getPositionalAndRotationalData(tag, object))
 		data = join(data, getAttachmentData(object))
+	elseif tag == "Building" then
+		data = join(data, getPositionalAndRotationalData(tag, object))
+		data = join(data, getAttachmentData(object))
+	elseif tag == "SaveableMapEntity" then
+		data = join(data, getPositionalAndRotationalData(tag, object))
 	end
 	if object:FindFirstChild("ID") then
 		data.i = object.ID.Value
@@ -148,7 +156,6 @@ local function getObjectSaveData(tag, object)
 end
 
 local function createItemWithAttachData(entity, itemData)
-	local Items = import "Server/Systems/Items"
 
 	local offset = CFrame.new(
 		deresolutionize(itemData._x, OFFSET_RESOLUTION),
@@ -162,9 +169,13 @@ local function createItemWithAttachData(entity, itemData)
 		math.rad(deresolutionize(itemData.oz, ROTATION_RESOLUTION_ITEM))
 	)
 
-	print("the rotation cf ios ", rotationCF)
+	local Items = import "Server/Systems/Items"
 	local physicalItem = Items.createItem(itemData.n, Vector3.new(), itemData.i)
 	physicalItem:SetPrimaryPartCFrame(entity.PrimaryPart.CFrame * offset * rotationCF)
+
+	-- for _, v in pairs(physicalItem:GetChildren()) do
+
+	-- end
 
 	if itemData.rt then
 		local deResPos0 = Vector3.new(
@@ -186,13 +197,53 @@ local function createItemWithAttachData(entity, itemData)
 	elseif itemData.ft then
 		ConstraintManager.freezeWeld(physicalItem, entity.PrimaryPart)
 	end
+
+	physicalItem.Parent = workspace
+end
+
+local function createBuildingWithAttachData(entity, buildingData)
+	local offset = CFrame.new(
+		deresolutionize(buildingData._x, OFFSET_RESOLUTION),
+		deresolutionize(buildingData._y, OFFSET_RESOLUTION),
+		deresolutionize(buildingData._z, OFFSET_RESOLUTION)
+	)
+
+	local rotationCF = CFrame.fromOrientation(
+		math.rad(deresolutionize(buildingData.ox, ROTATION_RESOLUTION_OTHER)),
+		math.rad(deresolutionize(buildingData.oy, ROTATION_RESOLUTION_OTHER)),
+		math.rad(deresolutionize(buildingData.oz, ROTATION_RESOLUTION_OTHER))
+	)
+
+	local Buildings = import "Server/Systems/Buildings"
+	local physicalBuilding = Buildings.createBuilding(buildingData.n, Vector3.new(), buildingData.i)
+	physicalBuilding:SetPrimaryPartCFrame(entity.PrimaryPart.CFrame * offset * rotationCF)
+	physicalBuilding.Parent = workspace.Buildings
+
+	if buildingData.rt then
+		local deResPos0 = Vector3.new(
+		deresolutionize(buildingData.r0x, OFFSET_RESOLUTION),
+		deresolutionize(buildingData.r0y, OFFSET_RESOLUTION),
+		deresolutionize(buildingData.r0z, OFFSET_RESOLUTION))
+
+		local deResPos1 = Vector3.new(
+		deresolutionize(buildingData.r1x, OFFSET_RESOLUTION),
+		deresolutionize(buildingData.r1y, OFFSET_RESOLUTION),
+		deresolutionize(buildingData.r1z, OFFSET_RESOLUTION))
+
+		local ropePos0 = physicalBuilding.PrimaryPart.Position + deResPos0
+		local ropePos1 = entity.PrimaryPart.Position + deResPos1
+		ConstraintManager.createRopeBetween(nil, physicalBuilding, ropePos0, entity, ropePos1)
+	elseif buildingData.ot then
+		local cf = entity.PrimaryPart.CFrame * offset
+		ConstraintManager.createObjectWeld(physicalBuilding, entity,cf.p, rotationCF)
+	end
 end
 
 
 local function loadObject(tag, objectData)
 
 	local rotationResolution = ROTATION_RESOLUTION_ITEM
-	if tag == "Building" then
+	if tag == "Building" or tag == "SaveableMapEntity" then
 		rotationResolution = ROTATION_RESOLUTION_OTHER
 	end
 
@@ -213,11 +264,25 @@ local function loadObject(tag, objectData)
 			Messages:send("WaitForEntityWithID", waitID, function(entity)
 				createItemWithAttachData(entity, objectData)
 			end)
+		elseif tag == "Building" then
+			Messages:send("WaitForEntityWithID", waitID, function(entity)
+				createBuildingWithAttachData(entity, objectData)
+			end)
 		end
 	else
-		print("creating with rotation", rotation)
-		print("components were", objectData.ox, objectData.oy, objectData.oz)
-		Messages:send("CreateItem", objectData.n, cf.p, objectData.i, rotation)
+		if tag == "Item" then
+			Messages:send("CreateItem", objectData.n, cf.p, objectData.i, rotation)
+		elseif tag == "Building" then
+			local Buildings = import "Server/Systems/Buildings"
+			local physicalBuilding = Buildings.createBuilding(objectData.n, Vector3.new(), objectData.i)
+			physicalBuilding:SetPrimaryPartCFrame(cf)
+			physicalBuilding.Parent = workspace.Buildings
+		elseif tag == "SaveableMapEntity" then
+			local Buildings = import "Server/Systems/Buildings"
+			local physicalBuilding = Buildings.createBuilding(objectData.n, Vector3.new(), objectData.i)
+			physicalBuilding:SetPrimaryPartCFrame(cf)
+			physicalBuilding.Parent = workspace.Buildings
+		end
 	end
 end
 
@@ -227,7 +292,7 @@ function SaveableObjectManager.saveTag(tag)
 	local ServerData = import "Server/Systems/ServerData"
 	local tagData = {}
 	for _, object in pairs(CollectionService:GetTagged(tag)) do
-		if object:IsDescendantOf(workspace) then
+		if object:IsDescendantOf(workspace) and object.PrimaryPart then
 			local data = getObjectSaveData(tag, object)
 			table.insert(tagData, data)
 		end

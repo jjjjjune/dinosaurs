@@ -205,7 +205,6 @@ function Items.createItem(itemName, position, presumedId, rotationCF)
 		ID.Name = "ID"
 		ID.Value = presumedId
 	end
-	itemModel.Parent = workspace
 
     return itemModel
 end
@@ -232,7 +231,8 @@ function Items:start()
         item:Destroy()
     end)
     Messages:hook("CreateItem", function(itemName, position, id, rotation)
-        Items.createItem(itemName, position, id, rotation)
+		local item = Items.createItem(itemName, position, id, rotation)
+		item.Parent = workspace
     end)
     Messages:hook("PlayerDied", function(player, character)
         throwAllPlayerItems(player)

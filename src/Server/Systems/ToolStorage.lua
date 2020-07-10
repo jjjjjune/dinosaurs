@@ -24,7 +24,8 @@ local function storeTool(player, itemInstance, desiredSlotNumber)
     if prevItem then
         local Items = import "Server/Systems/Items"
         local itemModel = Items.createItem(prevItem, Vector3.new(0,1000,0))
-        Messages:sendClient(player, "ForceSetItem", itemModel)
+		itemModel.Parent = workspace
+		Messages:sendClient(player, "ForceSetItem", itemModel)
     end
     slotData.item = itemInstance.Name
     ServerData:setPlayerValue(player, "storedTools", storeData)
@@ -60,7 +61,8 @@ local function equipStoredTool(player, slotName)
         -- if we did find a storable tool, the storeTool method will handle the unequip/reequipping
         Messages:sendClient(player, "ForceThrowItems")
         local Items = import "Server/Systems/Items"
-        local itemModel = Items.createItem(foundStoredTool, Vector3.new(0,1000,0))
+		local itemModel = Items.createItem(foundStoredTool, Vector3.new(0,1000,0))
+		itemModel.Parent = workspace
         Messages:sendClient(player,"ForceSetItem", itemModel)
     end
 end

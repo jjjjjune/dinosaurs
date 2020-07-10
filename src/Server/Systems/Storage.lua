@@ -122,10 +122,6 @@ local function step()
     backupItems()
 end
 
-local function loadSerializedItems()
-	SaveableObjectManager.loadTag("Item")
-end
-
 local Storage = {}
 
 function Storage:start()
@@ -148,8 +144,7 @@ function Storage:start()
 			ServerData:generateIdForInstanceOfType(item, "I")
 		end
 	end
-	Messages:hook("MapDoneGenerating", function()
-		loadSerializedItems()
+	Messages:hook("FirstMapRenderComplete", function()
 		RunService.Stepped:connect(function()
 			step()
 		end)

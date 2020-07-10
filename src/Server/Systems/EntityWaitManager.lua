@@ -10,16 +10,17 @@ local activeEntities = {}
 local function updateQueue()
 	for id, callbacks in pairs(entitiesBeingWaitedOn) do
 		if activeEntities[id] then
-			for _, callback in pairs(callbacks) do
+			for i, callback in pairs(callbacks) do
 				callback(activeEntities[id])
+				callbacks[i] = nil
 			end
-			entitiesBeingWaitedOn[id] = nil
 		end
 	end
 end
 
 local function onEntityAdded(entity)
 	if not entity:IsDescendantOf(game.Workspace) then
+		updateQueue()
 		return
 	end
 	wait()

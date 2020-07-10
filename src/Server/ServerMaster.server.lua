@@ -9,6 +9,8 @@ local loadOrder = {
 	"Shared/Systems/Data",
 	"Shared/Systems/Sounds",
 
+	"Server/Systems/Loader",
+	"Server/Systems/EntityWaitManager",
 	"Server/Systems/CharacterWrapper",
 	"Server/Systems/PlayerWrapper",
 	"Server/Systems/TopbarPlus",
@@ -47,7 +49,6 @@ local loadOrder = {
 	"Server/Systems/Knockback",
 	"Server/Systems/Combat",
 	"Server/Systems/ConstraintManager",
-	"Server/Systems/EntityWaitManager",
 }
 
 for _, path in ipairs(loadOrder) do

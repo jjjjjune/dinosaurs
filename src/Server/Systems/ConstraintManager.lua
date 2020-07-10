@@ -1,12 +1,12 @@
 local import = require(game.ReplicatedStorage.Shared.Import)
 
+local CollectionService = game:GetService("CollectionService")
+
 local Messages = import "Shared/Utils/Messages"
 
 local ropes = {}
 local freezeWelds = {}
 local objectWelds = {}
-
-
 
 local ConstraintManager = {}
 
@@ -145,12 +145,39 @@ end
 
 function ConstraintManager.createRopeBetween(creator, object1, object1Pos, object2, object2Pos)
 	if not (ConstraintManager.canBeRoped(object1) and ConstraintManager.canBeRoped(object2)) then
+		print("CAN NOT BE ROPED")
 		return
 	end
 
 	if object1:FindFirstChild("GameRope") then
+		print("OBJECTG 1 ALREADY HAS GAME ROPE")
 		return
 	end
+
+	local x = object1:Clone()
+
+	for _, v in pairs(x:GetChildren()) do
+		if v:IsA("BasePart") then
+			v.Anchored = true
+			v.Transparency = .5
+			v.CanCollide = false
+		end
+	end
+
+	CollectionService:RemoveTag(x, "Item")
+	x.Parent = workspace
+
+	local x = object2:Clone()
+
+	for _, v in pairs(x:GetChildren()) do
+		if v:IsA("BasePart") then
+			v.Anchored = true
+			v.Transparency = .5
+			v.CanCollide = false
+		end
+	end
+	CollectionService:RemoveTag(x, "Item")
+	x.Parent = workspace
 
 	ConstraintManager.unfreeze(object1)
 	ConstraintManager.unfreeze(object2)
@@ -164,7 +191,7 @@ function ConstraintManager.createRopeBetween(creator, object1, object1Pos, objec
 	local gameRope = Instance.new("RopeConstraint", object1)
 	gameRope.Name = "GameRope"
 	gameRope.Visible = true
-	gameRope.Length = (object1Pos - object2Pos).magnitude
+	gameRope.Length = (attach0.WorldPosition - attach1.WorldPosition).magnitude + .5
 	gameRope.Attachment0 = attach0
 	gameRope.Attachment1 = attach1
 

@@ -13,7 +13,7 @@ local Immutable = import "Immutable"
 local IS_SAVING_IN_STUDIO = true
 
 local function getServerId()
-    return "TestServer102"
+    return "TestServer120"
 end
 
 local function copy(value)
@@ -54,6 +54,7 @@ end
 local ServerData = {}
 
 function ServerData:generateIdForInstanceOfType(instance, type)
+	print("generating ID For ", instance.Name)
 	if instance:FindFirstChild("ID") then
 		return
 	else
@@ -68,6 +69,7 @@ function ServerData:generateIdForInstanceOfType(instance, type)
 	valueString = valueString..n+1
 	self:setValue("ID"..type, n+1)
 	instance.ID.Value = valueString
+	print("the id we generated for ", instance.Name, " is ", valueString)
 end
 
 

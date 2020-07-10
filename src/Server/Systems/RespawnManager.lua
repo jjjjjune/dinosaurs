@@ -11,7 +11,8 @@ local function emptyToolInventory(player, characterThatDied)
         if data.item and not data.equipped then
             if characterThatDied then
                 local items = import "Server/Systems/Items"
-                items.createItem(data.item, characterThatDied.PrimaryPart.Position)
+				local item = items.createItem(data.item, characterThatDied.PrimaryPart.Position)
+				item.Parent = workspace
             end
             data.item = nil
         end

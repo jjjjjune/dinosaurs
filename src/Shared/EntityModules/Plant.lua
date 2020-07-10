@@ -19,7 +19,7 @@ local function chop(entity)
             end
         end
         local remaining = math.random(0, itemTable.max - itemTable.min)
-        if remaining > 0 then 
+        if remaining > 0 then
             for i = 1, remaining do
                 local n = random(1, 100)
                 if n < itemTable.chance then
@@ -30,7 +30,8 @@ local function chop(entity)
     end
     for _, itemName in pairs(itemsToMake) do
         local newPos = pos + Vector3.new(random(-5,5), 0, random(-5,5))
-        Items.createItem(itemName, newPos)
+		local item = Items.createItem(itemName, newPos)
+		item.Parent = workspace
         Messages:send("PlayParticle", "DeathSmoke",  20, newPos)
     end
 end
