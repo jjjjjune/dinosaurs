@@ -108,27 +108,6 @@ function ConstraintManager.canBeRoped(object)
 	return true
 end
 
-function ConstraintManager.clearRopeData(object)
-	if object:FindFirstChild("RopedTo") then
-		object.RopedTo:Destroy()
-	end
-end
-
-function ConstraintManager.removeDuplicateRopes(object1, object2)
-	for i = #ropes, 1, -1 do
-		local rope = ropes[i]
-		if rope.baseObject == object1 and rope.attachObject == object2 then
-			ConstraintManager.clearRopeData(rope.attachObject)
-			rope.instance:Destroy()
-			table.remove(ropes, i)
-		elseif rope.attachObject == object1 and rope.baseObject == object2 then
-			ConstraintManager.clearRopeData(rope.attachObject)
-			rope.instance:Destroy()
-			table.remove(ropes, i)
-		end
-	end
-end
-
 function ConstraintManager.removeAllRelevantConstraints(object)
 	local tabs = {objectWelds, ropes, freezeWelds}
 	for _, tab in pairs(tabs) do
@@ -137,6 +116,10 @@ function ConstraintManager.removeAllRelevantConstraints(object)
 			if constraint.baseObject == object or constraint.attachObject == object or constraint.valueInstance.Value == object then
 				constraint.instance:Destroy()
 				constraint.valueInstance:Destroy()
+				if constraint.attach1 then
+					constraint.attach1:Destroy()
+					constraint.attach0:Destroy()
+				end
 				table.remove(tab, i)
 			end
 		end
@@ -156,10 +139,10 @@ function ConstraintManager.createRopeBetween(creator, object1, object1Pos, objec
 
 	ConstraintManager.unfreeze(object1)
 	ConstraintManager.unfreeze(object2)
-	ConstraintManager.removeDuplicateRopes(object1, object2)
 
 	local attach0 = Instance.new("Attachment", object1.PrimaryPart)
 	attach0.WorldPosition = object1Pos
+	attach0.Visible = true
 	local attach1 = Instance.new("Attachment", object2.PrimaryPart)
 	attach1.WorldPosition = object2Pos
 
@@ -181,6 +164,8 @@ function ConstraintManager.createRopeBetween(creator, object1, object1Pos, objec
 		attachObject = object2,
 		instance = gameRope,
 		valueInstance = ropeData,
+		attach1 = attach1,
+		attach0 = attach0,
 	}
 
 	table.insert(ropes, ropeObject)
@@ -189,13 +174,19 @@ function ConstraintManager.createRopeBetween(creator, object1, object1Pos, objec
 end
 
 function ConstraintManager.removeRopesAttachedTo(object)
-	for i = #ropes, 1, -1 do
-		local rope = ropes[i]
-		if rope.baseObject == object or rope.attachObject == object then
-			ConstraintManager.clearRopeData(object)
-			rope.instance.Enabled = false
-			rope.instance:Destroy()
-			table.remove(ropes, i)
+	local tabs = {ropes}
+	for _, tab in pairs(tabs) do
+		for i = #tab, 1, -1 do
+			local constraint = tab[i]
+			if constraint.baseObject == object or constraint.attachObject == object or constraint.valueInstance.Value == object then
+				constraint.instance:Destroy()
+				constraint.valueInstance:Destroy()
+				if constraint.attach1 then
+					constraint.attach1:Destroy()
+					constraint.attach0:Destroy()
+				end
+				table.remove(tab, i)
+			end
 		end
 	end
 end

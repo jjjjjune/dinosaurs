@@ -27,7 +27,6 @@ local Buildings = {}
 function Buildings.createBuilding(name, pos, presumedId)
 	local buildingModel = game.ReplicatedStorage.Buildings[name]:Clone()
 	if presumedId then
-		print("creating with ", presumedId)
 		local ID = Instance.new("StringValue", buildingModel)
 		ID.Name = "ID"
 		ID.Value = presumedId

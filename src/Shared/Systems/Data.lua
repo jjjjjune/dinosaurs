@@ -51,16 +51,16 @@ local yieldCache = {}
 
 
 local function yieldUntilDataReady(player)
-    --[[if dataReady[player.UserId] then
+    --[[if dataReady[tostring(player.UserId)] then
         return
 	end
-	yieldCache[player.UserId] = tick()
+	yieldCache[tostring(player.UserId)] = tick()
 	repeat wait()
-		if tick() - yieldCache[player.UserId] > 10 then warn ("yield cache going for: "..(tick() - yieldCache[player.UserId]).."seconds")
+		if tick() - yieldCache[tostring(player.UserId)] > 10 then warn ("yield cache going for: "..(tick() - yieldCache[tostring(player.UserId)]).."seconds")
 			 return
 		end
 	until
-		(dataReady[player.UserId] ~= nil) or player == nil or player.Parent == nil--]]
+		(dataReady[tostring(player.UserId)] ~= nil) or player == nil or player.Parent == nil--]]
 end
 
 function data:onDataChanged(player)
@@ -68,8 +68,8 @@ function data:onDataChanged(player)
 	if player == nil or player.Parent == nil then
 		return
 	end
-	Messages:sendClient(player, "PlayerDataSet", self.cache[player.UserId])
-	Messages:send("PlayerDataSet", player, self.cache[player.UserId])
+	Messages:sendClient(player, "PlayerDataSet", self.cache[tostring(player.UserId)])
+	Messages:send("PlayerDataSet", player, self.cache[tostring(player.UserId)])
 end
 
 function data:get(player,key)
@@ -78,11 +78,11 @@ function data:get(player,key)
 	if player == nil or player.Parent == nil then
 		return nil
 	end
-	if not self.cache[player.UserId] then
+	if not self.cache[tostring(player.UserId)] then
 		warn("get user not in cache: ", player.UserId)
 		return nil
 	end
-    return self.cache[player.UserId][key]
+    return self.cache[tostring(player.UserId)][key]
 end
 
 function data:set(player, key, value)
@@ -90,11 +90,11 @@ function data:set(player, key, value)
 	if player == nil or player.Parent == nil then
 		return
 	end
-	if not self.cache[player.UserId] then
+	if not self.cache[tostring(player.UserId)] then
 		warn(" setnot in cache", player.UserId)
 		return
 	end
-    self.cache[player.UserId][key] = value
+    self.cache[tostring(player.UserId)][key] = value
     self:onDataChanged(player)
 end
 
@@ -103,7 +103,7 @@ function data:add(player, key, value)
 	if player.Parent == nil then
 		return
 	end
-	local data = self.cache[player.UserId]
+	local data = self.cache[tostring(player.UserId)]
 	if not data[key] then
 		data[key] = 0
 	end
@@ -134,9 +134,9 @@ function data:loadIntoCache(player)
 		-- data did not load properly within the 5 tries, the player's data will not save this session
 		warn("data did not load, will not save")
 		Messages:sendClient(player, "Notify", "There was an error loading your data! Nothing you do will be saved this session.", "ERROR", "NOENTRY")
-		doNotSave[player.UserId] = true
+		doNotSave[tostring(player.UserId)] = true
 	else
-		doNotSave[player.UserId] = false
+		doNotSave[tostring(player.UserId)] = false
 	end
 
     if loadedData then
@@ -144,21 +144,21 @@ function data:loadIntoCache(player)
             data[key] = value
         end
     end
-    self.cache[player.UserId] = data
+    self.cache[tostring(player.UserId)] = data
     self:onDataChanged(player)
 end
 
 function data:save(player, callback)
-	if doNotSave[player.UserId] then
+	if doNotSave[tostring(player.UserId)] then
 		warn("can not save data for: ", player)
 		--Messages:sendClient(player, "Notify", "There was an error loading your data! Nothing you do will be saved this session.", "ERROR", "NOENTRY")
 		return false
 	end
-	local data = self.cache[player.UserId]
+	local data = self.cache[tostring(player.UserId)]
 	local _, err
 	if data then
 		_, err = pcall(function()
-			self.dataStore:SetAsync(player.UserId, data)
+			self.dataStore:SetAsync(tostring(player.UserId), data)
 			if callback then
 				callback(self)
 			end
@@ -193,13 +193,13 @@ function data:saveCache()
 end
 
 function data:clearFromCache(player)
-	self.cache[player.UserId] = nil
-	doNotSave[player.UserId] = nil
-	dataReady[player.UserId] = nil
+	self.cache[tostring(player.UserId)] = nil
+	doNotSave[tostring(player.UserId)] = nil
+	dataReady[tostring(player.UserId)] = nil
 end
 
 function data:isReady(player)
-	return dataReady[player.UserId]
+	return dataReady[tostring(player.UserId)]
 end
 
 local lastSave = time()
@@ -223,8 +223,8 @@ function data:start()
     end
 
 	game.Players.PlayerAdded:connect(function(player)
-		doNotSave[player.UserId] = true
-		self.cache[player.UserId] = getDefaultData()
+		doNotSave[tostring(player.UserId)] = true
+		self.cache[tostring(player.UserId)] = getDefaultData()
 		self:loadIntoCache(player)
 		Messages:send("PlayerAddedAfterData", player)
     end)
@@ -243,9 +243,9 @@ function data:start()
 	end)
 
 	Messages:hook("DataReadySignal", function(player)
-		--print("WE GOT DATA READY SIGNAL FOR ", player)
+		print("WE GOT DATA READY SIGNAL FOR ", player)
 		self:onDataChanged(player)
-        dataReady[player.UserId] = true
+        dataReady[tostring(player.UserId)] = true
 	end)
 
 	if not IsStudio then

@@ -79,17 +79,21 @@ end
 
 function ServerData:updatedPlayers()
     for _, player in pairs(game.Players:GetPlayers()) do
-        Messages:sendClient(player, "UpdatePlayerServerData", self.cache.players[player.UserId])
+        Messages:sendClient(player, "UpdatePlayerServerData", self.cache.players[tostring(player.UserId)])
     end
 end
 
+function ServerData:updatedPlayer(player)
+	Messages:sendClient(player, "UpdatePlayerServerData", self.cache.players[tostring(player.UserId)])
+end
+
 function ServerData:setPlayerValue(player, key, value)
-    self.cache.players[player.UserId][key] = value
+    self.cache.players[tostring(player.UserId)][key] = value
     self:updatedPlayers()
 end
 
 function ServerData:getPlayerValue(player, key)
-    return self.cache.players[player.UserId][key]
+    return self.cache.players[tostring(player.UserId)][key]
 end
 
 function ServerData:setValue(key, value)
@@ -113,7 +117,7 @@ end
 
 function ServerData:start()
     self.dataStore = DataStoreService:GetGlobalDataStore(SERVER_DATA_STORE)
-    self.cache = self.dataStore:GetAsync(getServerId()) or getDefaultData()
+	self.cache = self.dataStore:GetAsync(getServerId()) or getDefaultData()
     spawn(function()
         while wait(60) do
             self:saveCache()
@@ -121,14 +125,21 @@ function ServerData:start()
     end)
     game:BindToClose(function() self:saveCache() end)
     game:GetService("Players").PlayerAdded:connect(function(player)
-        if not self.cache.players[player.UserId] then
-            self.cache.players[player.UserId] = getDefaultPlayerData()
-        end
+		if not self.cache.players[tostring(player.UserId)] then
+			print("the player has no player data in da cache")
+            self.cache.players[tostring(player.UserId)] = getDefaultPlayerData()
+		end
+		self:updatedPlayer(player)
     end)
     for _, player in pairs(game.Players:GetPlayers()) do
-        if not self.cache.players[player.UserId] then
-            self.cache.players[player.UserId] = getDefaultPlayerData()
-        end
+		if not self.cache.players[tostring(player.UserId)] then
+			for i, v in pairs(self.cache.players) do
+				print(i, type(i))
+				print(v, type(v))
+			end
+            self.cache.players[tostring(player.UserId)] = getDefaultPlayerData()
+		end
+		self:updatedPlayer(player)
     end
 end
 

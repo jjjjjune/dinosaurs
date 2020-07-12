@@ -31,13 +31,19 @@ local function onMonsterAdded(monster)
 	ServerData:generateIdForInstanceOfType(monster, "M")
 end
 
-local function spawnMonster(monsterName, position)
+local function spawnMonster(monsterName, position, presumedId)
 	local monster = game.ServerStorage.Monsters[monsterName]:Clone()
 	monster.PrimaryPart.CFrame = CFrame.new(position)
+	if presumedId then
+		local ID = Instance.new("StringValue", monster)
+		ID.Name = "ID"
+		ID.Value = presumedId
+	end
 	monster.Parent = workspace
 	local component = getComponent(monster).new()
 	component:init(monster)
 	onMonsterAdded(monster)
+	return monster
 end
 
 local function shouldSpawnNewMonster(monsterName)
@@ -91,60 +97,68 @@ local function round(n, mult)
 end
 
 local function backupMonsters()
-    local ServerData = import "Server/Systems/ServerData"
-    local monsters = {}
-    for _, monster in pairs(CollectionService:GetTagged("Monster")) do
-        if monster:IsDescendantOf(workspace) then
-            local primaryPart = monster.PrimaryPart
-            local pos = primaryPart.Position
+    -- local ServerData = import "Server/Systems/ServerData"
+    -- local monsters = {}
+    -- for _, monster in pairs(CollectionService:GetTagged("Monster")) do
+    --     if monster:IsDescendantOf(workspace) then
+    --         local primaryPart = monster.PrimaryPart
+    --         local pos = primaryPart.Position
 
-            local info = {}
-            info.name = monster.Name
-            info.position = {x = round(pos.X, .15), y = round(pos.Y, .15), z = round(pos.Z, .15)}
+    --         local info = {}
+    --         info.name = monster.Name
+    --         info.position = {x = round(pos.X, .15), y = round(pos.Y, .15), z = round(pos.Z, .15)}
 
-            for _, v in pairs(monster:GetChildren()) do
-                if v:IsA("ValueBase") then
-                    info[v.Name] = v.Value
-                end
-            end
+    --         for _, v in pairs(monster:GetChildren()) do
+    --             if v:IsA("ValueBase") then
+    --                 info[v.Name] = v.Value
+    --             end
+    --         end
 
-            table.insert(monsters, info)
-        end
-    end
-    ServerData:setValue("monsters", monsters)
+    --         table.insert(monsters, info)
+    --     end
+    -- end
+	-- ServerData:setValue("monsters", monsters)
+	local SaveableObjectManager = import "Server/Systems/SaveableObjectManager"
+	SaveableObjectManager.saveTag("Monster")
 end
 
 local function loadMonsters()
-    local ServerData = import "Server/Systems/ServerData"
-    local monsters = ServerData:getValue("monsters")
-    if monsters then
-        for _, monster in pairs(monsters) do
-            local model = game.ServerStorage.Monsters[monster.name]:Clone()
-            local pos = monster.position
-            local posCF = CFrame.new(Vector3.new(pos.x, pos.y, pos.z))
-			model:SetPrimaryPartCFrame(posCF)
+    -- local ServerData = import "Server/Systems/ServerData"
+    -- local monsters = ServerData:getValue("monsters")
+    -- if monsters then
+    --     for _, monster in pairs(monsters) do
+    --         local model = game.ServerStorage.Monsters[monster.name]:Clone()
+    --         local pos = monster.position
+    --         local posCF = CFrame.new(Vector3.new(pos.x, pos.y, pos.z))
+	-- 		model:SetPrimaryPartCFrame(posCF)
 
-			local ID = Instance.new("StringValue", model)
-			ID.Name = "ID"
-			ID.Value = monster.ID
+	-- 		local ID = Instance.new("StringValue", model)
+	-- 		ID.Name = "ID"
+	-- 		ID.Value = monster.ID
 
-            for propName, value in pairs(monster) do
-                if model:FindFirstChild(propName) then
-                    if model[propName]:IsA("ValueBase") then
-                        model[propName].Value = value
-                    end
-                end
-            end
+    --         for propName, value in pairs(monster) do
+    --             if model:FindFirstChild(propName) then
+    --                 if model[propName]:IsA("ValueBase") then
+    --                     model[propName].Value = value
+    --                 end
+    --             end
+    --         end
 
-			model.Parent = workspace
+	-- 		model.Parent = workspace
 
-			local component = getComponent(model).new()
-			component:init(model)
-        end
-    end
+	-- 		local component = getComponent(model).new()
+	-- 		component:init(model)
+    --     end
+	-- end
+	local SaveableObjectManager = import "Server/Systems/SaveableObjectManager"
+	SaveableObjectManager.loadTag("Monster")
 end
 
 local Monsters = {}
+
+function Monsters.createMonster(monsterName, pos, presumedId)
+	return spawnMonster(monsterName, pos, presumedId)
+end
 
 function Monsters:start()
 	RunService.Stepped:connect(function(dt)

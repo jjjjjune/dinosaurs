@@ -137,6 +137,18 @@ local function getAttachmentData(object)
 	return data
 end
 
+local function getMetadata(object)
+	local data = {}
+
+	for _, v in pairs(object:GetChildren()) do
+		if v:IsA("ValueBase") then
+			data[v.Name] = v.Value
+		end
+	end
+
+	return data
+end
+
 local function getObjectSaveData(tag, object)
 	local data = {}
 	if tag == "Item" then
@@ -145,8 +157,12 @@ local function getObjectSaveData(tag, object)
 	elseif tag == "Building" then
 		data = join(data, getPositionalAndRotationalData(tag, object))
 		data = join(data, getAttachmentData(object))
+		data = join(data, getMetadata(object))
 	elseif tag == "SaveableMapEntity" then
 		data = join(data, getPositionalAndRotationalData(tag, object))
+	elseif tag == "Monster" then
+		data = join(data, getPositionalAndRotationalData(tag, object))
+		data = join(data, getMetadata(object))
 	end
 	if object:FindFirstChild("ID") then
 		data.i = object.ID.Value
@@ -285,6 +301,8 @@ local function loadObject(tag, objectData)
 			Messages:send("WaitForEntityWithID", waitID, function(entity)
 				createBuildingWithAttachData(entity, objectData)
 			end)
+		elseif tag == "Monster" then
+
 		end
 	else
 		if tag == "Item" then
@@ -299,6 +317,9 @@ local function loadObject(tag, objectData)
 			local physicalBuilding = Buildings.createBuilding(objectData.n, Vector3.new(), objectData.i)
 			physicalBuilding:SetPrimaryPartCFrame(cf)
 			physicalBuilding.Parent = workspace.Buildings
+		elseif tag == "Monster" then
+			local Monsters = import "Server/Systems/Monsters"
+			Monsters.createMonster(objectData.n, cf.p, objectData.i)
 		end
 	end
 end

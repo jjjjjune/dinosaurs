@@ -2,7 +2,7 @@ local import = require(game.ReplicatedStorage.Shared.Import)
 
 local Messages = import "Shared/Utils/Messages"
 
-local MIN_FIND_DISTANCE = 12
+local MIN_FIND_DISTANCE = 20
 
 local CollectionService = game:GetService("CollectionService")
 

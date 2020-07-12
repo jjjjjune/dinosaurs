@@ -40,7 +40,7 @@ local function refreshTools()
 end
 
 local function onPlayerDataSet(data)
-    if not data.server or not data.server.storedTools then
+	if not data.server or not data.server.storedTools then
         return
     end
     for slot, toolData in pairs(data.server.storedTools) do

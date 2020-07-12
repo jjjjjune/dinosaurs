@@ -37,6 +37,7 @@ Messages:hook("PlayerDataSet", function(data)
 end)
 
 Messages:hook("UpdatePlayerServerData", function(playerServerData)
+	print("my local player data updated")
     _G.Data.server = playerServerData
     --[[print("server data is: ")
     for i, v in pairs(_G.Data.server) do
