@@ -16,12 +16,17 @@ local function storeTool(player, itemInstance, desiredSlotNumber)
                 break
             end
         end
-    end
+	end
+
+	if not slotData then
+		return
+	end
 
     local prevItem = slotData.item
     Messages:send("DestroyItem", itemInstance)
     itemInstance:Destroy()
-    if prevItem then
+	if prevItem then
+		print("we had prev item! force settine")
         local Items = import "Server/Systems/Items"
         local itemModel = Items.createItem(prevItem, Vector3.new(0,1000,0))
 		itemModel.Parent = workspace
@@ -40,7 +45,7 @@ local function equipStoredTool(player, slotName)
         return
     end
     foundStoredTool = storedTool.item
-    storedTool.item = nil
+    --storedTool.item = nil
     ServerData:setPlayerValue(player, "storedTools", storeData)
 
     local totalStoredTools = 0
@@ -48,7 +53,7 @@ local function equipStoredTool(player, slotName)
         if tool.name then
             totalStoredTools = totalStoredTools + 1
         end
-    end
+	end
 
     local foundStorableTool = false
     for _, possibleTool in pairs(player.Character:GetChildren()) do
@@ -64,7 +69,14 @@ local function equipStoredTool(player, slotName)
 		local itemModel = Items.createItem(foundStoredTool, Vector3.new(0,1000,0))
 		itemModel.Parent = workspace
         Messages:sendClient(player,"ForceSetItem", itemModel)
-    end
+	end
+
+	if foundStoredTool then
+		local Items = import "Server/Systems/Items"
+        local itemModel = Items.createItem(foundStoredTool, Vector3.new(0,1000,0))
+		itemModel.Parent = workspace
+		Messages:sendClient(player, "ForceSetItem", itemModel)
+	end
 end
 
 local ToolStorage = {}

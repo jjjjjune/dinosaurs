@@ -230,6 +230,17 @@ local function equipCarryItem(itemInstance)
     --end
 end
 
+local function canStore()
+	local available = 0
+	local currentInventory = _G.Data.server.storedTools
+	for _, data in pairs(currentInventory) do
+		if data.item == nil then
+			available = available + 1
+		end
+	end
+	return available > 0
+end
+
 local Items = {}
 
 function Items:start()
@@ -248,7 +259,13 @@ function Items:start()
     end)
     Messages:hook("OnStoreAction", function()
         if carryItemInstance and carryItemInstance.Parent ~= nil and not CollectionService:HasTag(carryItemInstance, "Building") then
-            unequipCarryItem("STORE BIND")
+			if not canStore() then
+				Messages:send("PlaySoundOnClient",{
+					instance = game.ReplicatedStorage.Sounds.NewUICancel,
+				})
+				return
+			end
+			unequipCarryItem("STORE BIND")
             Messages:send("StoreTool", carryItemInstance)
             bindCarry()
         end
