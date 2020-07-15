@@ -145,7 +145,7 @@ local function openCrafting(stationType, station)
 	end
 
 	Messages:send("PlaySoundOnClient",{
-		instance = game.ReplicatedStorage.Sounds.NewUiClickHigh,
+		instance = game.ReplicatedStorage.Sounds.NewUIClickHigh,
 	})
 end
 

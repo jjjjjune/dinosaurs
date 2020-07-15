@@ -45,15 +45,12 @@ function Rope.clientUse(item)
 					return
 				end
 				Messages:send("Notify", "THIRST_COLOR_DARK", "SNOWFLAKE", "SELECT A SECOND OBJECT.")
-				print("first")
 				Messages:send("PlaySoundOnClient", {
 					instance = game.ReplicatedStorage.Sounds.NewUIClickHigh
 				})
 				Rope.object1 = object
 				Rope.object1Pos =  pos - object.PrimaryPart.Position
 			end
-		else
-			print('has nothing', object.Name, hit)
 		end
 	end
 end

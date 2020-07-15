@@ -37,6 +37,9 @@ local loadOrder = {
 local ui = {
 	--"Client/Ui/TopbarPlus",
 	"Client/Ui/Button",
+	"Client/Ui/MultipleOption",
+	"Client/Ui/Checkbox",
+	"Client/Ui/Label",
 	"Client/Ui/Tooltips",
 	--"Client/Ui/SeasonBar",
 	"Client/Ui/RadialProgress",
@@ -46,7 +49,8 @@ local ui = {
 	"Client/Ui/SacrificeUi",
 	"Client/Ui/Crafting",
 	"Client/Ui/Notifications",
-	"Client/Ui/ItemPlacementHelper"
+	"Client/Ui/ItemPlacementHelper",
+	"Client/Ui/Permissions",
 }
 
 for _, path in ipairs(loadOrder) do

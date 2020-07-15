@@ -33,7 +33,7 @@ end
 local function registerButton(button, buttonBG, callback)
 	callbacks[button] = callback
 	backgrounds[button] = buttonBG
-    button.Activated:connect(function()
+	button.Activated:connect(function()
         pressButton(button)
     end)
 end
