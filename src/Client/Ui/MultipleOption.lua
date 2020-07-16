@@ -27,7 +27,7 @@ local function registerMultipleOption(optionFrame, providedOptions, callback, de
 			end
 		end
 	end
-	optionFrame.LabelFG.Left.Button.Activated:connect(function()
+	Messages:send("RegisterButton", optionFrame.LabelFG.Left.Button, nil, function()
 		local originalValue = indexes[optionFrame]
 		indexes[optionFrame] = indexes[optionFrame] - 1
 		if indexes[optionFrame] < 1 then
@@ -47,7 +47,7 @@ local function registerMultipleOption(optionFrame, providedOptions, callback, de
 			})
 		end
 	end)
-	optionFrame.LabelFG.Right.Button.Activated:connect(function()
+	Messages:send("RegisterButton", optionFrame.LabelFG.Right.Button, nil, function()
 		local originalValue = indexes[optionFrame]
 		indexes[optionFrame] = indexes[optionFrame] + 1
 		if indexes[optionFrame] > # options[optionFrame] then

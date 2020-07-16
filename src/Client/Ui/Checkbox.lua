@@ -3,7 +3,7 @@ local Messages = import "Shared/Utils/Messages"
 
 local RunService = game:GetService("RunService")
 
-local function registerCheckbox(checkboxFrame, callback)
+local function registerCheckbox(checkboxFrame, callback, desiredValue)
 	checkboxFrame.CheckboxFG.Button.Activated:connect(function()
 		checkboxFrame.CheckboxFG.Checkmark.Visible = not checkboxFrame.CheckboxFG.Checkmark.Visible
 		if checkboxFrame.CheckboxFG.Checkmark.Visible == true then
@@ -16,6 +16,9 @@ local function registerCheckbox(checkboxFrame, callback)
 				instance = game.ReplicatedStorage.Sounds.NewUIOut
 			})
 			callback(false)
+		end
+		if desiredValue then
+			checkboxFrame.CheckboxFG.Checkmark.Visible = desiredValue
 		end
 	end)
 end

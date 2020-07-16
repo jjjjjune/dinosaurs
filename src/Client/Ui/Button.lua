@@ -16,14 +16,18 @@ local function pressButton(button)
 		end
 	end
 
-	local buttonBG = backgrounds[button]
-
 	callbacks[button]()
 
-	local originalPosition = button.Position
-	button:TweenPosition(buttonBG.Position, "Out", "Quad", .1, true, function()
-		button:TweenPosition(originalPosition, "Out", "Quad", .15, true)
-	end)
+	local buttonBG = backgrounds[button]
+
+	if buttonBG then
+
+		local originalPosition = button.Position
+		button:TweenPosition(buttonBG.Position, "Out", "Quad", .1, true, function()
+			button:TweenPosition(originalPosition, "Out", "Quad", .15, true)
+		end)
+
+	end
 
 	Messages:send("PlaySoundOnClient",{
 		instance = game.ReplicatedStorage.Sounds.NewUIBonk

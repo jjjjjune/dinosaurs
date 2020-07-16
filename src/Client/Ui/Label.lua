@@ -3,7 +3,10 @@ local Messages = import "Shared/Utils/Messages"
 
 local RunService = game:GetService("RunService")
 
-local function registerLabel(labelFrame, callback)
+local function registerLabel(labelFrame, callback, desiredValue)
+	if desiredValue then
+		labelFrame.Text = tostring(desiredValue)
+	end
 	labelFrame.FocusLost:connect(function()
 		Messages:send("PlaySoundOnClient",{
 			instance = game.ReplicatedStorage.Sounds.NewUIClickHigh
