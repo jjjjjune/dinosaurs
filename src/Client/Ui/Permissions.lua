@@ -20,6 +20,7 @@ local section = "Players"
 local function setPermissionValue(rank, permission, value)
 	local rankPermissions = _G.replicatedServerData.permissions
 	rankPermissions[rank][permission] = value
+	Messages:sendServer("SetPermissionValue", rank, permission, value)
 end
 
 local function getRankIndex(rank)
@@ -33,15 +34,17 @@ local function getRankIndex(rank)
 	return index
 end
 
-local function canPromoteToRank(rank)
+local function canPromoteToRank(player, rank)
 	local rankPermissions = _G.replicatedServerData.permissions
 	local ranks = _G.replicatedServerData.ranks
 	local myRank = ranks[tostring(game.Players.LocalPlayer.UserId)] or PermissionsConstants.RANKS[1]
 	local myPermissions = rankPermissions[myRank]
+	local theirRank = ranks[tostring(player.UserId)] or PermissionsConstants.RANKS[1]
 	if myPermissions["can promote lower ranks"] then
 		local myRankIndex = getRankIndex(myRank)
-		local theirRankIndex = getRankIndex(rank)
-		if myRankIndex > theirRankIndex then
+		local newRankIndex = getRankIndex(rank)
+		local theirRankIndex = getRankIndex(theirRank)
+		if myRankIndex > newRankIndex and myRankIndex > theirRankIndex then
 			return true
 		end
 	end
@@ -51,6 +54,7 @@ end
 local function setPlayerRank(player, rank)
 	local ranks = _G.replicatedServerData.ranks
 	ranks[tostring(player.UserId)] = rank
+	Messages:sendServer("SetPlayerRank", player, rank)
 end
 
 local function destroyAllFrames()
@@ -97,11 +101,16 @@ local function openPlayersSection()
 			currentRank = ranks[tostring(player.UserId)]
 		end
 
+		if player == game.Players.LocalPlayer then
+			label.LayoutOrder = 0
+			label.TextBG.TextFG.ImageColor3 = Color3.fromRGB(136, 255, 204)
+		end
+
 		Messages:send("RegisterMultipleOption", label.OptionFrameBG, PermissionsConstants.RANKS, function(rank)
 			if player == game.Players.LocalPlayer then
 				return false
 			end
-			if canPromoteToRank(rank) then
+			if canPromoteToRank(player, rank) then
 				setPlayerRank(player, rank)
 				return true
 			else
@@ -338,12 +347,31 @@ local Permissions = {}
 
 function Permissions:start()
 	Messages:hook("OpenPermissions", openPermissions)
+
 	Messages:send("RegisterButton", PermissionsUi.CloseButton, PermissionsUi.CloseButtonShadow, closePermissions)
+
 	Messages:send("RegisterButton", PermissionsUi.PlayersButton, PermissionsUi.PlayersButtonBG, function()
 		openPermissions("Players")
 	end)
+
 	Messages:send("RegisterButton", PermissionsUi.SettingsButton, PermissionsUi.SettingsButtonBG, function()
 		openPermissions("Settings")
+	end)
+
+	Messages:hook("UpdateReplicatedServerData", function (key, value)
+		if key == "ranks" or key == "permissions" then
+			if PermissionsUi.Visible == true then
+				if section == "Players" then
+					if key == "ranks" then
+						openPlayersSection()
+					end
+				elseif section == "Settings" then
+					if key == "permissions" then
+						openSettingsSection()
+					end
+				end
+			end
+		end
 	end)
 
 	delay(3, function()

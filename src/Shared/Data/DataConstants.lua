@@ -37,7 +37,8 @@ Data.TEST_SERVER_DATA = {
 	seasonsSurvived = 1,
 	permissions = PermissionsConstants.DEFAULT_PERMISSIONS,
 	ranks = {
-		[8835343] = "Leader",
+		["8835343"] = "Leader",
+		["-1"] = "Leader",
 	}
 }
 

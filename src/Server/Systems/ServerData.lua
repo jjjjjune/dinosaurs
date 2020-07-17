@@ -18,7 +18,7 @@ local keysToReplicateToClients = {
 }
 
 local function getServerId()
-    return "TestServer128"
+    return "TestServer133"
 end
 
 local function copy(value)
@@ -77,7 +77,9 @@ end
 
 
 function ServerData:updated(key, value)
-
+	if keysToReplicateToClients[key] then
+		Messages:sendAllClients("UpdateReplicatedServerData", key, value)
+	end
 end
 
 function ServerData:updatedPlayers()

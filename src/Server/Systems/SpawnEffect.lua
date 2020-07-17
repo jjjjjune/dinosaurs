@@ -8,8 +8,6 @@ local totalTweenlength = 2
 local info = TweenInfo.new(totalTweenlength,Enum.EasingStyle.Quad,Enum.EasingDirection.Out)
 
 local function playRespawnEffect(player, character)
-    Messages:send("PlayParticleSystem", "Explosion", character.PrimaryPart)
-    Messages:send("PlaySound", "ExplosionRocket1", character.PrimaryPart)
     for _, part in pairs(character:GetDescendants()) do
         if part:IsA("BasePart") and part.Transparency ~= 1 then
             local faces = {

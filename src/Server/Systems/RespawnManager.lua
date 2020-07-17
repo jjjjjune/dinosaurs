@@ -72,7 +72,9 @@ function RespawnManager:start()
         local altar = workspace:FindFirstChild("Altar", true)
         character.PrimaryPart.RootPriority = 127
         wait()
-        character.PrimaryPart.CFrame = altar.PrimaryPart.CFrame * CFrame.new(0,4,6)
+		character.PrimaryPart.CFrame = altar.PrimaryPart.CFrame * CFrame.new(0,4,6)
+		Messages:send("PlayParticleSystem", "Explosion", character.PrimaryPart)
+		Messages:send("PlaySound", "ExplosionRocket1", character.PrimaryPart)
     end)
     Messages:hook("PlayerAdded", function(player)
         local Gamemode = import "Server/Systems/Gamemode"
