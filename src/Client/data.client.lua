@@ -23,9 +23,23 @@ local function getDefaultPlayerServerData()
     return defaultData
 end
 
+local function getDefaultServerData()
+	local defaultData = {}
+    for key, value in pairs(Constants.DEFAULT_SERVER_DATA) do
+        defaultData[key] = value
+	end
+	if game:GetService("RunService"):IsStudio() or game.PlaceId == 3725285976 or game.PlaceId == 3725292176 then
+		for key, value in pairs(Constants.TEST_SERVER_DATA) do
+			defaultData[key] = value
+		end
+	end
+    return defaultData
+end
+
 
 _G.Data = getDefaultData()
 _G.Data.server = getDefaultPlayerServerData()
+_G.replicatedServerData = getDefaultServerData()
 
 Messages:hook("PlayerDataSet", function(data)
     local serverData = {}
@@ -36,13 +50,13 @@ Messages:hook("PlayerDataSet", function(data)
     _G.Data.server = serverData
 end)
 
+Messages:hook("UpdateReplicatedServerData", function (key, value)
+	print("recieved some replicated server data", key, value)
+	_G.replicatedServerData[key] = value
+end)
+
 Messages:hook("UpdatePlayerServerData", function(playerServerData)
-	print("my local player data updated")
     _G.Data.server = playerServerData
-    --[[print("server data is: ")
-    for i, v in pairs(_G.Data.server) do
-        print(i,v)
-    end--]]
     Messages:send("PlayerDataSet", _G.Data)
 end)
 

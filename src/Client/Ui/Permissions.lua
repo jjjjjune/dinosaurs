@@ -5,29 +5,9 @@ local BoundMenu = import "Shared/Utils/BoundMenu"
 
 local ContextActionService = game:GetService("ContextActionService")
 
+local PermissionsConstants = import "Shared/Data/PermissionsConstants"
+
 local PermissionsUi = game.Players.LocalPlayer.PlayerGui:WaitForChild("Permissions"):WaitForChild("Background")
-
-local function newPermissions()
-	return {
-		["can make ropes"] = false,
-		["can delete ropes"] = false,
-		["can sacrifice items"] = false,
-		["can promote lower ranks"] = false,
-		["can kick lower ranks"] = false,
-		["can ban lower ranks"] = false,
-		["can ride other's animals"] = false,
-		["can chop down plants"] = false,
-		["achievement share"] = 1,
-	}
-end
-
-local rankPermissions = {
-	["Guest"] = newPermissions(),
-	["Citizen"] = newPermissions(),
-	["Noble"] = newPermissions(),
-	["Priest"] = newPermissions(),
-	["Leader"] = newPermissions(),
-}
 
 local permissionsBoundMenu
 local selectedButton
@@ -38,11 +18,39 @@ local selectedRank = "Guest"
 local section = "Players"
 
 local function setPermissionValue(rank, permission, value)
+	local rankPermissions = _G.replicatedServerData.permissions
 	rankPermissions[rank][permission] = value
 end
 
+local function getRankIndex(rank)
+	local index
+	for i, v in pairs(PermissionsConstants.RANKS) do
+		if v == rank then
+			index = i
+			break
+		end
+	end
+	return index
+end
+
+local function canPromoteToRank(rank)
+	local rankPermissions = _G.replicatedServerData.permissions
+	local ranks = _G.replicatedServerData.ranks
+	local myRank = ranks[tostring(game.Players.LocalPlayer.UserId)] or PermissionsConstants.RANKS[1]
+	local myPermissions = rankPermissions[myRank]
+	if myPermissions["can promote lower ranks"] then
+		local myRankIndex = getRankIndex(myRank)
+		local theirRankIndex = getRankIndex(rank)
+		if myRankIndex > theirRankIndex then
+			return true
+		end
+	end
+	return false
+end
+
 local function setPlayerRank(player, rank)
-	print(player, " rank set to ", rank)
+	local ranks = _G.replicatedServerData.ranks
+	ranks[tostring(player.UserId)] = rank
 end
 
 local function destroyAllFrames()
@@ -67,6 +75,8 @@ local function openPlayersSection()
 
 	local totalSizeY = 0
 
+	local ranks = _G.replicatedServerData.ranks
+
 	for _, player in pairs(game.Players:GetPlayers()) do
 
 		local label = PermissionsUi.ScrollFrameContainer.ScrollingFrame.LabelMultipleOptionFrame:Clone()
@@ -81,14 +91,23 @@ local function openPlayersSection()
 
 		totalSizeY = totalSizeY + label.AbsoluteSize.Y * 1.2
 
-		Messages:send("RegisterMultipleOption", label.OptionFrameBG, {"Guest", "Citizen", "Noble", "Priest", "Leader"}, function(rank)
-			if rank == "Leader" then
+		local currentRank = PermissionsConstants.RANKS[1]
+
+		if ranks[tostring(player.UserId)] then
+			currentRank = ranks[tostring(player.UserId)]
+		end
+
+		Messages:send("RegisterMultipleOption", label.OptionFrameBG, PermissionsConstants.RANKS, function(rank)
+			if player == game.Players.LocalPlayer then
 				return false
-			else
+			end
+			if canPromoteToRank(rank) then
 				setPlayerRank(player, rank)
 				return true
+			else
+				return false
 			end
-		end)
+		end, currentRank)
 	end
 	PermissionsUi.ScrollFrameContainer.ScrollingFrame.CanvasSize = UDim2.new(0,0,0,totalSizeY)
 
@@ -118,9 +137,21 @@ local function openSettingsSection()
 
 	local previousRankStuff = {}
 
+	local ranks = _G.replicatedServerData.ranks
+	local myRank = ranks[tostring(game.Players.LocalPlayer.UserId)] or PermissionsConstants.RANKS[1]
+
+	local readOnly = false
+
+	if myRank ~= PermissionsConstants.RANKS[#PermissionsConstants.RANKS] then
+		readOnly = true
+	end
+
 	local function displaySettings(rank)
 		local totalSizeY = rankChoice.AbsoluteSize.Y * 1.2
 		selectedRank = rank
+
+		local rankPermissions = _G.replicatedServerData.permissions
+
 		for permissionName, permissionValue in pairs(rankPermissions[selectedRank]) do
 			if type(permissionValue) == "boolean" then
 
@@ -137,7 +168,7 @@ local function openSettingsSection()
 
 				Messages:send("RegisterCheckbox", permissionFrame.CheckboxBG, function(value)
 					setPermissionValue(selectedRank, permissionName, value)
-				end, permissionValue)
+				end, permissionValue, readOnly)
 
 				table.insert(previousRankStuff, permissionFrame)
 
@@ -153,7 +184,7 @@ local function openSettingsSection()
 
 				Messages:send("RegisterLabel", permissionFrame.BoxBG.BoxFG.TextBox, function(value)
 					setPermissionValue(selectedRank, permissionName, tonumber(value))
-				end, permissionValue)
+				end, permissionValue, readOnly)
 
 				table.insert(previousRankStuff, permissionFrame)
 
@@ -169,8 +200,7 @@ local function openSettingsSection()
 
 	displaySettings(selectedRank)
 
-	Messages:send("RegisterMultipleOption", rankChoice.OptionFrameBG, {"Guest", "Citizen", "Noble", "Priest", "Leader"}, function(rank)
-		print("displaying for ", rank)
+	Messages:send("RegisterMultipleOption", rankChoice.OptionFrameBG, PermissionsConstants.RANKS, function(rank)
 		for i, v in pairs(previousRankStuff) do
 			v:Destroy()
 			previousRankStuff[i] = nil
@@ -209,18 +239,11 @@ end
 
 local function selectButton()
 	if selectedButton then
-		print("selected buttonm")
 		if selectedButton:IsA("ImageButton") or selectedButton:IsA("TextButton") then
-			print("sending to lress buton")
 			Messages:send("PressButton", selectedButton)
 		elseif selectedButton:IsA("TextBox") then
-			print("capture focus")
 			selectedButton:CaptureFocus()
-		else
-			print(selectedButton.ClassName)
 		end
-	else
-		print("no selected buttone")
 	end
 end
 
@@ -322,7 +345,8 @@ function Permissions:start()
 	Messages:send("RegisterButton", PermissionsUi.SettingsButton, PermissionsUi.SettingsButtonBG, function()
 		openPermissions("Settings")
 	end)
-	delay(5, function()
+
+	delay(3, function()
 		openPermissions("Players")
 	end)
 

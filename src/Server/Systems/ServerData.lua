@@ -12,8 +12,13 @@ local Immutable = import "Immutable"
 
 local IS_SAVING_IN_STUDIO = true
 
+local keysToReplicateToClients = {
+	["permissions"] = true,
+	["ranks"] = true,
+}
+
 local function getServerId()
-    return "TestServer127"
+    return "TestServer128"
 end
 
 local function copy(value)
@@ -54,7 +59,6 @@ end
 local ServerData = {}
 
 function ServerData:generateIdForInstanceOfType(instance, type)
-	print("generating ID For ", instance.Name)
 	if instance:FindFirstChild("ID") then
 		return
 	else
@@ -69,22 +73,31 @@ function ServerData:generateIdForInstanceOfType(instance, type)
 	valueString = valueString..n+1
 	self:setValue("ID"..type, n+1)
 	instance.ID.Value = valueString
-	print("the id we generated for ", instance.Name, " is ", valueString)
 end
 
 
-function ServerData:updated()
+function ServerData:updated(key, value)
 
 end
 
 function ServerData:updatedPlayers()
     for _, player in pairs(game.Players:GetPlayers()) do
-        Messages:sendClient(player, "UpdatePlayerServerData", self.cache.players[tostring(player.UserId)])
+		Messages:sendClient(player, "UpdatePlayerServerData", self.cache.players[tostring(player.UserId)])
+		for key, value in pairs(self.cache) do
+			if keysToReplicateToClients[key] then
+				Messages:sendClient(player, "UpdateReplicatedServerData", key, value)
+			end
+		end
     end
 end
 
 function ServerData:updatedPlayer(player)
 	Messages:sendClient(player, "UpdatePlayerServerData", self.cache.players[tostring(player.UserId)])
+	for key, value in pairs(self.cache) do
+		if keysToReplicateToClients[key] then
+			Messages:sendClient(player, "UpdateReplicatedServerData", key, value)
+		end
+	end
 end
 
 function ServerData:setPlayerValue(player, key, value)
@@ -98,7 +111,7 @@ end
 
 function ServerData:setValue(key, value)
     self.cache[key] = value
-    self:updated()
+    self:updated(key, value)
 end
 
 function ServerData:getValue(key, value)
@@ -126,17 +139,12 @@ function ServerData:start()
     game:BindToClose(function() self:saveCache() end)
     game:GetService("Players").PlayerAdded:connect(function(player)
 		if not self.cache.players[tostring(player.UserId)] then
-			print("the player has no player data in da cache")
             self.cache.players[tostring(player.UserId)] = getDefaultPlayerData()
 		end
 		self:updatedPlayer(player)
     end)
     for _, player in pairs(game.Players:GetPlayers()) do
 		if not self.cache.players[tostring(player.UserId)] then
-			for i, v in pairs(self.cache.players) do
-				print(i, type(i))
-				print(v, type(v))
-			end
             self.cache.players[tostring(player.UserId)] = getDefaultPlayerData()
 		end
 		self:updatedPlayer(player)

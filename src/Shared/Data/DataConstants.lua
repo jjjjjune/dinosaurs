@@ -1,3 +1,6 @@
+local import = require(game.ReplicatedStorage.Shared.Import)
+
+local PermissionsConstants = import "Shared/Data/PermissionsConstants"
 
 local Data = {}
 
@@ -12,7 +15,11 @@ Data.TEST_DATA = {
 Data.DEFAULT_SERVER_DATA = {
 	players = {},
 	rockSpawners = {},
-    seasonsSurvived = 1,
+	seasonsSurvived = 1,
+	permissions = PermissionsConstants.DEFAULT_PERMISSIONS,
+	ranks = {
+		[8835343] = "Leader",
+	}
 }
 
 Data.DEFAULT_SERVER_PLAYER_DATA = {
@@ -25,7 +32,13 @@ Data.DEFAULT_SERVER_PLAYER_DATA = {
 }
 
 Data.TEST_SERVER_DATA = {
-    players = {},
+	players = {},
+	rockSpawners = {},
+	seasonsSurvived = 1,
+	permissions = PermissionsConstants.DEFAULT_PERMISSIONS,
+	ranks = {
+		[8835343] = "Leader",
+	}
 }
 
 Data.TEST_SERVER_PLAYER_DATA = {
