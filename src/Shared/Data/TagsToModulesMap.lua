@@ -25,6 +25,7 @@ TagsToModulesMap.Items.Building = import "Shared/ItemModules/Building"
 TagsToModulesMap.Entities.FreshWater = import "Shared/EntityModules/FreshWater"
 TagsToModulesMap.Entities.Plant = import "Shared/EntityModules/Plant"
 TagsToModulesMap.Entities.Workbench = import "Shared/EntityModules/Workbench"
+TagsToModulesMap.Entities.PermissionsTablet = import "Shared/EntityModules/PermissionsTablet"
 
 -- monsters
 

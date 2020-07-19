@@ -45,6 +45,17 @@ end
 
 local Permissions = {}
 
+function Permissions:playerHasPermission(player, permissionName)
+	local permissions = ServerData:getValue("permissions")
+	local ranks = ServerData:getValue("ranks")
+	local myRank = ranks[tostring(player.UserId)] or PermissionsConstants.RANKS[1]
+	local myPermissions = permissions[myRank]
+	if myPermissions[permissionName] == true then
+		return true
+	end
+	return false
+end
+
 function Permissions:start()
 	Messages:hook("SetPlayerRank", setPlayerRank)
 	Messages:hook("SetPermissionValue", setPermissionValue)

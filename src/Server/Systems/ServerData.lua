@@ -10,7 +10,7 @@ local RunService = game:GetService("RunService")
 
 local Immutable = import "Immutable"
 
-local IS_SAVING_IN_STUDIO = true
+local IS_SAVING_IN_STUDIO = false
 
 local keysToReplicateToClients = {
 	["permissions"] = true,
@@ -18,7 +18,7 @@ local keysToReplicateToClients = {
 }
 
 local function getServerId()
-    return "TestServer133"
+    return "TestServer135"
 end
 
 local function copy(value)

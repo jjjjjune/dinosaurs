@@ -374,7 +374,7 @@ function Permissions:start()
 		end
 	end)
 
-	delay(3, function()
+	Messages:hook("OpenPermissions", function()
 		openPermissions("Players")
 	end)
 

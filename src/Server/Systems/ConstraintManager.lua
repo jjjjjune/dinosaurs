@@ -127,13 +127,19 @@ function ConstraintManager.removeAllRelevantConstraints(object)
 end
 
 function ConstraintManager.createRopeBetween(creator, object1, object1Pos, object2, object2Pos)
+	local Permissions = import "Server/Systems/Permissions"
+	if not Permissions:playerHasPermission(creator, "can make ropes") then
+		Messages:sendClient(creator, "Notify", "HUNGER_COLOR_DARK", "ANGRY", "YOUR RANK LACKS PERMISSIONS.")
+		return
+	end
+
 	if not (ConstraintManager.canBeRoped(object1) and ConstraintManager.canBeRoped(object2)) then
-		print("CAN NOT BE ROPED")
+
 		return
 	end
 
 	if object1:FindFirstChild("GameRope") then
-		print("OBJECTG 1 ALREADY HAS GAME ROPE")
+
 		return
 	end
 
@@ -193,6 +199,11 @@ end
 
 function ConstraintManager:start()
 	Messages:hook("RemoveRopesAttachedTo", function(player, object)
+		local Permissions = import "Server/Systems/Permissions"
+		if not Permissions:playerHasPermission(player, "can delete ropes") then
+			Messages:sendClient(player, "Notify", "HUNGER_COLOR_DARK", "ANGRY", "YOUR RANK LACKS PERMISSIONS.")
+			return
+		end
 		-- TODO: auth check
 		ConstraintManager.removeRopesAttachedTo(object)
 	end)
