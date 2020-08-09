@@ -18,7 +18,12 @@ function LizardAttackComponent:doDamage(target)
     else
         Damage(target, {damage = self.damage, type = self.damageType, serverApplication = true})
         --Messages:send("Knockback", target, self.model.PrimaryPart.CFrame.lookVector * 100)
-    end
+	end
+	print("doing damge')")
+	if self.damageType == "fire" then
+		print("set on fire")
+		Messages:send("SetOnFire", target, 5)
+	end
 end
 
 function LizardAttackComponent:canAttack(target)

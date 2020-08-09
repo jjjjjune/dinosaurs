@@ -15,6 +15,7 @@ local nextMonsterSpawnStep = tick() + monsterSpawnStep
 local activeMonsters = {
 	"Lizard",
 	"Alpaca",
+	"FireLizard",
 }
 
 local function getComponent(monster)

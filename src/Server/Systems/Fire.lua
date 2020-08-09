@@ -110,10 +110,11 @@ local function canSpreadTo(fromObject, toObject)
     end
     if CollectionService:HasTag(toObject, "Character") then
         if fromObject then
-            if not CollectionService:HasTag(fromObject, "Item") then -- no spreading from an item to a player
-                return true
+            if CollectionService:HasTag(fromObject, "Item") then -- no spreading from an item to a player
+                return false
             end
-        end
+		end
+		return true
     end
     if CollectionService:HasTag(toObject, "Organic") then
         return true

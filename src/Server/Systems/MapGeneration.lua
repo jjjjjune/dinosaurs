@@ -480,7 +480,7 @@ local function backUpMap(allTiles)
             x = tile.x,
             y = tile.y,
             z = tile.z,
-            biome = "Rainforest", -- (noise > .55 and  "Desert") or
+            biome = "Desert", -- (noise > .55 and  "Desert") or
 		}
         table.insert(map, tileData)
     end

@@ -4,6 +4,9 @@ local TweenService = game:GetService("TweenService")
 
 game.ReplicatedFirst:RemoveDefaultLoadingScreen()
 
+
+wait()
+
 game.StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, false)
 game.StarterGui:SetCore("TopbarEnabled", false)
 

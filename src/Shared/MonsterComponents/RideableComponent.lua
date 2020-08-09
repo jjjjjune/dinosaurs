@@ -9,6 +9,11 @@ local RideableComponent = {}
 RideableComponent.__index = RideableComponent
 
 function RideableComponent:canBeMounted(player)
+	local Permissions = import "Server/Systems/Permissions"
+	if player and not Permissions:playerHasPermission(player, "can ride other's animals") then
+		Messages:sendClient(player, "Notify", "HUNGER_COLOR_DARK", "ANGRY", "YOUR RANK LACKS PERMISSIONS.")
+		return
+	end
     if player.Character then
         if not self.rider then
             return true

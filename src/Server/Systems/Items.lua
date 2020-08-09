@@ -47,6 +47,14 @@ local function prepare(item)
 	end
 end
 
+local function tagOwner(item, player)
+	if not item:FindFirstChild("LastOwner") then
+		local lastOwner = Instance.new("IntValue", item)
+		lastOwner.Name = "LastOwner"
+	end
+	item.LastOwner.Value = player.UserId
+end
+
 local function attemptCarryItem(player, item)
     local character = player.Character
     if not character then
@@ -79,6 +87,8 @@ local function attemptCarryItem(player, item)
     if not alive then
         return
 	end
+
+	tagOwner(item, player)
 
 	local ConstraintManager = import "Server/Systems/ConstraintManager"
 	ConstraintManager.destroyAllWelds(item)

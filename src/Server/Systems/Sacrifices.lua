@@ -61,6 +61,13 @@ end
 
 local function onSacrificedItem(item, pit)
 
+	local owner = item:FindFirstChild("LastOwner") and game.Players:GetPlayerByUserId(item.LastOwner.Value)
+	local Permissions = import "Server/Systems/Permissions"
+	if owner and not Permissions:playerHasPermission(owner, "can sacrifice items") then
+		--Messages:sendClient(owner, "Notify", "HUNGER_COLOR_DARK", "ANGRY", "YOUR RANK IS NOT ALLOWED TO SACRIFICE.")
+		return
+	end
+
     local itemName = item.Name
     local sacrificePoints = getSacrificeValue(item)
 
@@ -83,7 +90,7 @@ local function onSacrificedItem(item, pit)
         end
     end
 
-    item:Destroy()
+    Messages:send("DestroyItem", item)
     current = math.min(goal, current + sacrificePoints)
 
     Messages:sendAllClients("UpdateSacrificePercent", current/goal)
