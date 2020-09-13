@@ -8,7 +8,7 @@ local biomeChecks = {
         return CollectionService:HasTag(hit, "Grass")
     end,
     ["Desert"] = function(hit)
-        return CollectionService:HasTag(hit, "Sand") or CollectionService:HasTag(hit, "Grass")
+        return CollectionService:HasTag(hit, "Sand") or CollectionService:HasTag(hit, "Grass") or CollectionService:HasTag(hit, "Canyon")
 	end,
 	["RainforestCave"] = function(hit)
 		return CollectionService:HasTag(hit, "CaveGrowable")

@@ -31,4 +31,9 @@ PlantDrops["Cactus"] = {
     {name = "Thornberry", min = 1, max = 3, chance = 25},
 }
 
+PlantDrops["Tall Tree Old"] = {
+    {name = "Cactus Seed",min = 1, max = 2, chance = 65},
+    {name = "Thornberry", min = 1, max = 3, chance = 25},
+}
+
 return PlantDrops

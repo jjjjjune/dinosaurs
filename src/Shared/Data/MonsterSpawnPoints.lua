@@ -5,10 +5,14 @@ return {
 	},
 	["FireLizard"] = {
         type = "Plant",
-        name = "Yucca",
+        name = "Cactus",
     },
     Alpaca = {
         type = "Plant",
         name = "Banana Tree",
+	},
+	DesertAlpaca = {
+        type = "Plant",
+        name = "Yucca",
     },
 }

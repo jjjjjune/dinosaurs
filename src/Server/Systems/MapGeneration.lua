@@ -328,40 +328,41 @@ local function run(tiles)
 end
 
 local function conditionsMet(tiles)
-	local totalCaveEntrances = 0
-	local caveEntranceTiles = {}
-	for x = 1, #tiles do
-		for y = 1, #tiles[x] do
-			for z = 1, #tiles[x][y] do
-				local tile = tiles[x][y][z]
-				if string.find(string.lower(tile.collapseResult), "caveintoslope") then
-					totalCaveEntrances = totalCaveEntrances + 1
-					table.insert(caveEntranceTiles, tile)
-				end
-			end
-		end
-	end
-	local checks = {
-		[0] = false,
-		[1] = false,
-		[2] = false,
-		[3] = false,
-		[4] = false,
-		[5] = false,
-		[6] = false,
-		[7] = false,
-	}
-	for level, _ in pairs(checks) do
-		for _, t in pairs(caveEntranceTiles) do
-			if t.y == level then
-				checks[level] = true
-				print("found cave at level: ", level)
-			end
-		end
-	end
-	print("total cave entrances: ", totalCaveEntrances)
+	-- local totalCaveEntrances = 0
+	-- local caveEntranceTiles = {}
+	-- for x = 1, #tiles do
+	-- 	for y = 1, #tiles[x] do
+	-- 		for z = 1, #tiles[x][y] do
+	-- 			local tile = tiles[x][y][z]
+	-- 			if string.find(string.lower(tile.collapseResult), "caveintoslope") then
+	-- 				totalCaveEntrances = totalCaveEntrances + 1
+	-- 				table.insert(caveEntranceTiles, tile)
+	-- 			end
+	-- 		end
+	-- 	end
+	-- end
+	-- local checks = {
+	-- 	[0] = false,
+	-- 	[1] = false,
+	-- 	[2] = false,
+	-- 	[3] = false,
+	-- 	[4] = false,
+	-- 	[5] = false,
+	-- 	[6] = false,
+	-- 	[7] = false,
+	-- }
+	-- for level, _ in pairs(checks) do
+	-- 	for _, t in pairs(caveEntranceTiles) do
+	-- 		if t.y == level then
+	-- 			checks[level] = true
+	-- 			print("found cave at level: ", level)
+	-- 		end
+	-- 	end
+	-- end
+	-- print("total cave entrances: ", totalCaveEntrances)
 
-	return totalCaveEntrances > 6 and checks[2] and checks[3] and checks[4] and checks[5]
+	-- return totalCaveEntrances > 6 and checks[2] and checks[3] and checks[4] and checks[5]
+	return true
 end
 
 local function getWfcGridOfSize(xsize, ysize, zsize)
