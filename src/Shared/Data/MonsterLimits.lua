@@ -1,11 +1,11 @@
 return {
     Lizard = function(survivedSeasons)
-        local min = 1
+        local min = 0
         local max = 6
         return math.max(min, math.min(max, math.floor(survivedSeasons/6)))
 	end,
 	["FireLizard"]= function(survivedSeasons)
-        local min = 1
+        local min = 0
         local max = 6
         return math.max(min, math.min(max, math.floor(survivedSeasons/6)))
     end,

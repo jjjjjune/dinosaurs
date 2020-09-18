@@ -18,23 +18,23 @@ local function getSwingAnimation()
     return swingAnims[swings%(#swingAnims) + 1]
 end
 
-local function getClosestRock(player)
-    local rocks = CollectionService:GetTagged("Rock")
+local function getClosestTree(player)
+    local trees = CollectionService:GetTagged("Plant")
     local closestDist = 10
-    local closestRock
-    for _, rock in pairs(rocks) do
-        local dist = (rock.PrimaryPart.Position - player.Character.HumanoidRootPart.Position).magnitude
+    local closestTree
+    for _, tree in pairs(trees) do
+        local dist = (tree.PrimaryPart.Position - player.Character.HumanoidRootPart.Position).magnitude
         if dist < closestDist then
             closestDist = dist
-            closestRock = rock
+            closestTree = tree
         end
     end
-    return closestRock
+    return closestTree
 end
 
-local function getHitPosition(player, rock)
+local function getHitPosition(player, tree)
     local start = player.Character.HumanoidRootPart.Position
-    local goal = rock.PrimaryPart.Position
+    local goal = tree.PrimaryPart.Position
     local hit, pos = CastRay(start, (goal - start).unit * 10)
     if hit then
         return pos
@@ -42,25 +42,25 @@ local function getHitPosition(player, rock)
     return goal
 end
 
-local function chopRock(item, rock)
-    local shouldDestroy = rock:FindFirstChild("Health") and rock.Health.Value == 1
-    local pos = getHitPosition(game.Players.LocalPlayer, rock)
+local function chopTree(player, item, tree)
+    local shouldDestroy = true
+    local pos = getHitPosition(game.Players.LocalPlayer, tree)
     if shouldDestroy then
         Messages:send("PlayParticle", "HitSparks", 40, pos)
         Messages:send("PlaySoundOnClient",{
             instance = game.ReplicatedStorage.Sounds.HitPan2,
             part = item.PrimaryPart,
         })
-        Messages:send("PlayDamageEffect", rock)
-        --rock.Parent = nil
+        Messages:send("PlayDamageEffect", tree)
+        --tree.Parent = nil
     else
         Messages:send("PlayParticle", "HitSparks", 10, pos)
         Messages:send("PlaySoundOnClient",{
             instance = game.ReplicatedStorage.Sounds.HitPan,
             part = item.PrimaryPart,
         })
-        Messages:send("PlayDamageEffect", rock)
-    end
+        Messages:send("PlayDamageEffect", tree)
+	end
 end
 
 local Tool = {}
@@ -81,14 +81,14 @@ function Tool.damageClient(victim, part)
 end
 
 function Tool.clientUse(item)
-    local rock = getClosestRock(game.Players.LocalPlayer)
+    local tree = getClosestTree(game.Players.LocalPlayer)
     delay(.3, function()
         Messages:send("PlaySoundOnClient",{
             instance = game.ReplicatedStorage.Sounds.Swing2,
             part = item.PrimaryPart
         })
-        if rock then
-            chopRock(item, rock)
+        if tree then
+            chopTree(item, tree)
         end
         Messages:send("RegisterHitbox", "Default", function(part)
             if CollectionService:HasTag(part.Parent, "Monster") then
@@ -102,31 +102,12 @@ end
 
 function Tool.serverUse(player, item)
     Messages:reproOnClients(player, "PlaySound", "Swing2", item.PrimaryPart.Position)
-	local rock = getClosestRock(player)
+	local tree = getClosestTree(player)
+	print("tree ig")
 	delay(.3, function()
-		if rock then
-			local pos = getHitPosition(player, rock)
-			local health = rock:FindFirstChild("Health")
-			if (not health) or (health and health.Value > 1) then
-				if not health then
-					print("no health therefore val is 5")
-				else
-					print("health and the value is ", health.Value)
-				end
-				Messages:reproOnClients(player, "HitSparks", 10, pos)
-				Messages:reproOnClients(player, "PlaySoundOnClient",{
-					instance = game.ReplicatedStorage.Sounds.HitPan,
-					part = item.PrimaryPart,
-				})
-			else
-				print("to us this is the last hit", health.Value)
-				Messages:reproOnClients(player, "PlayParticle", "HitSparks", 40, pos)
-				Messages:reproOnClients(player, "PlaySoundOnClient",{
-					instance = game.ReplicatedStorage.Sounds.HitPan2,
-					part = item.PrimaryPart,
-				})
-			end
-			Messages:send("DamageRock", player, rock, item)
+		if tree then
+			print("treeweee")
+			Messages:send("UseEntity", player, tree)
 		end
 	end)
 end
