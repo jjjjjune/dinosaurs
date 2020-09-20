@@ -1,41 +1,95 @@
 local import = require(game.ReplicatedStorage.Shared.Import)
+
+local CollectionService = game:GetService("CollectionService")
+
 local Messages = import "Shared/Utils/Messages"
 
 local MovementComponent = import "Shared/MonsterComponents/MovementComponent"
 local AnimationComponent = import "Shared/MonsterComponents/AnimationComponent"
 local IdleComponent = import "Shared/MonsterComponents/IdleComponent"
-local TargetComponent = import "Shared/MonsterComponents/TargetComponent"
-local LizardAttackComponent = import "Shared/MonsterComponents/LizardAttackComponent"
-local TouchComponent = import "Shared/MonsterComponents/TouchComponent"
+local TargetComponent = import "Shared/MonsterComponents/TurtleTargetComponent"
+local TouchComponent = import "Shared/MonsterComponents/TurtleTouchComponent"
 local RideableComponent = import "Shared/MonsterComponents/RideableComponent"
 local TameableComponent = import "Shared/MonsterComponents/TameableComponent"
 
-local Lizard = {}
+local RedTurtle = {}
 
-Lizard.__index = Lizard
+RedTurtle.__index = RedTurtle
 
-function Lizard:step()
+function RedTurtle:step()
 	if not self.model.PrimaryPart then
 		self.mainThread:disconnect()
 		self.model:Destroy()
 		return
 	end
-    if not self.attackComponent.attacking then
-        local target = self.targetComponent:getTarget()
+    local target = self.targetComponent:getTarget()
+    local closeEnemy = self.targetComponent:hasCloseEnemy()
+	if closeEnemy then -- if we have a close enemy, and do not have an item nearby
+		self.movementComponent:setStopped(true)
+		self.animationComponent:playTrack("Hide", 1, 1, 0.05)
+		self.animationComponent:playTrack("SpikesOut")
+		self.animationComponent:stopTrack("Idle")
+		self.touchComponent.damageOnTouch = true
+		self.movementComponent.lookAtGoal = closeEnemy.PrimaryPart.Position
+		CollectionService:AddTag(self.model, "Spiky")
+	else
+		self.movementComponent:setStopped(false)
+		self.animationComponent:stopTrack("Hide")
+		self.animationComponent:stopTrack("SpikesOut")
+		self.animationComponent:playTrack("SpikesIn")
+		self.animationComponent:playTrack("Idle")
+		self.touchComponent.damageOnTouch = false
         if target and target.PrimaryPart then
             self.movementComponent:setGoal(target.PrimaryPart.Position)
         else
             self.movementComponent:setGoal(self.idleComponent:getIdlePosition())
-        end
-    else
-        self.movementComponent:setGoal(nil)
-    end
+		end
+		CollectionService:RemoveTag(self.model, "Spiky")
+	end
+	if target and CollectionService:HasTag(target, "Item") then
+		local distance = self.targetComponent.state.distanceFromTarget
+		if distance < 8 then
+			self:eat(target)
+		else
+			self:stopEating()
+		end
+	else
+		self:stopEating()
+	end
 end
 
-function Lizard:init(model)
+function RedTurtle:eat(target)
+	if not self.eatBeginTime then
+		self.eatBeginTime = tick()
+	end
+	if self.lastFood ~= target then
+		self.lastFood = target
+		self.eatBeginTime = tick()
+		Messages:send("PlaySound", "Lick"..math.random(1,4).."", self.model.Head.Position)
+	end
+	self.animationComponent:playTrack("Eat")
+	if tick() - self.eatBeginTime > 4 then
+		if CollectionService:HasTag(target, "Plant") then
+			local cf = target.PrimaryPart.CFrame
+			Messages:send("ChopPlant", target)
+			local Plants = import "Server/Systems/Plants"
+			Plants.createPlant(target.Type.Value, cf.p, 1, false)
+		else
+			Messages:send("DestroyItem", target)
+		end
+		Messages:send("PlaySound", "Lick"..math.random(1,4).."", self.model.Head.Position)
+	end
+end
+
+function RedTurtle:stopEating()
+	self.eatBeginTime = tick()
+	self.animationComponent:stopTrack("Eat")
+end
+
+function RedTurtle:init(model)
     self.model = model
 
-    self.animationScaledWalkspeed = 22 -- this is about the speed at which the animation expects the lizzy to travel
+    self.animationScaledWalkspeed = 10 -- this is about the speed at which the animation expects the animal to travel
 
     self.idleComponent = IdleComponent.new()
     self.idleComponent:init(self.model)
@@ -45,48 +99,44 @@ function Lizard:init(model)
 
     self.animationComponent = AnimationComponent.new()
     self.animationComponent:init(self.model, {
-        Walking = "rbxassetid://5009072693",
-        Attack = "rbxassetid://5009197262",
-        ChargeAttack = "rbxassetid://5009187418",
-        Falling = "rbxassetid://5009163593",
-        Idle = "rbxassetid://5009118786",
+        Walking = "rbxassetid://5704116230",
+        Falling = "rbxassetid://5704119019",
+        Idle = "rbxassetid://5706614653",
         Speak = "rbxassetid://5037809602",
-        Dead = "rbxassetid://5079811280"
+		Dead = "rbxassetid://5706618821",
+		SpikesIn = "rbxassetid://5704133423",
+		SpikesOut = "rbxassetid://5704133131",
+		Hide = "rbxassetid://5704143833",
+		Eat = "rbxassetid://5711177087"
     })
 
     self.movementComponent = MovementComponent.new()
     self.movementComponent:init(self.model, {
         jumpDebounce = 2,
-        speed = 20,
-        closenessThreshold = 11,
+        speed = 10,
+        closenessThreshold = 5,
         jumpLength = .5,
         rideableComponent = self.rideableComponent,
         animationComponent = self.animationComponent,
-        jumpVelocity = 800000
+        jumpVelocity = 1050000
     })
 
     self.targetComponent = TargetComponent.new()
-    self.targetComponent.wantItem = "Banana"
-    self.targetComponent.wantedEnemyTags = {"Character", "Alpaca", "RedTurtle"}
+    self.targetComponent.fleeFromTags = {"Lizard", "Character"}
+	self.targetComponent.wantItem = "Thornberry"
+	self.targetComponent.wantPlant = "Yucca"
+    self.targetComponent.wantedEnemyTags = {}
     self.targetComponent:init(self.model, {
-        giveUpTargetTime = 10,
-    })
-
-    self.attackComponent = LizardAttackComponent.new()
-    self.attackComponent:init(self.model, {
-        animationComponent = self.animationComponent,
-        targetComponent = self.targetComponent,
-        attackDistance = 45,
-        damage = 15,
-        damageType = "poison",
-        reloadTime = 4,
-        chargeTime = 2,
-        spawnAttackDebounce = 4,
-        rideableComponent = self.rideableComponent,
+		giveUpTargetTime = 10,
+		rideableComponent = self.rideableComponent,
     })
 
     self.touchComponent = TouchComponent.new()
-    self.touchComponent:init(self.model)
+    self.touchComponent:init(self.model, {
+		shouldDamageOnTouch = true,
+		damageTypeOnTouch = "normal",
+		damageValueOnTouch = 15,
+	})
 
     self.tameableComponent = TameableComponent.new()
     self.tameableComponent:init(self.model)
@@ -98,12 +148,9 @@ function Lizard:init(model)
     }
 
     self.hitNoises = {
-        "Hiss1",
-        "Hiss2",
-        "Hiss3",
-        "Hiss4",
-        "Hiss5",
-        "Hiss6"
+        "RedTurtle1",
+        "RedTurtle2",
+        "RedTurtle3",
     }
 
     self.lastHealth = self.model.Health.Value
@@ -118,20 +165,16 @@ function Lizard:init(model)
 
         if self.model.Health.Value <= 0 then
             self:die()
-        else
-            self.attackComponent:onDamaged()
         end
 
     end)
 
     self.mainThread = game:GetService("RunService").Stepped:connect(function(t, dt)
-
 		self:step(dt)
 
-		self.movementComponent:step(dt)
+        self.movementComponent:step(dt)
         self.targetComponent:step(dt)
         self.idleComponent:step(dt)
-        self.attackComponent:step(dt)
         self.touchComponent:step(dt)
         self.rideableComponent:step(dt)
 
@@ -149,7 +192,7 @@ function Lizard:init(model)
     self.model.PrimaryPart:SetNetworkOwner()
 end
 
-function Lizard:makeDropItems()
+function RedTurtle:makeDropItems()
     local Items = import "Server/Systems/Items"
 
     local dropTable = self.drops
@@ -185,7 +228,7 @@ function Lizard:makeDropItems()
     end
 end
 
-function Lizard:die()
+function RedTurtle:die()
 
     self.mainThread:disconnect()
 
@@ -193,31 +236,30 @@ function Lizard:die()
 
     if not self.isDead then
         self.isDead = true
-        self.model.Torso.TextureID = "rbxassetid://5079825969"
         self.animationComponent:stopTrack("Idle")
         self.animationComponent:playTrack("Dead")
-        self.model.Head.RotVelocity = Vector3.new(math.random(), math.random(), math.random())*10
-        self.model.HumanoidRootPart.BodyGyro:Destroy()
-        self.model.HumanoidRootPart.BodyVelocity:Destroy()
-		self.model.Torso.CanCollide = true
-
-		for _, v in pairs(self.model:GetChildren()) do
+        self.model.Head.RotVelocity = Vector3.new(math.random(), math.random(), math.random())*1
+        for _, v in pairs(self.model:GetChildren()) do
             if v:IsA("BasePart") then
 				v.Massless = false
 				v.CustomPhysicalProperties = PhysicalProperties.new(Enum.Material.Metal)
             end
         end
-    else
+        self.model.HumanoidRootPart.BodyGyro:Destroy()
+        self.model.HumanoidRootPart.BodyVelocity:Destroy()
+		self.model.Torso.CanCollide = true
+		self.model.Collider.CanCollide = false
+	else
 		local ConstraintManager = import "Server/Systems/ConstraintManager"
 		ConstraintManager.removeAllRelevantConstraints(self.model)
-		self:makeDropItems()
+        self:makeDropItems()
         self.model:Destroy()
     end
 end
 
-function Lizard.new()
+function RedTurtle.new()
     local class = {}
-    return setmetatable(class, Lizard)
+    return setmetatable(class, RedTurtle)
 end
 
-return Lizard
+return RedTurtle

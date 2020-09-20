@@ -14,7 +14,7 @@ function Knockback:start()
 		knockbackStart = tick()
 		knockbackVelocity = velocity
 	end)
-	game:GetService("RunService").Stepped:connect(function(dt)
+	game:GetService("RunService").Heartbeat:connect(function(dt)
 		local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
 		if hrp then
 			if tick() - knockbackStart < knockbackLength then

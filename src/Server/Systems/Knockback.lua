@@ -20,7 +20,7 @@ function Knockback:start()
 			}
 		end
 	end)
-	game:GetService("RunService").Stepped:connect(function()
+	game:GetService("RunService").Heartbeat:connect(function()
 		for character, characterInfo in pairs(knockbackedCharacters) do
 			if time() - characterInfo.start < characterInfo.length then
 				local root = character:FindFirstChild("HumanoidRootPart")

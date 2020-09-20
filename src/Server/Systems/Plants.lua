@@ -55,7 +55,7 @@ local function setPhase(plantModel, phaseNumber)
     phase.Name = "Phase"
     phase.Value = phaseNumber
 	CollectionService:AddTag(newModel, "Plant")
-	newModel.Parent = workspace
+	newModel.Parent = workspace.Plants
     return newModel
 end
 
@@ -101,7 +101,7 @@ local function createPlant(plantName, posOrCF, phase, isUserPlanted)
     else
         plantModel:SetPrimaryPartCFrame(CFrame.new(posOrCF) * CFrame.new(0, plantModel.PrimaryPart.Size.Y/2, 0) * ang)
     end
-    plantModel.Parent = workspace
+    plantModel.Parent = workspace.Plants
     plantModel = setPhase(plantModel, phase)
     if isUserPlanted then
         plantModel.UserPlanted.Value = true
@@ -116,7 +116,7 @@ local function loadSavedPlants()
     end
     for _, plant in pairs(plants) do
         local plantModel = game.ServerStorage.PlantPhases[plant.type][plant.phase]:Clone()
-        plantModel.Parent = workspace
+        plantModel.Parent = workspace.Plants
         local pos = plant.position
         local orientation = plant.orientation
         local rotCF = CFrame.fromOrientation(orientation.x, orientation.y, orientation.z)

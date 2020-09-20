@@ -28,10 +28,20 @@ function MovementComponent:stop()
     self.moveToGoal = nil
 end
 
+function MovementComponent:setStopped(isStopped)
+	self.stopOverride = isStopped
+end
+
 function MovementComponent:jump()
+
+	if self.stopOverride then
+		return
+	end
+
     if not self.jumpEnd then
         self.jumpEnd = tick()
-    end
+	end
+
     if tick() > self.nextJump then
         Messages:send("PlaySound", "AnimalJump", self.model.PrimaryPart.Position)
         Messages:send("PlayParticle", "JumpParticle", 10, self.model.PrimaryPart.Position)
@@ -45,7 +55,7 @@ function MovementComponent:goToGoal(dt)
         self.lastGoal = self.goal
         self.stuckTime = 0
     end
-    if self.stuckTime > .5 then
+	if self.stuckTime > .5 then
         self:jump()
         self:walkToGoal()
     else
@@ -56,7 +66,7 @@ end
 
 function MovementComponent:evaluateStuckness(dt)
     if self.walking then
-        if (self.model.PrimaryPart.Velocity*Vector3.new(1,0,1)).magnitude < 10 then
+        if (self.model.PrimaryPart.Velocity*Vector3.new(1,0,1)).magnitude < self.speed*.5 then
             self.stuckTime = self.stuckTime + dt
         else
             self.stuckTime = 0
@@ -82,10 +92,14 @@ function MovementComponent:move(hit)
         self.model.HumanoidRootPart.BodyVelocity.Velocity = self.model.HumanoidRootPart.CFrame.lookVector * self.speed
         if self.jumping and hit then
             self.model.HumanoidRootPart.BodyVelocity.Velocity = self.model.HumanoidRootPart.BodyVelocity.Velocity + Vector3.new(0,2000,0)
-        end
+		end
+		self.model.HumanoidRootPart.BodyVelocity.Velocity = self.model.HumanoidRootPart.BodyVelocity.Velocity
     else
         self.model.HumanoidRootPart.BodyVelocity.Velocity = Vector3.new()
-    end
+	end
+	if self.stopOverride then
+		self.model.HumanoidRootPart.BodyVelocity.Velocity = Vector3.new()
+	end
 end
 
 function MovementComponent:checkIfShouldBeMoving(dt)
@@ -142,7 +156,11 @@ function MovementComponent:handleJumpForces()
         self.animationComponent:playTrack("Falling")
     else
         self.animationComponent:stopTrack("Falling")
-    end
+	end
+
+	if self.stopOverride then
+		self.maxYVelocity = 0
+	end
 
     self.model.HumanoidRootPart.BodyVelocity.MaxForce = Vector3.new(1000000,self.maxYVelocity or 0,1000000)
 end
@@ -165,6 +183,10 @@ function MovementComponent:step(dt)
     end
 end
 
+function MovementComponent:setSpeedMultiplier(n)
+	self.speedMultiplier = n
+end
+
 function MovementComponent:init(model, movementProperties)
     self.model = model
     self.speed = movementProperties.speed
@@ -173,7 +195,9 @@ function MovementComponent:init(model, movementProperties)
     self.jumpLength = movementProperties.jumpLength
     self.rideableComponent = movementProperties.rideableComponent
     self.animationComponent = movementProperties.animationComponent
-    self.jumpVelocity = movementProperties.jumpVelocity
+	self.jumpVelocity = movementProperties.jumpVelocity
+
+	self.speedMultiplier = 1
 
     local speedValue = Instance.new("IntValue", model)
     speedValue.Name = "Speed"

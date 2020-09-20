@@ -4,9 +4,9 @@ local AnimationComponent = {}
 
 AnimationComponent.__index = AnimationComponent
 
-function AnimationComponent:playTrack(trackName, speed, weight)
+function AnimationComponent:playTrack(trackName, speed, weight, fadeTime)
     if not self.tracks[trackName].IsPlaying then
-        self.tracks[trackName]:Play(.25)
+        self.tracks[trackName]:Play(fadeTime or .25)
     end
     if speed then
         self.tracks[trackName]:AdjustSpeed(speed)

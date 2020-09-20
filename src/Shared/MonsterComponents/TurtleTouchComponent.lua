@@ -4,6 +4,8 @@ local CollectionService = game:GetService("CollectionService")
 
 local Messages = import "Shared/Utils/Messages"
 
+local Damage = import "Shared/Utils/Damage"
+
 local HIT_DEBOUNCE = .75
 
 local TouchComponent = {}
@@ -20,6 +22,20 @@ function TouchComponent:onHitSpikyThing(part)
 
 end
 
+function TouchComponent:passiveDamage(victim)
+	if self.shouldDamageOnTouch then
+		if not self.nextCanTouchDamage[victim] then
+			self.nextCanTouchDamage[victim] = 0
+		end
+		if tick() > self.nextCanTouchDamage[victim] then
+			local dir = CFrame.new(victim.PrimaryPart.Position, self.model.PrimaryPart.Position).lookVector
+			Messages:send("Knockback", victim, dir*-100, .3)
+			Damage(victim, {damage = self.damageValueOnTouch, type = self.damageTypeOnTouch, serverApplication = true})
+			self.nextCanTouchDamage[victim] = tick() + 1
+		end
+	end
+end
+
 function TouchComponent:onHitboxContact(part)
     if CollectionService:HasTag(part.Parent, "Spiky") then
         if tick() - self.lastContact > HIT_DEBOUNCE then
@@ -29,15 +45,27 @@ function TouchComponent:onHitboxContact(part)
     end
     if CollectionService:HasTag(part.Parent, "FreshWater") then
         Messages:send("ReportCollision", self.model, part.Parent)
-    end
+	end
+
+	-- if self.shouldDamageOnTouch then
+	-- 	if CollectionService:HasTag(part.Parent, "Monster") or CollectionService:HasTag(part.Parent, "Character") then
+	-- 		if self.model.Name ~= part.Parent.Name then
+	-- 			self:passiveDamage(part.Parent)
+	-- 		end
+	-- 	end
+	-- end
 end
 
-function TouchComponent:init(model)
+function TouchComponent:init(model, props)
     self.model = model
-    self.lastContact = tick()
+	self.lastContact = tick()
+	self.nextCanTouchDamage = {}
     model.Hitbox.Touched:connect(function(hit)
         self:onHitboxContact(hit)
-    end)
+	end)
+	self.shouldDamageOnTouch = props.shouldDamageOnTouch
+	self.damageTypeOnTouch = props.damageTypeOnTouch
+	self.damageValueOnTouch = props.damageValueOnTouch
 end
 
 function TouchComponent:step(dt)

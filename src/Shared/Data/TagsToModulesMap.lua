@@ -33,5 +33,6 @@ TagsToModulesMap.Entities.PermissionsTablet = import "Shared/EntityModules/Permi
 TagsToModulesMap.Monsters.Lizard = import "Shared/MonsterModules/Lizard"
 TagsToModulesMap.Monsters.FireLizard = import "Shared/MonsterModules/FireLizard"
 TagsToModulesMap.Monsters.Alpaca = import "Shared/MonsterModules/Alpaca"
+TagsToModulesMap.Monsters.RedTurtle = import "Shared/MonsterModules/RedTurtle"
 
 return TagsToModulesMap
