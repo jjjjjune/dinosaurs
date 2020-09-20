@@ -92,7 +92,7 @@ end
 
 local function checkDespawn()
     for item, t in pairs(lastInteractedOrInStorageTimer) do
-        if item.Parent ~= nil then
+        if item.Parent ~= nil and (item.PrimaryPart) then
             if tick() - t > ITEM_DESPAWN_TIME and (not CollectionService:HasTag(item, "Building")) then
                 if item:IsDescendantOf(workspace) then
                     item:Destroy()
@@ -100,8 +100,8 @@ local function checkDespawn()
                     lastInteractedOrInStorageTimer[item] = tick()
                 end
                 lastInteractedOrInStorageTimer[item] = nil
-            else
-                checkMoved(item)
+			else
+				checkMoved(item)
             end
         else
             lastInteractedOrInStorageTimer[item] = nil
