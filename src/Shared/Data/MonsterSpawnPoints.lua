@@ -3,6 +3,10 @@ return {
         type = "Plant",
         name = "Thorn Vine",
 	},
+	["RedTurtle"] = {
+        type = "Plant",
+        name = "Cactus",
+	},
 	["FireLizard"] = {
         type = "Plant",
         name = "Cactus",

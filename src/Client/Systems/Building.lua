@@ -8,6 +8,8 @@ local RunService = game:GetService("RunService")
 
 local placementModel
 
+local rotAngle = 0
+
 local function setCharTransparency()
     local character = GetCharacter()
     for _, v in pairs(character:GetDescendants()) do
@@ -72,7 +74,7 @@ function Building.step()
             placementModel.Parent = character
             local dir = CFrame.new(Vector3.new(), normal)
             dir = dir - dir.p
-            placementModel:SetPrimaryPartCFrame(CFrame.new(pos) * dir * CFrame.Angles(-math.pi/2,0,0) * CFrame.new(0, placementModel.PrimaryPart.Size.Y/2, 0) )
+            placementModel:SetPrimaryPartCFrame(CFrame.new(pos) * dir * CFrame.Angles(-math.pi/2,0,0) * CFrame.new(0, placementModel.PrimaryPart.Size.Y/2, 0) * CFrame.Angles(0, math.rad(rotAngle), 0) )
             Building.placementCF = placementModel.PrimaryPart.CFrame
             Building.placementTarget = hit
        --[[works else
@@ -90,7 +92,15 @@ function Building.step()
     end
 end
 
+local function rotateBuilding()
+	rotAngle = rotAngle + 45
+end
+
 function Building:start()
+	Messages:hook("SetVelocityToZero", function(v)
+		v.Velocity = Vector3.new()
+	end)
+	Messages:hook("RotateBuilding", rotateBuilding)
     Messages:hook("StartBuilding", startBuilding)
     Messages:hook("EndBuilding", endBuilding)
     RunService.RenderStepped:connect(self.step)

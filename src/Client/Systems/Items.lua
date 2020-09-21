@@ -105,8 +105,7 @@ local function getPlaceableSurface(item)
 	end
 end
 
-local function attemptThrowItem() -- the fact that this is for both normal items and buildings
-    -- is one of the most unfortunate aspects of this code base so far
+local function attemptThrowItem()
     local character = GetCharacter()
     for _, possibleItem in pairs(character:GetChildren()) do
 		if CollectionService:HasTag(possibleItem, "Item") or CollectionService:HasTag(possibleItem, "Building") then
@@ -118,10 +117,10 @@ local function attemptThrowItem() -- the fact that this is for both normal items
             item.ServerWeld:Destroy()
 			item.Parent = workspace
 
-            if not CollectionService:HasTag(item, "Building") then
+			if not CollectionService:HasTag(item, "Building") then
                 item.PrimaryPart.CFrame = character.HumanoidRootPart.CFrame * CFrame.new(0,0,-4)
 				item.PrimaryPart:GetRootPart().Velocity = velocity * 1.5
-            else
+			else
                 for _, v in pairs(item:GetDescendants()) do
                     if v:IsA("BasePart") then
 						v.Velocity = Vector3.new()

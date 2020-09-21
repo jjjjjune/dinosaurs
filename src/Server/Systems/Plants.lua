@@ -1,10 +1,13 @@
 local import = require(game.ReplicatedStorage.Shared.Import)
 local Messages = import "Shared/Utils/Messages"
-local SeasonsData = import "Shared/Data/SeasonsData"
+
 local CollectionService = game:GetService("CollectionService")
 local TweenService = game:GetService("TweenService")
+
 local PlantPhases = import "ServerStorage/PlantPhases"
 local ServerData = import "Server/Systems/ServerData"
+local PlantDrops = import "Shared/Data/PlantDrops"
+local SeasonsData = import "Shared/Data/SeasonsData"
 
 local lastSeason = 1
 
@@ -74,7 +77,7 @@ end
 
 local function growPlant(plantModel)
     local currentPhase = ((tonumber(plantModel.Name) ~= 0) and tonumber(plantModel.Name)) or 1
-    local maxPhase = getMaxPhase(plantModel.Type.Value)
+    local maxPhase = plantModel.MaxPhase.Value
     if currentPhase < maxPhase then
         setPhase(plantModel, math.min(maxPhase, currentPhase+1))
         if currentPhase+1 == maxPhase then
@@ -171,6 +174,10 @@ local function preparePlants()
 			local altName = Instance.new("StringValue", phaseModel)
 			altName.Name = "AlternateName"
 			altName.Value = plantFolder.Name
+
+			local maxPhase = Instance.new("IntValue", phaseModel)
+			maxPhase.Name = "MaxPhase"
+			maxPhase.Value = getMaxPhase(phaseModel.Type.Value)
         end
     end
     for _, plant in pairs(CollectionService:GetTagged("Plant")) do
@@ -181,7 +188,64 @@ local function preparePlants()
     end
 end
 
+local function chop(entity)
+	entity.Parent = nil
+    local Items = import "Server/Systems/Items"
+    local pos = entity.PrimaryPart.Position
+    local dropTable = PlantDrops[entity.Type.Value]
+    local itemsToMake = {}
+    for i, itemTable in pairs(dropTable) do
+        if itemTable.min > 0 then
+            for i = 1, itemTable.min do
+                table.insert(itemsToMake, itemTable.name)
+            end
+        end
+        local remaining = math.random(0, itemTable.max - itemTable.min)
+        if remaining > 0 then
+            for i = 1, remaining do
+                local n = random(1, 100)
+                if n < itemTable.chance then
+                    table.insert(itemsToMake, itemTable.name)
+                end
+            end
+        end
+    end
+    for _, itemName in pairs(itemsToMake) do
+        local newPos = pos + Vector3.new(random(-5,5), 0, random(-5,5))
+		local item = Items.createItem(itemName, newPos)
+		item.Parent = workspace
+        Messages:send("PlayParticle", "DeathSmoke",  20, newPos)
+    end
+end
+
+local lastChops = {}
+
+local function chopTree(player, tree)
+	if not lastChops[player] then
+		lastChops[player] = 0
+	end
+	if tick() - lastChops[player] < .2 then
+		return
+	end
+	local foundAxe = false
+	for _, v in pairs(player.Character:GetChildren()) do
+		if string.find(v.Name, "Axe") then
+			foundAxe = true
+		end
+	end
+	if not foundAxe then
+		return
+	end
+	if (player.Character.PrimaryPart.Position - tree.PrimaryPart.Position).magnitude < 20 then
+		chop(tree)
+	end
+end
+
 local Plants = {}
+
+function Plants.chopPlant(plant, player)
+	chop(plant)
+end
 
 function Plants.createPlant(plantName, posOrCF, phase, isUserPlanted)
     return createPlant(plantName, posOrCF, phase, isUserPlanted)
@@ -194,7 +258,8 @@ function Plants:start()
 	end)
 	Messages:hook("DestroyPlant", destroyPlant)
     CollectionService:GetInstanceAddedSignal("Grass"):connect(colorGrass)
-    loadSavedPlants()
+	loadSavedPlants()
+	Messages:hook("ChopTree", chopTree)
     Messages:hook("GrowAllPlants", growAllPlants)
     Messages:hook("CreatePlant", createPlant)
     spawn(function()

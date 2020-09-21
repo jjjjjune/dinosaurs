@@ -24,13 +24,13 @@ function RedTurtle:step()
 	end
     local target = self.targetComponent:getTarget()
     local closeEnemy = self.targetComponent:hasCloseEnemy()
-	if closeEnemy then -- if we have a close enemy, and do not have an item nearby
+	if closeEnemy and not target then -- if we have a close enemy, and do not have an item nearby
 		self.movementComponent:setStopped(true)
 		self.animationComponent:playTrack("Hide", 1, 1, 0.05)
 		self.animationComponent:playTrack("SpikesOut")
 		self.animationComponent:stopTrack("Idle")
 		self.touchComponent.damageOnTouch = true
-		self.movementComponent.lookAtGoal = closeEnemy.PrimaryPart.Position
+		self.movementComponent:setLookAtGoal(closeEnemy.PrimaryPart.Position)
 		CollectionService:AddTag(self.model, "Spiky")
 	else
 		self.movementComponent:setStopped(false)
@@ -46,9 +46,9 @@ function RedTurtle:step()
 		end
 		CollectionService:RemoveTag(self.model, "Spiky")
 	end
-	if target and CollectionService:HasTag(target, "Item") then
+	if target and (CollectionService:HasTag(target, "Item") or CollectionService:HasTag(target, "Plant")) then
 		local distance = self.targetComponent.state.distanceFromTarget
-		if distance < 8 then
+		if distance < 12 then
 			self:eat(target)
 		else
 			self:stopEating()
@@ -59,6 +59,9 @@ function RedTurtle:step()
 end
 
 function RedTurtle:eat(target)
+	if target.Parent == nil then
+		return
+	end
 	if not self.eatBeginTime then
 		self.eatBeginTime = tick()
 	end
@@ -71,8 +74,8 @@ function RedTurtle:eat(target)
 	if tick() - self.eatBeginTime > 4 then
 		if CollectionService:HasTag(target, "Plant") then
 			local cf = target.PrimaryPart.CFrame
-			Messages:send("ChopPlant", target)
 			local Plants = import "Server/Systems/Plants"
+			Plants.chopPlant(target)
 			Plants.createPlant(target.Type.Value, cf.p, 1, false)
 		else
 			Messages:send("DestroyItem", target)
@@ -123,8 +126,8 @@ function RedTurtle:init(model)
 
     self.targetComponent = TargetComponent.new()
     self.targetComponent.fleeFromTags = {"Lizard", "Character"}
-	self.targetComponent.wantItem = "Thornberry"
-	self.targetComponent.wantPlant = "Yucca"
+	self.targetComponent.wantItem = "None"
+	self.targetComponent.wantPlant = "Cactus"
     self.targetComponent.wantedEnemyTags = {}
     self.targetComponent:init(self.model, {
 		giveUpTargetTime = 10,

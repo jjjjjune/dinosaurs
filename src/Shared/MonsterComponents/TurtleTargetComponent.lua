@@ -29,8 +29,8 @@ local function getClosestItemOfName(position, name)
     return closestItem
 end
 
-local function getClosestEnemyOfSet(position, set)
-    local closestDistance = MIN_FIND_DISTANCE
+local function getClosestOfSet(position, set, dist)
+    local closestDistance = dist or MIN_FIND_DISTANCE
     local closestItem
     for _, character in pairs(set) do
         local isValid do
@@ -96,15 +96,16 @@ function TargetComponent:hasCloseEnemy()
 			end
 		end
 	end
-	local targetToFleeFrom = getClosestEnemyOfSet(self.position, fleeFrom)
+	local targetToFleeFrom = getClosestOfSet(self.position, fleeFrom)
 	return targetToFleeFrom
 end
 
-function TargetComponent:getCanSeePosition(position)
+function TargetComponent:getCanSeePosition(position, item)
     if tick() > self.nextSightCheck then
         self.nextSightCheck = tick() + .5
-        local hit, pos = CastRay(self.position, (position - self.position).unit * 200, {self.model})
-        return hit and hit:IsDescendantOf(self.state.lastValidTarget)
+		local hit, pos = CastRay(self.position, (position - self.position).unit * 300, {self.model})
+		local conditions = hit and hit:IsDescendantOf(item or self.state.lastValidTarget)
+        return conditions and hit
     else
         return self.state.isTargetVisible
     end
@@ -126,7 +127,7 @@ function TargetComponent:getValidEnemy()
                 end
             end
         end
-        return getClosestEnemyOfSet(self.position, allEnemies)
+        return getClosestOfSet(self.position, allEnemies)
     end
 end
 
@@ -145,7 +146,7 @@ function TargetComponent:getFleeing(forceRecalc)
                 end
             end
         end
-        local targetToFleeFrom = getClosestEnemyOfSet(self.position, fleeFrom)
+        local targetToFleeFrom = getClosestOfSet(self.position, fleeFrom)
         if targetToFleeFrom and self:getCanSeePosition(targetToFleeFrom.PrimaryPart.Position) then
             self.lastFleeTargetReset = self.lastFleeTargetReset or 0
             if tick() - self.lastFleeTargetReset > 5 then
@@ -170,21 +171,37 @@ function TargetComponent:getFleePosition()
 end
 
 function TargetComponent:step(dt)
-    self.position = (self.model.PrimaryPart and self.model.PrimaryPart.Position) or Vector3.new()
+	self.position = (self.model.PrimaryPart and self.model.PrimaryPart.Position) or Vector3.new()
+	if self.wantPlant then
+		local plants = CollectionService:GetTagged("Plant")
+		local validPlants = {}
+		for _, v in pairs(plants) do
+			if v:FindFirstChild("Type") and v.Type.Value == self.wantPlant and tonumber(v.Name) == v.MaxPhase.Value then
+				if not v:IsDescendantOf(game.ServerStorage.PlantPhases) then
+					table.insert(validPlants, v)
+				end
+			end
+		end
+		local plant = getClosestOfSet(self.position, validPlants, MIN_ITEM_FIND_DISTANCE)
+		if plant and self:getCanSeePosition(plant.PrimaryPart.Position, plant) then
+			self.state.cantSeeTargetCounter = nil
+			self.state.lastValidTarget = plant
+		end
+	end
     local wantedItem = self.wantItem
     local item do
 		item = getClosestItemOfName(self.position, wantedItem)
 		if not item then
-			print("no item finding person")
 			item = self:getValidEnemy()
-		else
-			print("item ios: ", item)
 		end
     end
-    if item and self:getCanSeePosition(item.PrimaryPart.Position) then
+    local canSeeItem = item and self:getCanSeePosition(item.PrimaryPart.Position, item)
+	if item and canSeeItem then
         self.state.cantSeeTargetCounter = nil
         self.state.lastValidTarget = item
-    end
+    else
+        print("item is" , item, canSeeItem)
+	end
     if self.state.lastValidTarget and self.state.lastValidTarget.PrimaryPart and self.state.lastValidTarget.Parent ~= nil then
         self.state.lastValidTargetPosition = self.state.lastValidTarget.PrimaryPart.Position
         self.state.distanceFromTarget = (self.state.lastValidTargetPosition - self.position).magnitude

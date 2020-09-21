@@ -164,7 +164,7 @@ function TargetComponent:step(dt)
     if item and self:getCanSeePosition(item.PrimaryPart.Position) then
         self.state.cantSeeTargetCounter = nil
         self.state.lastValidTarget = item
-    end
+	end
     if self.state.lastValidTarget and self.state.lastValidTarget.PrimaryPart and self.state.lastValidTarget.Parent ~= nil then
         self.state.lastValidTargetPosition = self.state.lastValidTarget.PrimaryPart.Position
         self.state.distanceFromTarget = (self.state.lastValidTargetPosition - self.position).magnitude

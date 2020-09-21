@@ -10,6 +10,11 @@ Recipes.Workbench = {
         product = "Pickaxe",
         ingredient = "Log",
         default = true,
+	},
+	{
+        product = "Axe",
+        ingredient = "Iron Bar",
+        default = true,
     },
     {
         product = "Iron Pickaxe",
@@ -53,6 +58,18 @@ Recipes.Workbench = {
     {
         product = "Cistern",
         ingredient = "Clay Brick",
+        default = true,
+        building = true,
+	},
+	{
+        product = "Wood Wall",
+        ingredient = "Log",
+        default = true,
+        building = true,
+	},
+	{
+        product = "Stone Wall",
+        ingredient = "Stone",
         default = true,
         building = true,
 	},

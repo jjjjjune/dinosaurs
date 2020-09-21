@@ -4,6 +4,7 @@ local Messages = import "Shared/Utils/Messages"
 local Item = {}
 
 function Item.clientUse(item)
+	Messages:send("RotateBuilding")
 end
 
 function Item.serverUse(player, item)

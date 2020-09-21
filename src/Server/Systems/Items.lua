@@ -156,13 +156,14 @@ local function throw(player, item, desiredCF, target)
 	end)
 
     if CollectionService:HasTag(item, "Building") and not CollectionService:HasTag(item, "Unanchored") then
-        if not welded then
+		if not welded then
             for _, v in pairs(item:GetDescendants()) do
                 if v:IsA("BasePart") then
 					v.Anchored = true
 					v.CanCollide = true
 					v.Velocity = Vector3.new()
 					v.RotVelocity = Vector3.new()
+					Messages:sendAllClients("SetVelocityToZero", v)
                 end
             end
         end

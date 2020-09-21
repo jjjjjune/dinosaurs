@@ -4,7 +4,8 @@ local Messages = import "Shared/Utils/Messages"
 local CollectionService = game:GetService("CollectionService")
 
 local tagsToEffectsMap = {
-    Rock = import "Shared/Effects/RockEffect",
+	Rock = import "Shared/Effects/RockEffect",
+	Plant = import "Shared/Effects/PlantEffect",
     Character = import "Shared/Effects/CharacterDamageEffect",
     Monster = import "Shared/Effects/MonsterDamageEffect"
 }

@@ -43,7 +43,7 @@ local function getHitPosition(player, tree)
 end
 
 local function chopTree(player, item, tree)
-    local shouldDestroy = true
+    local shouldDestroy = math.random(1, 5) == 1
     local pos = getHitPosition(game.Players.LocalPlayer, tree)
     if shouldDestroy then
         Messages:send("PlayParticle", "HitSparks", 40, pos)
@@ -52,7 +52,8 @@ local function chopTree(player, item, tree)
             part = item.PrimaryPart,
         })
         Messages:send("PlayDamageEffect", tree)
-        --tree.Parent = nil
+		--tree.Parent = nil
+		Messages:sendServer("ChopTree", tree)
     else
         Messages:send("PlayParticle", "HitSparks", 10, pos)
         Messages:send("PlaySoundOnClient",{
@@ -88,7 +89,7 @@ function Tool.clientUse(item)
             part = item.PrimaryPart
         })
         if tree then
-            chopTree(item, tree)
+            chopTree(game.Players.LocalPlayer, item, tree)
         end
         Messages:send("RegisterHitbox", "Default", function(part)
             if CollectionService:HasTag(part.Parent, "Monster") then
@@ -102,14 +103,6 @@ end
 
 function Tool.serverUse(player, item)
     Messages:reproOnClients(player, "PlaySound", "Swing2", item.PrimaryPart.Position)
-	local tree = getClosestTree(player)
-	print("tree ig")
-	delay(.3, function()
-		if tree then
-			print("treeweee")
-			Messages:send("UseEntity", player, tree)
-		end
-	end)
 end
 
 function Tool.clientEquip(item)

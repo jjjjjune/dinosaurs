@@ -45,7 +45,7 @@ local function equipStoredTool(player, slotName)
         return
     end
     foundStoredTool = storedTool.item
-    --storedTool.item = nil
+    storedTool.item = nil
     ServerData:setPlayerValue(player, "storedTools", storeData)
 
     local totalStoredTools = 0

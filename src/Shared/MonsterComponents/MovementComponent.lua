@@ -7,128 +7,130 @@ local MovementComponent = {}
 
 MovementComponent.__index = MovementComponent
 
-
-function MovementComponent:getDistanceToGoal()
-    local f = Vector3.new(1,1,1)
-    return (self.model.Head.Position*f - self.goal*f).magnitude
-end
-
 function MovementComponent:setGoal(goal)
-    self.goal = goal
-end
-
-function MovementComponent:walkToGoal()
-    self.walking = true
-    self.lookAtGoal = (self.goal)
-    self.moveToGoal = (self.goal)
-end
-
-function MovementComponent:stop()
-    self.walking = false
-    self.moveToGoal = nil
+    self._goal = goal
 end
 
 function MovementComponent:setStopped(isStopped)
-	self.stopOverride = isStopped
+	self._stopOverride = isStopped
 end
 
-function MovementComponent:jump()
+function MovementComponent:setLookAtGoal(goal)
+	self._lookAtGoal = goal
+end
 
-	if self.stopOverride then
+function MovementComponent:_walkToGoal()
+    self._walking = true
+    self._lookAtGoal = (self._goal)
+    self._moveToGoal = (self._goal)
+end
+
+function MovementComponent:_getDistanceToGoal()
+    local f = Vector3.new(1,1,1)
+    return (self.model.Head.Position*f - self._goal*f).magnitude
+end
+
+function MovementComponent:_stop()
+    self._walking = false
+    self._moveToGoal = nil
+end
+
+function MovementComponent:_jump()
+	if self._stopOverride then
 		return
 	end
 
-    if not self.jumpEnd then
-        self.jumpEnd = tick()
+    if not self._jumpEnd then
+        self._jumpEnd = tick()
 	end
 
-    if tick() > self.nextJump then
+    if tick() > self._nextJump then
         Messages:send("PlaySound", "AnimalJump", self.model.PrimaryPart.Position)
         Messages:send("PlayParticle", "JumpParticle", 10, self.model.PrimaryPart.Position)
-        self.jumpEnd = tick() + self.jumpLength
-        self.nextJump = tick() + self.jumpDebounce
+        self._jumpEnd = tick() + self._jumpLength
+        self._nextJump = tick() + self._jumpDebounce
     end
 end
 
-function MovementComponent:goToGoal(dt)
-    if not self.lastGoal then
-        self.lastGoal = self.goal
-        self.stuckTime = 0
+function MovementComponent:_goToGoal(dt)
+    if not self._lastGoal then
+        self._lastGoal = self._goal
+        self._stuckTime = 0
     end
-	if self.stuckTime > .5 then
-        self:jump()
-        self:walkToGoal()
+	if self._stuckTime > .5 then
+        self:_jump()
+        self:_walkToGoal()
     else
-        self:walkToGoal()
+        self:_walkToGoal()
     end
-    self:evaluateStuckness(dt)
+    self:_evaluateStuckness(dt)
 end
 
-function MovementComponent:evaluateStuckness(dt)
-    if self.walking then
-        if (self.model.PrimaryPart.Velocity*Vector3.new(1,0,1)).magnitude < self.speed*.5 then
-            self.stuckTime = self.stuckTime + dt
+function MovementComponent:_evaluateStuckness(dt)
+    if self._walking then
+        if (self.model.PrimaryPart.Velocity*Vector3.new(1,0,1)).magnitude < self._speed*.5 then
+            self._stuckTime = self._stuckTime + dt
         else
-            self.stuckTime = 0
+            self._stuckTime = 0
         end
     else
-        self.stuckTime = 0
+        self._stuckTime = 0
     end
 end
 
-function MovementComponent:floorRay(dt)
+function MovementComponent:_floorRay(dt)
     local start = self.model.HumanoidRootPart.Position + (self.model.HumanoidRootPart.Velocity*dt)
     local hit, pos, normal = CastRay(start, Vector3.new(0,-8,0), {self.model})
 
     if hit then
-        self.lastNormal = normal
+        self._lastNormal = normal
     end
 
     return hit
 end
 
-function MovementComponent:move(hit)
-    if self.moveToGoal then
-        self.model.HumanoidRootPart.BodyVelocity.Velocity = self.model.HumanoidRootPart.CFrame.lookVector * self.speed
-        if self.jumping and hit then
+function MovementComponent:_move(hit)
+    if self._moveToGoal then
+        self.model.HumanoidRootPart.BodyVelocity.Velocity = self.model.HumanoidRootPart.CFrame.lookVector * self._speed
+        if self._jumping and hit then
             self.model.HumanoidRootPart.BodyVelocity.Velocity = self.model.HumanoidRootPart.BodyVelocity.Velocity + Vector3.new(0,2000,0)
 		end
 		self.model.HumanoidRootPart.BodyVelocity.Velocity = self.model.HumanoidRootPart.BodyVelocity.Velocity
     else
         self.model.HumanoidRootPart.BodyVelocity.Velocity = Vector3.new()
 	end
-	if self.stopOverride then
+	if self._stopOverride then
 		self.model.HumanoidRootPart.BodyVelocity.Velocity = Vector3.new()
 	end
 end
 
-function MovementComponent:checkIfShouldBeMoving(dt)
-    if self.goal then
-        local distance = self:getDistanceToGoal()
-        if distance > self.closenessThreshold then
-            self:goToGoal(dt)
+function MovementComponent:_checkIfShouldBeMoving(dt)
+    if self._goal then
+        local distance = self:_getDistanceToGoal()
+        if distance > self._closenessThreshold then
+            self:_goToGoal(dt)
         else
-            self:stop()
-            self.stuckTime = 0
+            self:_stop()
+            self._stuckTime = 0
         end
     else
-        self:stop()
+        self:_stop()
     end
 end
 
-function MovementComponent:alignToNormal()
+function MovementComponent:_alignToNormal()
     local goalGyroCF =  self.model.HumanoidRootPart.BodyGyro.CFrame
 
-    if self.lookAtGoal then
-        goalGyroCF = CFrame.new(self.model.HumanoidRootPart.Position*Vector3.new(1,0,1), self.lookAtGoal*Vector3.new(1,0,1))
+    if self._lookAtGoal then
+        goalGyroCF = CFrame.new(self.model.HumanoidRootPart.Position*Vector3.new(1,0,1), self._lookAtGoal*Vector3.new(1,0,1))
     end
 
-    if self.lastNormal and self.lookAtGoal then
+    if self._lastNormal and self._lookAtGoal then
 
-        local goalOffset = (self.lookAtGoal*Vector3.new(1,0,1)) - (self.model.HumanoidRootPart.Position*Vector3.new(1,0,1))
+        local goalOffset = (self._lookAtGoal*Vector3.new(1,0,1)) - (self.model.HumanoidRootPart.Position*Vector3.new(1,0,1))
         local yGoal = math.atan2(goalOffset.Z, -goalOffset.X) + math.pi / 2
 
-        local normal = self.lastNormal
+        local normal = self._lastNormal
         local lookVector = Vector3.new(0, 0, -1)
         local rightVector = Vector3.new(1, 0, 0)
 
@@ -137,67 +139,55 @@ function MovementComponent:alignToNormal()
         local floorCF = CFrame.Angles(-tilt, 0, -roll)
 
         goalGyroCF = CFrame.new(self.model.HumanoidRootPart.Position) * floorCF * CFrame.Angles(0, yGoal, 0)
-
     end
 
     self.model.HumanoidRootPart.BodyGyro.CFrame = goalGyroCF
 end
 
-function MovementComponent:handleJumpForces()
-    if self.jumpEnd and tick() < self.jumpEnd then
-        self.maxYVelocity = self.jumpVelocity
-        self.jumping = true
+function MovementComponent:_handleJumpForces()
+    if self._jumpEnd and tick() < self._jumpEnd then
+        self._maxYVelocity = self._jumpVelocity
+        self._jumping = true
     else
-        self.jumping = false
-        self.maxYVelocity = 0
+        self._jumping = false
+        self._maxYVelocity = 0
     end
 
-    if self.jumping then
-        self.animationComponent:playTrack("Falling")
+    if self._jumping then
+        self._animationComponent:playTrack("Falling")
     else
-        self.animationComponent:stopTrack("Falling")
+        self._animationComponent:stopTrack("Falling")
 	end
 
-	if self.stopOverride then
-		self.maxYVelocity = 0
+	if self._stopOverride then
+		self._maxYVelocity = 0
 	end
 
-    self.model.HumanoidRootPart.BodyVelocity.MaxForce = Vector3.new(1000000,self.maxYVelocity or 0,1000000)
+    self.model.HumanoidRootPart.BodyVelocity.MaxForce = Vector3.new(1000000,self._maxYVelocity or 0,1000000)
 end
 
 function MovementComponent:step(dt)
-    if self.rideableComponent:isMounted() then
+    if self._rideableComponent:isMounted() then
 
     else
+        local hit = self:_floorRay(dt)
 
-        local hit = self:floorRay(dt)
-
-        self:alignToNormal()
-
-        self:handleJumpForces()
-
-        self:move(hit)
-
-        self:checkIfShouldBeMoving(dt)
-
+        self:_alignToNormal()
+        self:_handleJumpForces()
+        self:_move(hit)
+        self:_checkIfShouldBeMoving(dt)
     end
-end
-
-function MovementComponent:setSpeedMultiplier(n)
-	self.speedMultiplier = n
 end
 
 function MovementComponent:init(model, movementProperties)
     self.model = model
-    self.speed = movementProperties.speed
-    self.jumpDebounce = movementProperties.jumpDebounce
-    self.closenessThreshold = movementProperties.closenessThreshold
-    self.jumpLength = movementProperties.jumpLength
-    self.rideableComponent = movementProperties.rideableComponent
-    self.animationComponent = movementProperties.animationComponent
-	self.jumpVelocity = movementProperties.jumpVelocity
-
-	self.speedMultiplier = 1
+    self._speed = movementProperties.speed
+    self._jumpDebounce = movementProperties.jumpDebounce
+    self._closenessThreshold = movementProperties.closenessThreshold
+    self._jumpLength = movementProperties.jumpLength
+    self._rideableComponent = movementProperties.rideableComponent
+    self._animationComponent = movementProperties.animationComponent
+	self._jumpVelocity = movementProperties.jumpVelocity
 
     local speedValue = Instance.new("IntValue", model)
     speedValue.Name = "Speed"
@@ -206,9 +196,8 @@ end
 
 function MovementComponent.new()
     local class = {}
-    class.stuckTime = 0
-    class.nextJump = 0
-    class.computingPath = false
+    class._stuckTime = 0
+    class._nextJump = 0
     return setmetatable(class, MovementComponent)
 end
 
