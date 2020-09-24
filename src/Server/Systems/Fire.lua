@@ -9,9 +9,9 @@ local FastSpawn = import "Shared/Utils/FastSpawn"
 local CollectionService = game:GetService("CollectionService")
 local RunService = game:GetService("RunService")
 
-local BURN_TIME_TO_DESTROY_OBJECT = 2
+local BURN_TIME_TO_DESTROY_OBJECT = 4
 
-local PLAYER_BURN_DAMAGE = 20
+local PLAYER_BURN_DAMAGE = 15
 
 local PLAYER_BURN_DEBOUNCE = 5
 
@@ -20,13 +20,16 @@ local burningObjects = {}
 local lastPlayerDamages = {}
 
 local lastPartColors = {}
+local lastPartMaterials = {}
 local lastPartTextures = {}
 
 local function setFireSkin(object)
     for _, part in pairs(object:GetDescendants()) do
         if part:IsA("BasePart") then
-            lastPartColors[part] = part.Color
-            part.Color = Color3.fromRGB(255,50,20)
+			lastPartColors[part] = part.Color
+			lastPartMaterials[part] = part.Material
+			part.Material = Enum.Material.SmoothPlastic
+            part.Color = Color3.fromRGB(241, 104, 25)
         end
         if part:IsA("MeshPart") then
             lastPartTextures[part] = part.TextureID
@@ -38,7 +41,8 @@ end
 local function unsetFireSkin(object)
     for _, part in pairs(object:GetDescendants()) do
         if part:IsA("BasePart") then
-            part.Color = lastPartColors[part]
+			part.Color = lastPartColors[part]
+			part.Material = lastPartMaterials[part]
         end
         if part:IsA("MeshPart") then
             part.TextureID = lastPartTextures[part]
@@ -110,11 +114,14 @@ local function canSpreadTo(fromObject, toObject)
     end
     if CollectionService:HasTag(toObject, "Character") then
         if fromObject then
-            if CollectionService:HasTag(fromObject, "Item") then -- no spreading from an item to a player
+            if CollectionService:HasTag(fromObject, "Item") then
                 return false
             end
 		end
 		return true
+	end
+	if CollectionService:HasTag(toObject, "Monster") then
+        return true
     end
     if CollectionService:HasTag(toObject, "Organic") then
         return true

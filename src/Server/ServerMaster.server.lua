@@ -50,6 +50,7 @@ local loadOrder = {
 	"Server/Systems/Combat",
 	"Server/Systems/ConstraintManager",
 	"Server/Systems/Permissions",
+	"Server/Systems/Gates",
 }
 
 for _, path in ipairs(loadOrder) do

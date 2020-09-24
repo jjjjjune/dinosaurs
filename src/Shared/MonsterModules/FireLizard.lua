@@ -76,8 +76,8 @@ function Lizard:init(model)
     self.attackComponent:init(self.model, {
         animationComponent = self.animationComponent,
         targetComponent = self.targetComponent,
-        attackDistance = 45,
-        damage = 15,
+        attackDistance = 25,
+        damage = 4,
         damageType = "fire",
         reloadTime = 4,
         chargeTime = 2,
@@ -94,7 +94,7 @@ function Lizard:init(model)
     self.drops = {
 		{name = "Skull", min = 1, max = 2, chance = 45},
 		{name = "Bone", min = 1, max = 2, chance = 45},
-		{name = "Raw Meat", min = 1, max = 2, chance = 35},
+		{name = "Cooked Meat", min = 1, max = 2, chance = 35},
     }
 
     self.hitNoises = {

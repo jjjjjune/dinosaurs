@@ -16,8 +16,6 @@
 
 --]]
 
-
-
 local CameraShakeInstance = require(script.Parent.CameraShakeInstance)
 
 local CameraShakePresets = {
@@ -31,7 +29,6 @@ local CameraShakePresets = {
 		c.RotationInfluence = Vector3.new(1, 1, 1)
 		return c
 	end;
-
 
 	-- An intense and rough shake.
 	-- Should happen once.
@@ -107,6 +104,15 @@ local CameraShakePresets = {
 		return c
 	end;
 
+
+	-- A slightly rough, medium magnitude shake.
+	-- Sustained.
+	Gate = function()
+		local c = CameraShakeInstance.new(4, 7, 1.5, 1.5)
+		c.PositionInfluence = Vector3.new(0, 1, 0)
+		c.RotationInfluence = Vector3.new(1, 1, 1)
+		return c
+	end;
 
 }
 

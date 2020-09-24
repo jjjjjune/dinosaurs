@@ -125,7 +125,7 @@ function RedTurtle:init(model)
     })
 
     self.targetComponent = TargetComponent.new()
-    self.targetComponent.fleeFromTags = {"Lizard", "Character"}
+    self.targetComponent.fleeFromTags = {"Lizard", "Character", "FireLizard"}
 	self.targetComponent.wantItem = "None"
 	self.targetComponent.wantPlant = "Cactus"
     self.targetComponent.wantedEnemyTags = {}

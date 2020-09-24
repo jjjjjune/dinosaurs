@@ -16,6 +16,8 @@ local activeMonsters = {
 	"Lizard",
 	"Alpaca",
 	"FireLizard",
+	"DesertAlpaca",
+	"RedTurtle",
 }
 
 local function getComponent(monster)

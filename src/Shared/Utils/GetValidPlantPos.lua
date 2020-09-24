@@ -35,16 +35,16 @@ end
 local grassesCache = {}
 
 local function getValidSurfacesFor(tile, biome)
-	if grassesCache[tile] and grassesCache[tile][biome] then
-		local grasses = {}
-		for grass, _ in pairs(grassesCache[tile][biome]) do
-			table.insert(grasses, grass)
-		end
-		return grasses
-	end
+	-- if grassesCache[tile] and grassesCache[tile][biome] then
+	-- 	local grasses = {}
+	-- 	for grass, _ in pairs(grassesCache[tile][biome]) do
+	-- 		table.insert(grasses, grass)
+	-- 	end
+	-- 	return grasses
+	-- end
 	local grasses = {}
 	for _, v in pairs(tile:GetDescendants()) do
-		if v:IsA("BasePart") and biomeChecks[biome](v) then
+		if v:IsA("BasePart") and biomeChecks[biome](v) and (v.Position.Y) > workspace.Effects.Water.Position.Y then
 			if not grassesCache[tile] then
 				grassesCache[tile] = {}
 			end

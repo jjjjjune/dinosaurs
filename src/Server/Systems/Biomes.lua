@@ -137,7 +137,7 @@ local function performBiomeCheck(isFirstTime)
     for biome, _ in pairs(allBiomes) do
         local allBiomeTiles = {}
         for i, tileFolder in pairs(workspace.Tiles:GetChildren()) do
-            for _, tile in pairs(tileFolder:GetChildren()) do
+			for _, tile in pairs(tileFolder:GetChildren()) do
                 if getBiome(tile) == biome then
                     table.insert(allBiomeTiles, tile)
                 end
