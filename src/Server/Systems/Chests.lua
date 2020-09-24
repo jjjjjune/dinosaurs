@@ -7,6 +7,56 @@ local CollectionService = game:GetService("CollectionService")
 
 local ChestDrops = import "Server/Data/ChestDrops"
 
+local originalTransparencies = {}
+local originalColors = {}
+local originalMaterials = {}
+
+local function setUnusable(chest)
+	for _, v in pairs(chest:GetChildren()) do
+		if v:IsA("BasePart") then
+			if not originalTransparencies[v] then
+				originalTransparencies[v] = v.Transparency
+			end
+			if not originalColors[v] then
+				originalColors[v] = v.Color
+			end
+			if not originalMaterials[v] then
+				originalMaterials[v] = v.Material
+			end
+			if v.Transparency ~= 1 then
+				v.Transparency = 0
+			end
+			if v.Name ~= "Lock" then
+				v.Material = Enum.Material.Glass
+				v.Color = Color3.fromRGB(38, 0, 255)
+			end
+			v.CanCollide = false
+		end
+	end
+end
+
+local function setUsable(chest)
+	for _, v in pairs(chest:GetChildren()) do
+		if v:IsA("BasePart") then
+			if not originalTransparencies[v] then
+				originalTransparencies[v] = v.Transparency
+			end
+			if not originalColors[v] then
+				originalColors[v] = v.Color
+			end
+			if not originalMaterials[v] then
+				originalMaterials[v] = v.Material
+			end
+			v.Transparency = originalTransparencies[v]
+			v.CanCollide = true
+			v.Material = originalMaterials[v]
+			if v.Name ~= "Lock" then
+				v.Color = originalColors[v]
+			end
+		end
+	end
+end
+
 local function random(min, max)
     local randomObj = Random.new()
     return randomObj:NextInteger(min, max)
@@ -64,9 +114,13 @@ local function updateChest(chest)
 
 	if percentReady == 1 then
 		chest.Sparkles.Sparkles.Rate = 2
+		setUsable(chest)
 	else
 		chest.Sparkles.Sparkles.Rate = 0
+		setUnusable(chest)
 	end
+
+	chest.Base.Attachment.PointLight.Color = result
 end
 
 local function step()

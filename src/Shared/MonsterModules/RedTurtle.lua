@@ -24,7 +24,7 @@ function RedTurtle:step()
 	end
     local target = self.targetComponent:getTarget()
     local closeEnemy = self.targetComponent:hasCloseEnemy()
-	if closeEnemy and not target then -- if we have a close enemy, and do not have an item nearby
+	if closeEnemy then -- if we have a close enemy, and do not have an item nearby
 		self.movementComponent:setStopped(true)
 		self.animationComponent:playTrack("Hide", 1, 1, 0.05)
 		self.animationComponent:playTrack("SpikesOut")
@@ -32,6 +32,7 @@ function RedTurtle:step()
 		self.touchComponent.damageOnTouch = true
 		self.movementComponent:setLookAtGoal(closeEnemy.PrimaryPart.Position)
 		CollectionService:AddTag(self.model, "Spiky")
+		self:stopEating()
 	else
 		self.movementComponent:setStopped(false)
 		self.animationComponent:stopTrack("Hide")
@@ -126,7 +127,7 @@ function RedTurtle:init(model)
 
     self.targetComponent = TargetComponent.new()
     self.targetComponent.fleeFromTags = {"Lizard", "Character", "FireLizard"}
-	self.targetComponent.wantItem = "None"
+	self.targetComponent.wantItem = "Thornberry"
 	self.targetComponent.wantPlant = "Cactus"
     self.targetComponent.wantedEnemyTags = {}
     self.targetComponent:init(self.model, {

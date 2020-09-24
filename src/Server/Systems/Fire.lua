@@ -65,7 +65,7 @@ end
 
 local function putOutFire(object)
     CollectionService:RemoveTag(object, "Burning")
-    Messages:send("PlaySound", "Fireputout", object.BurnHitbox.Position)
+    Messages:send("PlaySound", "Burn", object.BurnHitbox.Position)
     Messages:send("PlayParticle", "Extinguish", 10, object.BurnHitbox.Position)
     if object:FindFirstChild("BurnHitbox") then
         object.BurnHitbox:Destroy()

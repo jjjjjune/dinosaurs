@@ -24,7 +24,7 @@ local function createChestForGate(gateModel, tile)
 end
 
 local function playOpenGateEffect(gateModel)
-	Messages:send("PlaySound", "RumbleFaster", gateModel.PrimaryPart.Position)
+	Messages:send("PlaySound", "GateOpen", gateModel.PrimaryPart.Position)
 
 	for _, v in pairs(game.Players:GetPlayers()) do
 		if v.Character and v.Character.PrimaryPart then
@@ -158,6 +158,10 @@ local function createOrLoadGateFromTemplate(gateTemplate, tile)
 
 	connectEventsForGate(gateModel, tile)
 	updateGate(gateModel, tile)
+
+	local sound = game.ReplicatedStorage.Sounds.Gate:Clone()
+	sound.Parent = gateModel.PrimaryPart
+	sound:Play()
 end
 
 local function checkTileForGates(tile)
@@ -182,6 +186,9 @@ local Gates = {}
 
 function Gates:start()
 	Messages:hook("MapDoneGenerating", checkTilesForGates)
+	CollectionService:GetInstanceAddedSignal("Gate"):connect(function()
+		checkTilesForGates()
+	end)
 end
 
 return Gates
