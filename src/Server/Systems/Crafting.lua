@@ -7,8 +7,12 @@ local CraftingRecipes = import "Shared/Data/CraftingRecipes"
 
 local function craftItem(player, station, stationType, index)
     local recipe = CraftingRecipes[stationType][index]
-    local character = player.Character
-    if character:FindFirstChild(recipe.ingredient) then
+	local character = player.Character
+	local wasOnFire = false
+	if character:FindFirstChild(recipe.ingredient) then
+		if CollectionService:HasTag(character[recipe.ingredient], "Fire") then
+			wasOnFire = true
+		end
         Messages:send("DestroyItem", character[recipe.ingredient])
     else
         return
@@ -18,6 +22,9 @@ local function craftItem(player, station, stationType, index)
     Messages:send("PlaySound", "GoodCraft", product.PrimaryPart.Position)
 	product:SetPrimaryPartCFrame(station.PrimaryPart.CFrame * CFrame.new(0, station.PrimaryPart.Size.Y/2 + product.PrimaryPart.Size.Y/2, 0))
 	product.Parent = workspace
+	if wasOnFire then
+		Messages:send("SetOnFire", product)
+	end
     -- force grab item?
     Messages:sendClient(player, "ForceSetItem", product)
     Messages:send("PlayParticle", "DeathSmoke",  20, product.PrimaryPart.Position)

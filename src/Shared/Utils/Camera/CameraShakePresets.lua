@@ -51,7 +51,7 @@ local CameraShakePresets = {
 	-- A continuous, rough shake
 	-- Sustained.
 	Earthquake = function()
-		local c = CameraShakeInstance.new(4, 6.5, 4.5, 5)
+		local c = CameraShakeInstance.new(3, 5, 4.5, 5)
 		c.PositionInfluence = Vector3.new(0.15, 0.3, 0.15)
 		c.RotationInfluence = Vector3.new(0.25, 0.25, 0.25)
 		return c

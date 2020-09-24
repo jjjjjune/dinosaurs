@@ -23,6 +23,7 @@ TagsToModulesMap.Items.Building = import "Shared/ItemModules/Building"
 
 -- entities
 
+TagsToModulesMap.Entities.Chest = import "Shared/EntityModules/Chest"
 TagsToModulesMap.Entities.FreshWater = import "Shared/EntityModules/FreshWater"
 TagsToModulesMap.Entities.Plant = import "Shared/EntityModules/Plant"
 TagsToModulesMap.Entities.Workbench = import "Shared/EntityModules/Workbench"

@@ -69,7 +69,7 @@ local function playThrowSound(velocity, character, possibleItem)
 			})
 		else
 			Messages:send("PlaySoundOnClient",{
-				instance = game.ReplicatedStorage.Sounds.SoftPlacement,
+				instance = game.ReplicatedStorage.Sounds.UiClickLow,
 				part = character.Head,
 				volume = .15
 			})

@@ -199,8 +199,6 @@ function TargetComponent:step(dt)
 	if item and canSeeItem then
         self.state.cantSeeTargetCounter = nil
         self.state.lastValidTarget = item
-    else
-        print("item is" , item, canSeeItem)
 	end
     if self.state.lastValidTarget and self.state.lastValidTarget.PrimaryPart and self.state.lastValidTarget.Parent ~= nil then
         self.state.lastValidTargetPosition = self.state.lastValidTarget.PrimaryPart.Position

@@ -24,7 +24,7 @@ local function createChestForGate(gateModel, tile)
 end
 
 local function playOpenGateEffect(gateModel)
-	Messages:send("PlaySound", "Rumble", gateModel.PrimaryPart.Position)
+	Messages:send("PlaySound", "RumbleFaster", gateModel.PrimaryPart.Position)
 
 	for _, v in pairs(game.Players:GetPlayers()) do
 		if v.Character and v.Character.PrimaryPart then
@@ -40,26 +40,23 @@ local function playOpenGateEffect(gateModel)
 	local tween = TweenService:Create(gateModel.Bottom, tweenInfo, goals)
 	tween:Play()
 
-	FastSpawn(function()
-		wait(.25)
-		goals = {
-			CFrame = gateModel.Offering.Base.CFrame * CFrame.new(0,-5,0)
-		}
-		tween = TweenService:Create(gateModel.Offering.Base, tweenInfo, goals)
-		tween:Play()
+	goals = {
+		CFrame = gateModel.Offering.Base.CFrame * CFrame.new(0,-5,0)
+	}
+	tween = TweenService:Create(gateModel.Offering.Base, tweenInfo, goals)
+	tween:Play()
 
-		goals = {
-			CFrame = gateModel.Offering.Bowl.CFrame * CFrame.new(0,-5,0)
-		}
-		tween = TweenService:Create(gateModel.Offering.Bowl, tweenInfo, goals)
-		tween:Play()
+	goals = {
+		CFrame = gateModel.Offering.Bowl.CFrame * CFrame.new(0,-5,0)
+	}
+	tween = TweenService:Create(gateModel.Offering.Bowl, tweenInfo, goals)
+	tween:Play()
 
-		goals = {
-			Rate = 0
-		}
-		tween = TweenService:Create(gateModel.Offering.Base.Sparks, tweenInfo, goals)
-		tween:Play()
-	end)
+	goals = {
+		Rate = 0
+	}
+	tween = TweenService:Create(gateModel.Offering.Base.Sparks, tweenInfo, goals)
+	tween:Play()
 
 end
 
@@ -133,10 +130,8 @@ local function createOrLoadGateFromTemplate(gateTemplate, tile)
 
 	local yLevel = TileRenderer.getCellYLevelOfPosition(tile.PrimaryPart.Position)
 
-	print("Y LEVEL IS : ", yLevel)
-
 	local gateType = GetGateName(yLevel)
-	local needed = 10
+	local needed = 1
 	local has = 0
 	local hasCreatedChest = false
 
