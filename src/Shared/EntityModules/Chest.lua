@@ -18,6 +18,8 @@ function Chest.serverUse(player, entityInstance)
 	if timeLeft <= 0 then
 		entityInstance.LastUse.Value = currentTime
 		Messages:send("ClaimChest", player, entityInstance)
+	else
+		Messages:sendClient(player, "Notify", "HUNGER_COLOR_DARK", "ANGRY", "THE CHEST APPEARS TO BE RESTING.")
 	end
 end
 

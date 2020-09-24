@@ -22,7 +22,8 @@ local rocks = { -- REMEMBER: these start high and work their way DOWN
 		{name = "Organic", chance = 100},
 	},
 	[7] = {
-		{name = "Mineral", chance = 100},
+		{name = "Mineral", chance = 50},
+		{name = "Organic", chance = 50},
 	},
 }
 

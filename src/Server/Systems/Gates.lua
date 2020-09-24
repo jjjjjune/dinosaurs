@@ -13,12 +13,40 @@ local TileRenderer = import "Server/MapRenderComponents/TileRenderer"
 
 local alreadyCheckedTiles = {} -- tiles that have been scanned for gates already
 
+local chestTypesForYLevels = {
+	[1] = "Mythic Chest",
+	[2] = "Legendary Chest",
+	[3] = "Legendary Chest",
+	[4] = "Rare Chest",
+	[5] = "Uncommon Chest",
+	[6] = "Uncommon Chest",
+	[7] = "Common Chest",
+}
+
+local gateTypeModifiers = {
+	Organic = 1,
+	Mineral = .7,
+}
+
+local gateSacrificeBaseAmounts = {
+	[1] = 1000,
+	[2] = 700,
+	[3] = 500,
+	[4] = 250,
+	[5] = 100,
+	[6] = 50,
+	[7] = 10,
+	[8] = 10,
+}
+
 local function createChestForGate(gateModel, tile)
 	local savedGates = ServerData:getValue("gates")
 	local myGateData = savedGates[tile.Name]
 	myGateData.hasCreatedChest = true
-	ServerData:setValue("Gates", savedGates)
-	local chest = game.ServerStorage.Entities.Chest:Clone()
+	ServerData:setValue("gates", savedGates)
+	local yLevel = TileRenderer.getCellYLevelOfPosition(tile.PrimaryPart.Position)
+	local chestType = chestTypesForYLevels[yLevel]
+	local chest = game.ServerStorage.Entities[chestType]:Clone()
 	chest.Parent = workspace.Entities
 	chest:SetPrimaryPartCFrame(gateModel.ChestSpawn.CFrame)
 end
@@ -112,7 +140,7 @@ local function onSacrificedItemToGate(item, gateModel, tile)
 	Messages:send("PlayParticle", "PurpleDeathSmoke",  10, Vector3.new(pos.X , gateModel.Offering.TouchPart.Position.Y, pos.Z))
 	Messages:send("PlaySound", "Burn", pos)
 
-	ServerData:setValue("Gates", savedGates)
+	ServerData:setValue("gates", savedGates)
 
 	updateGate(gateModel, tile)
 end
@@ -131,7 +159,7 @@ local function createOrLoadGateFromTemplate(gateTemplate, tile)
 	local yLevel = TileRenderer.getCellYLevelOfPosition(tile.PrimaryPart.Position)
 
 	local gateType = GetGateName(yLevel)
-	local needed = 1
+	local needed = gateSacrificeBaseAmounts[yLevel] * gateTypeModifiers[gateType]
 	local has = 0
 	local hasCreatedChest = false
 
@@ -154,7 +182,7 @@ local function createOrLoadGateFromTemplate(gateTemplate, tile)
 		hasCreatedChest = hasCreatedChest,
 	}
 
-	ServerData:setValue("Gates", savedGates)
+	ServerData:setValue("gates", savedGates)
 
 	connectEventsForGate(gateModel, tile)
 	updateGate(gateModel, tile)

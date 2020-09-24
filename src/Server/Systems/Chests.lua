@@ -65,7 +65,7 @@ end
 local function open(entity)
     local Items = import "Server/Systems/Items"
     local pos = entity.PrimaryPart.Position
-    local dropTable = ChestDrops[entity.Type.Value]
+    local dropTable = ChestDrops[entity.Name]
     local itemsToMake = {}
     for i, itemTable in pairs(dropTable) do
         if itemTable.min > 0 then
