@@ -14,12 +14,12 @@ Recipes.Workbench = {
 	{
         product = "Axe",
         ingredient = "Iron Bar",
-        default = true,
+        default = false,
     },
     {
         product = "Iron Pickaxe",
         ingredient = "Iron Bar",
-        default = true,
+        default = false,
     },
     {
         product = "Torch",
@@ -29,7 +29,7 @@ Recipes.Workbench = {
 	{
         product = "Taming Potion",
         ingredient = "Bone",
-        default = true,
+        default = false,
     },
     {
         product = "Workbench",
@@ -58,8 +58,8 @@ Recipes.Workbench = {
     {
         product = "Cistern",
         ingredient = "Clay Brick",
-        default = true,
-        building = true,
+        default = false,
+		building = true,
 	},
 	{
         product = "Wood Wall",

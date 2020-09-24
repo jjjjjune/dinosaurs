@@ -15,6 +15,7 @@ TagsToModulesMap.Items.Bucket = import "Shared/ItemModules/Bucket"
 TagsToModulesMap.Items.Rope = import "Shared/ItemModules/Rope"
 TagsToModulesMap.Items.Scissors = import "Shared/ItemModules/Scissors"
 TagsToModulesMap.Items["Taming Potion"] = import "Shared/ItemModules/TamingPotion"
+TagsToModulesMap.Items.RecipeBook = import "Shared/ItemModules/RecipeBook"
 
 -- special module (this is a very funny way of defining buildings through the interaction system)
 -- idk if it is a good idea, but i also don't care

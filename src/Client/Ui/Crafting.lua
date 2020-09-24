@@ -64,6 +64,21 @@ local function openCrafting(stationType, station)
 	local frame = CraftingUi.ScrollFrameContainer.ScrollingFrame
 	local typeRecipes = Recipes[stationType]
 
+	local newTypeRecipes = {}
+
+	for _i, v in pairs(typeRecipes) do
+		if not v.default then
+			local unlockedRecipes = _G.Data.server.unlockedRecipes[stationType]
+			if unlockedRecipes[v.product] then
+				table.insert(newTypeRecipes, v)
+			end
+		else
+			table.insert(newTypeRecipes, v)
+		end
+	end
+
+	typeRecipes = newTypeRecipes
+
 	CraftingUi.Visible = true
 	frame.CanvasSize = UDim2.new(0,0,0,0)
 
@@ -92,13 +107,14 @@ local function openCrafting(stationType, station)
 				craftFrame = frame.CraftFrame:Clone()
 			end
 		end
+
 		local folderName do
 			if recipe.building then
 				folderName = "Buildings"
 			else
 				folderName = "Items"
 			end
-	end
+		end
 
 		frame.CanvasSize = frame.CanvasSize + UDim2.new(0,0,0,craftFrame.AbsoluteSize.Y + 10)
 

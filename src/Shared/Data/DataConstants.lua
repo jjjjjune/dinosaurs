@@ -29,7 +29,10 @@ Data.DEFAULT_SERVER_PLAYER_DATA = {
         [2] = {item = nil, equipped = false},
         [3] = {item = nil, equipped = false},
         [4] = {item = nil, equipped = false},
-    },
+	},
+	unlockedRecipes = {
+		Workbench = {},
+	}
 }
 
 Data.TEST_SERVER_DATA = {
@@ -50,7 +53,10 @@ Data.TEST_SERVER_PLAYER_DATA = {
         [2] = {item = nil, equipped = false},
         [3] = {item = nil, equipped = false},
         [4] = {item = nil, equipped = false},
-    },
+	},
+	unlockedRecipes = {
+		Workbench = {},
+	}
 }
 
 Data.TEST_STORE = "testStore5"
