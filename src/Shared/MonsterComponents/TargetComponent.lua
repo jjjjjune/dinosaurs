@@ -53,7 +53,7 @@ local function getClosestEnemyOfSet(position, set)
     return closestItem
 end
 
-local function getPositionOnEdgeOfCirlceAwayFrom(position, distance)
+local function getPositionOnEdgeOfcircleAwayFrom(position, distance)
     local deg = math.random(1, 360)
     local rad = math.rad(deg)
     local cf = CFrame.new(position) * CFrame.Angles(0, rad, 0)
@@ -124,9 +124,9 @@ function TargetComponent:getFleeing(forceRecalc)
     if timeSinceLastFleeCalculation > 1 or forceRecalc then
         self.lastFleeCalculation = tick()
         local fleeFrom = {}
-        for _, enemyTag in pairs(self.fleeFromTags) do
+		for _, enemyTag in pairs(self.fleeFromTags) do
             for _, enemy in pairs(CollectionService:GetTagged(enemyTag)) do
-                if enemy ~= self.model then
+				if enemy ~= self.model then
                     table.insert(fleeFrom, enemy)
                 end
             end
@@ -135,7 +135,7 @@ function TargetComponent:getFleeing(forceRecalc)
         if targetToFleeFrom and self:getCanSeePosition(targetToFleeFrom.PrimaryPart.Position) then
             self.lastFleeTargetReset = self.lastFleeTargetReset or 0
             if tick() - self.lastFleeTargetReset > 5 then
-                self.fleePosition = getPositionOnEdgeOfCirlceAwayFrom(targetToFleeFrom.PrimaryPart.Position, 100)
+                self.fleePosition = getPositionOnEdgeOfcircleAwayFrom(targetToFleeFrom.PrimaryPart.Position, 100)
                 self.lastFleeTargetReset = tick()
             end
             self.lastFleeing = true

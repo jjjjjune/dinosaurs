@@ -190,7 +190,7 @@ function RedTurtle:init(model)
         local speedPercent = math.max(.01, speed/self.animationScaledWalkspeed)
         local weightPercent = math.max(.01, speed/2)
 
-        self.animationComponent:playTrack("Walking", speedPercent, weightPercent)
+		self.animationComponent:playTrack("Walking", speedPercent, weightPercent)
     end)
 
     self.model.PrimaryPart:SetNetworkOwner()

@@ -67,28 +67,15 @@ local TargetComponent = {}
 
 TargetComponent.__index = TargetComponent
 
---[[
-    - last thing we saw that we want
-    - last position we saw the thing at
-    - can that thing currently be seen
-    - is that thing more than give_up_distance away
-
-    -- if we can currently see the thing (and is within radius), return the thing, record position (spotted)
-    -- if we can't currently see it, but we know its last position, return last position (investigating)
-    -- if the thing has moved too far away, it is no longer a valid target (give up)
-
-    {
-        lastValidTargetPosition
-        lastValidTarget
-        isTargetVisible
-        distanceFromTarget
-    }
-
-    give up method resets all target state info
-]]
-
 function TargetComponent:hasCloseEnemy()
 	local fleeFrom = {}
+	if self.model.Tamed.Value == true then
+		for i, tag in pairs(self.fleeFromTags) do
+			if tag == "Character" then
+				table.remove(self.fleeFromTags, i)
+			end
+		end
+	end
 	for _, enemyTag in pairs(self.fleeFromTags) do
 		for _, enemy in pairs(CollectionService:GetTagged(enemyTag)) do
 			if enemy ~= self.model then
