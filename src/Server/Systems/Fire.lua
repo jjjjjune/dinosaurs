@@ -9,11 +9,11 @@ local FastSpawn = import "Shared/Utils/FastSpawn"
 local CollectionService = game:GetService("CollectionService")
 local RunService = game:GetService("RunService")
 
-local BURN_TIME_TO_DESTROY_OBJECT = 4
+local BURN_TIME_TO_DESTROY_OBJECT = 90
 
-local PLAYER_BURN_DAMAGE = 15
+local PLAYER_BURN_DAMAGE = 1
 
-local PLAYER_BURN_DEBOUNCE = 5
+local PLAYER_BURN_DEBOUNCE = 1
 
 local burningObjects = {}
 
