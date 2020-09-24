@@ -55,7 +55,7 @@ function Alpaca:init(model)
     self.movementComponent = MovementComponent.new()
     self.movementComponent:init(self.model, {
         jumpDebounce = 2.1,
-        speed = 24,
+        speed = 28,
         closenessThreshold = 11,
         jumpLength = .45,
         rideableComponent = self.rideableComponent,

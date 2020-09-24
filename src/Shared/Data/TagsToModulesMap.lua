@@ -35,5 +35,6 @@ TagsToModulesMap.Monsters.Lizard = import "Shared/MonsterModules/Lizard"
 TagsToModulesMap.Monsters.FireLizard = import "Shared/MonsterModules/FireLizard"
 TagsToModulesMap.Monsters.Alpaca = import "Shared/MonsterModules/Alpaca"
 TagsToModulesMap.Monsters.RedTurtle = import "Shared/MonsterModules/RedTurtle"
+TagsToModulesMap.Monsters.DesertAlpaca = import "Shared/MonsterModules/DesertAlpaca"
 
 return TagsToModulesMap

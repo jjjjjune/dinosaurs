@@ -67,7 +67,7 @@ function Lizard:init(model)
 
     self.targetComponent = TargetComponent.new()
     self.targetComponent.wantItem = "Yucca Seed"
-    self.targetComponent.wantedEnemyTags = {"Character", "Alpaca"}
+    self.targetComponent.wantedEnemyTags = {"Character", "Alpaca", "RedTurtle", "DesertAlpaca"}
     self.targetComponent:init(self.model, {
         giveUpTargetTime = 10,
     })
