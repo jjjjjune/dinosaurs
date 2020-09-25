@@ -64,21 +64,6 @@ local function openCrafting(stationType, station)
 	local frame = CraftingUi.ScrollFrameContainer.ScrollingFrame
 	local typeRecipes = Recipes[stationType]
 
-	local newTypeRecipes = {}
-
-	for _i, v in pairs(typeRecipes) do
-		if not v.default then
-			local unlockedRecipes = _G.Data.server.unlockedRecipes[stationType]
-			if unlockedRecipes[v.product] then
-				table.insert(newTypeRecipes, v)
-			end
-		else
-			table.insert(newTypeRecipes, v)
-		end
-	end
-
-	typeRecipes = newTypeRecipes
-
 	CraftingUi.Visible = true
 	frame.CanvasSize = UDim2.new(0,0,0,0)
 
@@ -118,12 +103,24 @@ local function openCrafting(stationType, station)
 
 		frame.CanvasSize = frame.CanvasSize + UDim2.new(0,0,0,craftFrame.AbsoluteSize.Y + 10)
 
+		craftFrame.Locked.Visible = false
+		craftFrame.LockedShadow.Visible = false
+
+		if not recipe.default then
+			local unlockedRecipes = _G.Data.server.unlockedRecipes[stationType]
+			if not unlockedRecipes[recipe.product] then
+				craftFrame.Locked.Visible = true
+				craftFrame.LockedShadow.Visible = true
+				craftFrame.Craft.ImageColor3 = Color3.fromRGB(200,200,200)
+			end
+		end
+
 		craftFrame.Parent = frame
 		craftFrame.LayoutOrder = getBuildValue(recipe)
 		craftFrame.Visible = true
 
 		if not game.Players.LocalPlayer.Character:FindFirstChild(recipe.ingredient) then
-			craftFrame.Craft.ImageColor3 = Color3.fromRGB(200,200,200)
+			craftFrame.Craft.ImageColor3 = Color3.fromRGB(220,220,220)
 		else
 			Messages:send("RegisterButton", craftFrame.Craft, craftFrame.CraftShadow, function()
 				Messages:sendServer("CraftItem", station, stationType, index)
@@ -139,6 +136,13 @@ local function openCrafting(stationType, station)
 		skin(craftFrame.ProductShadow, recipe.product, folderName)
 
 		craftFrame.ItemName.Text = recipe.product
+
+		if not recipe.default then
+			local unlockedRecipes = _G.Data.server.unlockedRecipes[stationType]
+			if not unlockedRecipes[recipe.product] then
+				craftFrame.LayoutOrder = craftFrame.LayoutOrder + 1000000
+			end
+		end
 	end
 
 	local device = GetDevice()

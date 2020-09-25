@@ -39,6 +39,9 @@ local function getSacrificeValue(item)
 	if CollectionService:HasTag(item, "Gem") then
 		value = 6
 	end
+	if CollectionService:HasTag(item, "Corpse") then
+		value = 5 + (math.floor(item.Health.MaxValue/10))
+	end
 	if currentSeason == 1 then
 		if CollectionService:HasTag(item, "Seed") then
 			mod = 2
@@ -52,8 +55,8 @@ local function getSacrificeValue(item)
 			mod = 2
 		end
 	elseif currentSeason == 4 then
-		if CollectionService:HasTag(item, "Hide") then
-			mod = 2
+		if CollectionService:HasTag(item, "Corpse") then
+			mod = 3
 		end
 	end
 	return value*mod
@@ -90,7 +93,11 @@ local function onSacrificedItem(item, pit)
         end
     end
 
-    Messages:send("DestroyItem", item)
+	if CollectionService:HasTag(item, "Item") then
+		Messages:send("DestroyItem", item)
+	else
+		item:Destroy()
+	end
     current = math.min(goal, current + sacrificePoints)
 
     Messages:sendAllClients("UpdateSacrificePercent", current/goal)
@@ -104,7 +111,9 @@ local function initializeAltar(altar)
         if CollectionService:HasTag(hit.Parent, "Item") then
             if not hit.Parent.Parent:FindFirstChild("Humanoid") then
                 onSacrificedItem(hit.Parent, altar)
-            end
+			end
+		elseif CollectionService:HasTag(hit.Parent, "Corpse") then
+			onSacrificedItem(hit.Parent, altar)
         end
     end)
 end
