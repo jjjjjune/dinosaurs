@@ -162,6 +162,22 @@ local function manageBurningPlayer(character)
     end
 end
 
+local function manageBurningMonster(character)
+	if not lastPlayerDamages[character] then
+        lastPlayerDamages[character] = tick() - 100
+    end
+    if tick() - lastPlayerDamages[character] > PLAYER_BURN_DEBOUNCE then
+        lastPlayerDamages[character] = tick()
+        Damage(character, {damage = PLAYER_BURN_DAMAGE, type = "fire", serverApplication = true})
+    end
+    local position = character.PrimaryPart.Position - Vector3.new(0,1,0)
+    if Water.isPositionWithinWater(position) then
+        return false
+    else
+        return true
+    end
+end
+
 local function manageBurningItem(object)
     local position = object.PrimaryPart.Position
     if Water.isPositionWithinWater(position) then
@@ -211,7 +227,10 @@ local function manageBurningObject(tableObject, elapsedTime)
         if not manageBurningPlayer(object) then
             return false
         end
-    else
+	else
+		if CollectionService:HasTag(object, "Monster") then
+			manageBurningMonster(object)
+		end
         if not manageBurningItem(object) then
             return false
         end
@@ -221,10 +240,12 @@ local function manageBurningObject(tableObject, elapsedTime)
         return false
     end
 
-    local bottom = object.BurnHitbox.Position - Vector3.new(0, object.BurnHitbox.Size.Y/2, 0)
-    if bottom.Y <= workspace.Effects.Water.Position.Y then
-        return false
-    end
+	if object:FindFirstChild("BurnHitbox") then
+		local bottom = object.BurnHitbox.Position - Vector3.new(0, object.BurnHitbox.Size.Y/2, 0)
+		if bottom.Y <= workspace.Effects.Water.Position.Y then
+			return false
+		end
+	end
 
     return true
 end
