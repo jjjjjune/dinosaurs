@@ -162,7 +162,7 @@ function RedTurtle:init(model)
     self.model.Health.Changed:connect(function()
 
         if self.model.Health.Value < self.lastHealth then
-            Messages:send("PlaySound", self.hitNoises[math.random(1, #self.hitNoises)], self.model.PrimaryPart.Position)
+            --Messages:send("PlaySound", self.hitNoises[math.random(1, #self.hitNoises)], self.model.PrimaryPart.Position)
         end
 
         self.lastHealth = self.model.Health.Value
@@ -253,7 +253,20 @@ function RedTurtle:die()
         self.model.HumanoidRootPart.BodyVelocity:Destroy()
 		self.model.Torso.CanCollide = true
 		self.model.Collider.CanCollide = false
+
+		CollectionService:AddTag(self.model, "Corpse")
+
+		delay(120, function()
+			if self.madeItems then
+				return
+			end
+			local ConstraintManager = import "Server/Systems/ConstraintManager"
+			ConstraintManager.removeAllRelevantConstraints(self.model)
+			self:makeDropItems()
+			self.model:Destroy()
+		end)
 	else
+		self.madeItems = true
 		local ConstraintManager = import "Server/Systems/ConstraintManager"
 		ConstraintManager.removeAllRelevantConstraints(self.model)
         self:makeDropItems()

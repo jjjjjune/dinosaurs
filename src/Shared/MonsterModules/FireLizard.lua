@@ -10,6 +10,8 @@ local TouchComponent = import "Shared/MonsterComponents/TouchComponent"
 local RideableComponent = import "Shared/MonsterComponents/RideableComponent"
 local TameableComponent = import "Shared/MonsterComponents/TameableComponent"
 
+local CollectionService = game:GetService("CollectionService")
+
 local Lizard = {}
 
 Lizard.__index = Lizard
@@ -146,7 +148,10 @@ function Lizard:init(model)
         self.animationComponent:playTrack("Walking", speedPercent, weightPercent)
     end)
 
-    self.model.PrimaryPart:SetNetworkOwner()
+	self.model.PrimaryPart:SetNetworkOwner()
+
+	self.model.TongueEnd.CFrame = self.model.TongueStart.CFrame * CFrame.new(0,0,-4)
+	self.model.TongueStart.RopeConstraint.Enabled = true
 end
 
 function Lizard:makeDropItems()
@@ -193,24 +198,30 @@ function Lizard:die()
 
     if not self.isDead then
         self.isDead = true
-        self.model.Torso.TextureID = "rbxassetid://5079825969"
         self.animationComponent:stopTrack("Idle")
         self.animationComponent:playTrack("Dead")
-        self.model.Head.RotVelocity = Vector3.new(math.random(), math.random(), math.random())*10
+        self.model.Head.RotVelocity = Vector3.new(math.random(), math.random(), math.random())*1
         self.model.HumanoidRootPart.BodyGyro:Destroy()
         self.model.HumanoidRootPart.BodyVelocity:Destroy()
 		self.model.Torso.CanCollide = true
+		self.model.Collider.CanCollide = false
 
-		for _, v in pairs(self.model:GetChildren()) do
-            if v:IsA("BasePart") then
-				v.Massless = false
-				v.CustomPhysicalProperties = PhysicalProperties.new(Enum.Material.Metal)
-            end
-        end
-    else
+		CollectionService:AddTag(self.model, "Corpse")
+
+		delay(120, function()
+			if self.madeItems then
+				return
+			end
+			local ConstraintManager = import "Server/Systems/ConstraintManager"
+			ConstraintManager.removeAllRelevantConstraints(self.model)
+			self:makeDropItems()
+			self.model:Destroy()
+		end)
+	else
+		self.madeItems = true
 		local ConstraintManager = import "Server/Systems/ConstraintManager"
 		ConstraintManager.removeAllRelevantConstraints(self.model)
-		self:makeDropItems()
+        self:makeDropItems()
         self.model:Destroy()
     end
 end
