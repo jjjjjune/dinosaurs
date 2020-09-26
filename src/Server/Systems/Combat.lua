@@ -59,7 +59,8 @@ local function registerHit(murdererPlayer, victim, knockback)
         Damage(victim, {
             damage = damage,
             type = damageType,
-            ignorePlayer = murdererPlayer
+			ignorePlayer = murdererPlayer,
+			murderer = murdererPlayer,
         })
         if knockback then
             Messages:send("Knockback", victim, knockback, .15)

@@ -69,12 +69,12 @@ local Tool = {}
 
 Tool.debounce = .5
 
-Tool.damageType = "normal"
+Tool.damageType = "tame"
 
 Tool.damage = 20
 
 function Tool.damageClient(victim, part)
-    Messages:send("PlayDamageEffect", victim, "normal", part)
+    Messages:send("PlayDamageEffect", victim, Tool.damageType, part)
     Messages:sendServer("RegisterHit", victim, GetCharacter().PrimaryPart.CFrame.lookVector * 50)
     Messages:send("PlaySoundOnClient",{
         instance = game.ReplicatedStorage.Sounds.HitBasic,

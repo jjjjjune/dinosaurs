@@ -78,7 +78,9 @@ function Alpaca:init(model)
     self.touchComponent:init(self.model)
 
     self.tameableComponent = TameableComponent.new()
-    self.tameableComponent:init(self.model)
+    self.tameableComponent:init(self.model, {
+		targetComponent = self.targetComponent,
+	})
 
     self.drops = {
 		{name = "Skull", min = 1, max = 2, chance = 45},

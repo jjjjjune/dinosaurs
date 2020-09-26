@@ -89,7 +89,7 @@ function ScrollingTextures:start()
 		tickTextures(allTextureParts)
 	end)
 	CollectionService:GetInstanceAddedSignal("TexturePart"):connect(function()
-		wait()
+		wait(.1)
 		checkLOD()
 	end)
 end

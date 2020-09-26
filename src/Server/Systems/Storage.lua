@@ -55,14 +55,16 @@ end
 local function checkFreezeWeld(item, position)
 	local ConstraintManager = import "Server/Systems/ConstraintManager"
 	if not item:FindFirstChild("FreezeWeld") and not item:FindFirstChild("GameRope") and not CollectionService:HasTag(item, "Building") and not ConstraintManager.hasAnyRopesAttached(item) then
-		local hit, pos = CastRay(position, Vector3.new(0,-5,0), {item})
-		if hit and hit.Anchored then
-			local ConstraintManager = import "Server/Systems/ConstraintManager"
-			ConstraintManager.freezeWeld(item, hit)
-			for _, v in pairs(item:GetChildren()) do
-				if v:IsA("BasePart") then
-					v.Anchored = true
-					v.CanCollide = false
+		if not item.Parent:FindFirstChild("Humanoid") then
+			local hit, pos = CastRay(position, Vector3.new(0,-5,0), {item})
+			if hit and hit.Anchored then
+				local ConstraintManager = import "Server/Systems/ConstraintManager"
+				ConstraintManager.freezeWeld(item, hit)
+				for _, v in pairs(item:GetChildren()) do
+					if v:IsA("BasePart") then
+						v.Anchored = true
+						v.CanCollide = false
+					end
 				end
 			end
 		end

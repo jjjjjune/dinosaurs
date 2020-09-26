@@ -23,7 +23,8 @@ function TameableComponent:onTamed(player)
     self.model.PrimaryPart.NameBillboard.Enabled = true
     self.model.PrimaryPart.NameBillboard.NameLabel.Text = self.model.MonsterName.Value
     self.model.PrimaryPart.NameBillboard.NameLabelShadow.Text = self.model.MonsterName.Value
-    self:updateName()
+	self:updateName()
+	self.targetComponent:resetLastValidTarget()
 end
 
 function TameableComponent:attemptTame(player)
@@ -33,14 +34,16 @@ function TameableComponent:attemptTame(player)
 end
 
 function TameableComponent:init(model, props)
-    self.model = model
+	self.model = model
 
     self.nameValue = Instance.new("StringValue", model)
     self.nameValue.Name = "MonsterName"
     self.nameValue.Value = model.Name
     self.nameValue.Changed:connect(function()
         self:updateName()
-    end)
+	end)
+
+	self.targetComponent = props.targetComponent
 
     self:updateName()
 

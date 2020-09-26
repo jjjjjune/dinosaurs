@@ -87,6 +87,10 @@ function TargetComponent:hasCloseEnemy()
 	return targetToFleeFrom
 end
 
+function TargetComponent:resetLastValidTarget()
+	self.state.lastValidTarget = nil
+end
+
 function TargetComponent:getCanSeePosition(position, item)
     if tick() > self.nextSightCheck then
         self.nextSightCheck = tick() + .5

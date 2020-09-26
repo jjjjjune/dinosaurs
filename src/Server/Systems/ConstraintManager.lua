@@ -83,6 +83,7 @@ function ConstraintManager.createObjectWeld(attaching, attachTo, intendedPositio
 end
 
 function ConstraintManager.unfreeze(object)
+	--print('unfreeze being called')
 	local weld = object:FindFirstChild("FreezeWeld", true)
 	if weld then
 		weld:Destroy()
@@ -92,7 +93,7 @@ function ConstraintManager.unfreeze(object)
 	end
 	for _, v in pairs(object:GetChildren()) do
 		if v:IsA("BasePart") then
-			v.CanCollide = true
+			--v.CanCollide = true
 			v.Anchored = false
 		end
 	end

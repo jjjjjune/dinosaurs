@@ -4,14 +4,15 @@ local CollectionService = game:GetService("CollectionService")
 
 local CastRay = import "Shared/Utils/CastRay"
 
-local MIN_FIND_DISTANCE = 300
+local MIN_FIND_DISTANCE = 200
+local MIN_ITEM_FIND_DISTANCE = 100
 
 local function isValid(item)
     return not item.Parent:FindFirstChild("Humanoid")
 end
 
 local function getClosestItemOfName(position, name)
-    local closestDistance = MIN_FIND_DISTANCE
+    local closestDistance = MIN_ITEM_FIND_DISTANCE
     local closestItem
     for _, item in pairs(CollectionService:GetTagged("Item")) do
         if item.Name == name and isValid(item) then
@@ -28,8 +29,8 @@ local function getClosestItemOfName(position, name)
     return closestItem
 end
 
-local function getClosestEnemyOfSet(position, set)
-    local closestDistance = MIN_FIND_DISTANCE
+local function getClosestOfSet(position, set, dist)
+    local closestDistance = dist or MIN_FIND_DISTANCE
     local closestItem
     for _, character in pairs(set) do
         local isValid do
@@ -49,11 +50,11 @@ local function getClosestEnemyOfSet(position, set)
                 end
             end
         end
-    end
+	end
     return closestItem
 end
 
-local function getPositionOnEdgeOfcircleAwayFrom(position, distance)
+local function getPositionOnEdgeOfCirlceAwayFrom(position, distance)
     local deg = math.random(1, 360)
     local rad = math.rad(deg)
     local cf = CFrame.new(position) * CFrame.Angles(0, rad, 0)
@@ -66,34 +67,39 @@ local TargetComponent = {}
 
 TargetComponent.__index = TargetComponent
 
---[[
-    - last thing we saw that we want
-    - last position we saw the thing at
-    - can that thing currently be seen
-    - is that thing more than give_up_distance away
+function TargetComponent:hasCloseEnemy()
+	local fleeFrom = {}
+	if self.model.Tamed.Value == true then
+		for i, tag in pairs(self.fleeFromTags) do
+			if tag == "Character" then
+				table.remove(self.fleeFromTags, i)
+			end
+		end
+	end
+	for _, enemyTag in pairs(self.fleeFromTags) do
+		for _, enemy in pairs(CollectionService:GetTagged(enemyTag)) do
+			if enemy ~= self.model then
+				table.insert(fleeFrom, enemy)
+			end
+		end
+	end
+	local targetToFleeFrom = getClosestOfSet(self.position, fleeFrom)
+	return targetToFleeFrom
+end
 
-    -- if we can currently see the thing (and is within radius), return the thing, record position (spotted)
-    -- if we can't currently see it, but we know its last position, return last position (investigating)
-    -- if the thing has moved too far away, it is no longer a valid target (give up)
-
-    {
-        lastValidTargetPosition
-        lastValidTarget
-        isTargetVisible
-        distanceFromTarget
-    }
-
-    give up method resets all target state info
-]]
-
-function TargetComponent:getCanSeePosition(position)
+function TargetComponent:getCanSeePosition(position, item)
     if tick() > self.nextSightCheck then
         self.nextSightCheck = tick() + .5
-        local hit, pos = CastRay(self.position, (position - self.position).unit * 200, {self.model})
-        return hit and hit:IsDescendantOf(self.state.lastValidTarget)
+		local hit, pos = CastRay(self.position, (position - self.position).unit * 300, {self.model})
+		local conditions = hit and hit:IsDescendantOf(item or self.state.lastValidTarget)
+        return conditions and hit
     else
         return self.state.isTargetVisible
     end
+end
+
+function TargetComponent:resetLastValidTarget()
+	self.state.lastValidTarget = nil
 end
 
 function TargetComponent:getTarget()
@@ -112,7 +118,23 @@ function TargetComponent:getValidEnemy()
                 end
             end
         end
-        return getClosestEnemyOfSet(self.position, allEnemies)
+		return getClosestOfSet(self.position, allEnemies)
+	else
+		local allEnemies = {}
+		local newAllEnemies = {}
+        for _, enemyTag in pairs(self.wantedEnemyTags) do
+            for _, enemy in pairs(CollectionService:GetTagged(enemyTag)) do
+                if enemy ~= self.model then
+                    table.insert(allEnemies, enemy)
+                end
+            end
+		end
+		for _, v in pairs(allEnemies) do
+			if CollectionService:HasTag(v, "Character") then
+				table.insert(newAllEnemies, v)
+			end
+		end
+		return getClosestOfSet(self.position, newAllEnemies)
     end
 end
 
@@ -124,18 +146,18 @@ function TargetComponent:getFleeing(forceRecalc)
     if timeSinceLastFleeCalculation > 1 or forceRecalc then
         self.lastFleeCalculation = tick()
         local fleeFrom = {}
-		for _, enemyTag in pairs(self.fleeFromTags) do
+        for _, enemyTag in pairs(self.fleeFromTags) do
             for _, enemy in pairs(CollectionService:GetTagged(enemyTag)) do
-				if enemy ~= self.model then
+                if enemy ~= self.model then
                     table.insert(fleeFrom, enemy)
                 end
             end
         end
-        local targetToFleeFrom = getClosestEnemyOfSet(self.position, fleeFrom)
+        local targetToFleeFrom = getClosestOfSet(self.position, fleeFrom)
         if targetToFleeFrom and self:getCanSeePosition(targetToFleeFrom.PrimaryPart.Position) then
             self.lastFleeTargetReset = self.lastFleeTargetReset or 0
             if tick() - self.lastFleeTargetReset > 5 then
-                self.fleePosition = getPositionOnEdgeOfcircleAwayFrom(targetToFleeFrom.PrimaryPart.Position, 100)
+                self.fleePosition = getPositionOnEdgeOfCirlceAwayFrom(targetToFleeFrom.PrimaryPart.Position, 100)
                 self.lastFleeTargetReset = tick()
             end
             self.lastFleeing = true
@@ -156,12 +178,32 @@ function TargetComponent:getFleePosition()
 end
 
 function TargetComponent:step(dt)
-    self.position = (self.model.PrimaryPart and self.model.PrimaryPart.Position) or Vector3.new()
+	self.position = (self.model.PrimaryPart and self.model.PrimaryPart.Position) or Vector3.new()
+	if self.wantPlant then
+		local plants = CollectionService:GetTagged("Plant")
+		local validPlants = {}
+		for _, v in pairs(plants) do
+			if v:FindFirstChild("Type") and v.Type.Value == self.wantPlant and tonumber(v.Name) == v.MaxPhase.Value then
+				if not v:IsDescendantOf(game.ServerStorage.PlantPhases) then
+					table.insert(validPlants, v)
+				end
+			end
+		end
+		local plant = getClosestOfSet(self.position, validPlants, MIN_ITEM_FIND_DISTANCE)
+		if plant and self:getCanSeePosition(plant.PrimaryPart.Position, plant) then
+			self.state.cantSeeTargetCounter = nil
+			self.state.lastValidTarget = plant
+		end
+	end
     local wantedItem = self.wantItem
     local item do
-        item = getClosestItemOfName(self.position, wantedItem) or self:getValidEnemy()
+		item = getClosestItemOfName(self.position, wantedItem)
+		if not item then
+			item = self:getValidEnemy()
+		end
     end
-    if item and self:getCanSeePosition(item.PrimaryPart.Position) then
+    local canSeeItem = item and self:getCanSeePosition(item.PrimaryPart.Position, item)
+	if item and canSeeItem then
         self.state.cantSeeTargetCounter = nil
         self.state.lastValidTarget = item
 	end

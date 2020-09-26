@@ -157,6 +157,14 @@ local function loadMonsters()
 	SaveableObjectManager.loadTag("Monster")
 end
 
+local function prepareMonsters()
+	for _, monster in pairs(game.ServerStorage.Monsters:GetChildren()) do
+		local tamedHealth = monster.Health:Clone()
+		tamedHealth.Name = "TamedHealth"
+		tamedHealth.Parent = monster
+	end
+end
+
 local Monsters = {}
 
 function Monsters.createMonster(monsterName, pos, presumedId)
@@ -164,6 +172,7 @@ function Monsters.createMonster(monsterName, pos, presumedId)
 end
 
 function Monsters:start()
+	prepareMonsters()
 	RunService.Stepped:connect(function(dt)
 		if tick() > nextMonsterSpawnStep then
 			nextMonsterSpawnStep = tick() + monsterSpawnStep
