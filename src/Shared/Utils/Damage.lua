@@ -3,6 +3,8 @@ local Messages = import "Shared/Utils/Messages"
 
 return function(target, damageInfo)
 
+	local damageColor = Color3.fromRGB(255,255,255)
+
     if target:FindFirstChild("Humanoid") then
         target.Humanoid.Health = target.Humanoid.Health - damageInfo.damage
     else
@@ -13,7 +15,8 @@ return function(target, damageInfo)
     end
 
     if damageInfo.damage < 0 then
-        damageInfo.type = "heal"
+		damageInfo.type = "heal"
+		damageColor = Color3.fromRGB(16, 219, 255)
     end
 
     local player = game:GetService("Players"):GetPlayerFromCharacter(target)
@@ -28,6 +31,13 @@ return function(target, damageInfo)
         else
             Messages:reproOnClients(damageInfo.ignorePlayer, "PlayDamageEffect", target, damageInfo.type)
         end
-    end
+	end
 
+	if damageInfo.damage > 30 then
+		damageColor = Color3.fromRGB(255, 196, 32)
+	end
+
+	if target.PrimaryPart then
+		Messages:sendAllClients("CreateDamageIndicator", target.PrimaryPart.Position, damageInfo.damage, damageColor)
+	end
 end

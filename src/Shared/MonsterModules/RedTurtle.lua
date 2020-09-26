@@ -12,6 +12,8 @@ local TouchComponent = import "Shared/MonsterComponents/TurtleTouchComponent"
 local RideableComponent = import "Shared/MonsterComponents/RideableComponent"
 local TameableComponent = import "Shared/MonsterComponents/TameableComponent"
 
+local CastRay = import "Shared/Utils/CastRay"
+
 local RedTurtle = {}
 
 RedTurtle.__index = RedTurtle
@@ -75,9 +77,10 @@ function RedTurtle:eat(target)
 	if tick() - self.eatBeginTime > 4 then
 		if CollectionService:HasTag(target, "Plant") then
 			local cf = target.PrimaryPart.CFrame
+			local _, pos = CastRay(cf.p, Vector3.new(0,-10,0), {target})
 			local Plants = import "Server/Systems/Plants"
 			Plants.chopPlant(target)
-			Plants.createPlant(target.Type.Value, cf.p, 1, false)
+			Plants.createPlant(target.Type.Value, pos, 1, false)
 		else
 			Messages:send("DestroyItem", target)
 		end
@@ -253,6 +256,13 @@ function RedTurtle:die()
         self.model.HumanoidRootPart.BodyVelocity:Destroy()
 		self.model.Torso.CanCollide = true
 		self.model.Collider.CanCollide = false
+
+		for _, v in pairs(self.model:GetChildren()) do
+			if v:IsA("BasePart") then
+				v.Massless = false
+				v.CustomPhysicalProperties = PhysicalProperties.new(1,1,1)
+			end
+		end
 
 		CollectionService:AddTag(self.model, "Corpse")
 

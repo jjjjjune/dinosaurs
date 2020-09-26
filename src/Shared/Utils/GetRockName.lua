@@ -23,9 +23,11 @@ local rocks = {
 		{name = "Iron",  chance = 50},
 	},
 	[4] = {
-		{name = "Coal", chance = 80},
+		{name = "Coal", chance = 40},
 
-		{name = "Stone",  chance = 55},
+		{name = "Stone",  chance = 40},
+
+		{name = "Iron",  chance = 20},
 	},
 	[5] = {
 		{name = "Coal", chance = 10},
@@ -33,6 +35,8 @@ local rocks = {
 		{name = "Clay", chance = 50},
 
 		{name = "Stone",  chance = 75},
+
+		{name = "Iron",  chance = 20},
 	},
 	[6] = {
 		{name = "Clay", chance = 75},

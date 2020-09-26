@@ -15,6 +15,8 @@ local PLAYER_BURN_DAMAGE = 1
 
 local PLAYER_BURN_DEBOUNCE = 1
 
+local GO_OUT_CHANCE = 3 -- out of 100
+
 local burningObjects = {}
 
 local lastPlayerDamages = {}
@@ -245,6 +247,10 @@ local function manageBurningObject(tableObject, elapsedTime)
 		if bottom.Y <= workspace.Effects.Water.Position.Y then
 			return false
 		end
+	end
+
+	if math.random(1, 100) <= GO_OUT_CHANCE then
+		return false
 	end
 
     return true

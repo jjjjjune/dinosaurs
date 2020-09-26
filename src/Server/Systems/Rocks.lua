@@ -6,6 +6,7 @@ local ServerData = import "Server/Systems/ServerData"
 local TileRenderer = import "Server/MapRenderComponents/TileRenderer"
 
 local GetRockName = import "Shared/Utils/GetRockName"
+local RockRespawnTimes = import "Shared/Data/RockRespawnTimes"
 
 local CollectionService = game:GetService("CollectionService")
 
@@ -133,7 +134,7 @@ local function skinRockSpawners()
 
 		if spawnerData then
 
-			local respawnTime = 5
+			local respawnTime = RockRespawnTimes[spawnerData.rock] or 60
 
 			if os.time() - spawnerData.lastMine > respawnTime then
 				if spawnerData.rock then

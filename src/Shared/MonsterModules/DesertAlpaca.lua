@@ -183,6 +183,12 @@ function Alpaca:die()
 		self.model.Torso.CanCollide = true
 		self.model.Collider.CanCollide = false
 
+		for _, v in pairs(self.model:GetChildren()) do
+			if v:IsA("BasePart") then
+				v.Massless = false
+				v.CustomPhysicalProperties = PhysicalProperties.new(1,1,1)
+			end
+		end
 		CollectionService:AddTag(self.model, "Corpse")
 
 		delay(120, function()

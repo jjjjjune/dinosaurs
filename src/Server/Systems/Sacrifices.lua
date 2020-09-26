@@ -27,6 +27,9 @@ local seasonIcons = {
 local function getSacrificeValue(item)
 	local value = 1
 	local mod = 1
+	local bonusText = ""
+	local sacrificeColor = Color3.fromRGB(255,255,255)
+
 	if CollectionService:HasTag(item, "Seed") then
 		value = 3
 	end
@@ -46,20 +49,31 @@ local function getSacrificeValue(item)
 		if CollectionService:HasTag(item, "Seed") then
 			mod = 2
 		end
+		bonusText = "(seed bonus)"
+		sacrificeColor = Color3.fromRGB(110, 255, 199)
 	elseif currentSeason == 2 then
 		if CollectionService:HasTag(item, "Fruit") then
 			mod = 2
 		end
+		bonusText = "(fruit bonus)"
+		sacrificeColor = Color3.fromRGB(110, 255, 199)
 	elseif currentSeason == 3 then
-		if CollectionService:HasTag(item, "Dead") then
+		if CollectionService:HasTag(item, "Corpse") then
 			mod = 2
 		end
+		bonusText = "(corpse bonus)"
+		sacrificeColor = Color3.fromRGB(110, 255, 199)
 	elseif currentSeason == 4 then
-		if CollectionService:HasTag(item, "Corpse") then
+		if CollectionService:HasTag(item, "Mineral") then
 			mod = 3
 		end
+		bonusText = "(mineral bonus)"
+		sacrificeColor = Color3.fromRGB(110, 255, 199)
 	end
-	return value*mod
+
+	local sacrificeText = (value*mod)--..""..bonusText
+
+	return value*mod, sacrificeText, sacrificeColor
 end
 
 local function onSacrificedItem(item, pit)
@@ -72,7 +86,9 @@ local function onSacrificedItem(item, pit)
 	end
 
     local itemName = item.Name
-    local sacrificePoints = getSacrificeValue(item)
+	local sacrificePoints, sacrificeText, sacrificeTextColor = getSacrificeValue(item)
+
+	Messages:sendAllClients("CreateDamageIndicator", item.PrimaryPart.Position, sacrificeText.."", sacrificeTextColor)
 
     local lavaPos = Vector3.new(item.PrimaryPart.Position.X, pit.Lava.Position.Y, item.PrimaryPart.Position.Z)
 

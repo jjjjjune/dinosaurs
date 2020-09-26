@@ -72,9 +72,11 @@ Tool.damageType = "normal"
 
 Tool.damage = 14
 
+Tool.knockback = 55
+
 function Tool.damageClient(victim, part)
     Messages:send("PlayDamageEffect", victim, "normal", part)
-    Messages:sendServer("RegisterHit", victim, GetCharacter().PrimaryPart.CFrame.lookVector * 100)
+    Messages:sendServer("RegisterHit", victim, GetCharacter().PrimaryPart.CFrame.lookVector * Tool.knockback)
     Messages:send("PlaySoundOnClient",{
         instance = game.ReplicatedStorage.Sounds.HitBasic,
         part = victim.PrimaryPart

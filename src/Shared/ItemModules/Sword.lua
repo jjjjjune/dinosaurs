@@ -13,6 +13,8 @@ local swings = 0
 
 local function getSwingAnimation()
     local swingAnims = {
+		"Swing1",
+		"Swing2",
         "SwingEnd"
     }
     return swingAnims[swings%(#swingAnims) + 1]
@@ -69,13 +71,11 @@ Tool.debounce = .5
 
 Tool.damageType = "normal"
 
-Tool.damage = 10
-
-Tool.knockback = 40
+Tool.damage = 20
 
 function Tool.damageClient(victim, part)
     Messages:send("PlayDamageEffect", victim, "normal", part)
-    Messages:sendServer("RegisterHit", victim, GetCharacter().PrimaryPart.CFrame.lookVector * Tool.knockback)
+    Messages:sendServer("RegisterHit", victim, GetCharacter().PrimaryPart.CFrame.lookVector * 50)
     Messages:send("PlaySoundOnClient",{
         instance = game.ReplicatedStorage.Sounds.HitBasic,
         part = victim.PrimaryPart

@@ -28,6 +28,7 @@ local loadOrder = {
 	"Client/Systems/BiomeSounds",
 	"Client/Systems/ClientEffects",
 	"Client/Systems/LavaBubbles",
+	"Client/Systems/ScrollingTextures",
 	--"Client/Systems/Data"
 
 	"Shared/Systems/Particles",
@@ -52,6 +53,7 @@ local ui = {
 	"Client/Ui/Notifications",
 	"Client/Ui/ItemPlacementHelper",
 	"Client/Ui/Permissions",
+	"Client/Ui/DamageIndicators",
 }
 
 for _, path in ipairs(loadOrder) do
