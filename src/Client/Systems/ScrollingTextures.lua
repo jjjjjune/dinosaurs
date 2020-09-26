@@ -19,7 +19,7 @@ local FACES = {
 
 local textureFunctions = {
 	Wave = function(instance)
-		instance.OffsetStudsV = instance.OffsetStudsV + .05
+		instance.OffsetStudsV = instance.OffsetStudsV - .05
 	end,
 }
 

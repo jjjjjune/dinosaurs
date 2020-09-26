@@ -11,7 +11,7 @@ local RunService = game:GetService("RunService")
 local lastNormal = Vector3.new()
 
 local JUMP_TIME = .2
-local JUMP_FORCE = 7500
+local JUMP_FORCE = 5500
 
 local lastJump = 0
 

@@ -130,7 +130,7 @@ function TargetComponent:getValidEnemy()
             end
 		end
 		for _, v in pairs(allEnemies) do
-			if CollectionService:HasTag(v, "Character") then
+			if not CollectionService:HasTag(v, "Character") then
 				table.insert(newAllEnemies, v)
 			end
 		end

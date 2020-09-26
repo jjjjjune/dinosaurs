@@ -34,7 +34,7 @@ local Tool = {}
 
 Tool.debounce = .5
 
-Tool.damageType = "normal"
+Tool.damageType = "tame"
 
 Tool.damage = 20
 

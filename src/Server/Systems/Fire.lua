@@ -204,7 +204,10 @@ local function manageBurningObject(tableObject, elapsedTime)
 
     if tick() - tableObject.lastSpread > 1 then
         tableObject.lastSpread = tick()
-        manageSpread(object)
+		manageSpread(object)
+		if math.random(1, 100) <= GO_OUT_CHANCE then
+			return false
+		end
     end
 
     local isCharacter = object:FindFirstChild("Humanoid")
@@ -247,10 +250,6 @@ local function manageBurningObject(tableObject, elapsedTime)
 		if bottom.Y <= workspace.Effects.Water.Position.Y then
 			return false
 		end
-	end
-
-	if math.random(1, 100) <= GO_OUT_CHANCE then
-		return false
 	end
 
     return true

@@ -118,7 +118,23 @@ function TargetComponent:getValidEnemy()
                 end
             end
         end
-        return getClosestOfSet(self.position, allEnemies)
+		return getClosestOfSet(self.position, allEnemies)
+	else
+		local allEnemies = {}
+		local newAllEnemies = {}
+        for _, enemyTag in pairs(self.wantedEnemyTags) do
+            for _, enemy in pairs(CollectionService:GetTagged(enemyTag)) do
+                if enemy ~= self.model then
+                    table.insert(allEnemies, enemy)
+                end
+            end
+		end
+		for _, v in pairs(allEnemies) do
+			if not CollectionService:HasTag(v, "Character") then
+				table.insert(newAllEnemies, v)
+			end
+		end
+		return getClosestOfSet(self.position, newAllEnemies)
     end
 end
 

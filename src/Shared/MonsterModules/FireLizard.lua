@@ -64,7 +64,7 @@ function Lizard:init(model)
         jumpLength = .5,
         rideableComponent = self.rideableComponent,
         animationComponent = self.animationComponent,
-        jumpVelocity = 800000
+        jumpVelocity = 400000
     })
 
     self.targetComponent = TargetComponent.new()
