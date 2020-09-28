@@ -9,15 +9,25 @@ local Damage = import "Shared/Utils/Damage"
 
 local CollectionService = game:GetService("CollectionService")
 
-local function onExplosionHit(hit, dist, damaged, player)
+local function onExplosionHit(hit, dist, damaged, player, startPos)
+	if damaged[hit.Parent] then
+		return
+	end
+	local shouldDamage = false
 	local victim = hit.Parent
 	if victim:FindFirstChild("Health") or CollectionService:HasTag(victim, "Character") then
-		Messages:send("Knockback", hit.Parent, hit.Parent.PrimaryPart.CFrame.lookVector * -(1000/(dist/2)), .4)
-		Messages:send("PlaySound", "BoneBreak", hit.Position)
-		Damage(victim, {damage = math.max(0, 200 - (dist*8)), type = "fire", serverApplication = true})
+		local dir = CFrame.new(hit.Position, startPos)
+		Messages:send("Knockback", hit.Parent, dir.lookVector * (1000/(dist/2)), .4)
+		shouldDamage = true
 	end
-	damaged[hit.Parent] = true
+
 	Messages:send("SetOnFire", hit.Parent, 4)
+
+	damaged[hit.Parent] = true
+
+	if shouldDamage then
+		Damage(victim, {damage = math.max(0, math.floor(200 - (dist*8))), type = "fire", serverApplication = true})
+	end
 end
 
 local function createExplosion(player, pos)
@@ -31,7 +41,7 @@ local function createExplosion(player, pos)
 	ex.BlastPressure = 10000
 	local damaged = {}
 	ex.Hit:connect(function(hit, dist)
-		onExplosionHit(hit, dist, damaged, player)
+		onExplosionHit(hit, dist, damaged, player, pos)
 	end)
 	ex.Parent = workspace
 end

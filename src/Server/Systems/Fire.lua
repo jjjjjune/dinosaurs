@@ -26,6 +26,9 @@ local lastPartMaterials = {}
 local lastPartTextures = {}
 
 local function setFireSkin(object)
+	if CollectionService:HasTag(object, "FireSkinSet") then
+		return
+	end
     for _, part in pairs(object:GetDescendants()) do
         if part:IsA("BasePart") then
 			lastPartColors[part] = part.Color
@@ -37,10 +40,15 @@ local function setFireSkin(object)
             lastPartTextures[part] = part.TextureID
             part.TextureID = ""
         end
-    end
+	end
+	CollectionService:AddTag(object, "FireSkinSet")
 end
 
 local function unsetFireSkin(object)
+	if not CollectionService:HasTag(object, "FireSkinSet") then
+		return
+	end
+	CollectionService:RemoveTag(object, "FireSkinSet")
     for _, part in pairs(object:GetDescendants()) do
         if part:IsA("BasePart") then
 			part.Color = lastPartColors[part]
@@ -172,8 +180,8 @@ local function manageBurningMonster(character)
         lastPlayerDamages[character] = tick()
         Damage(character, {damage = PLAYER_BURN_DAMAGE, type = "fire", serverApplication = true})
     end
-    local position = character.PrimaryPart.Position - Vector3.new(0,1,0)
-    if Water.isPositionWithinWater(position) then
+    local position = character.PrimaryPart and character.PrimaryPart.Position - Vector3.new(0,1,0)
+    if position and Water.isPositionWithinWater(position) then
         return false
     else
         return true
@@ -234,7 +242,7 @@ local function manageBurningObject(tableObject, elapsedTime)
             return false
         end
 	else
-		if CollectionService:HasTag(object, "Monster") then
+		if CollectionService:HasTag(object, "Monster")  and object.PrimaryPart then
 			manageBurningMonster(object)
 		end
         if not manageBurningItem(object) then

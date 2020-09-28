@@ -48,8 +48,8 @@ return function(character, damageType, particlePart)
                     tween = TweenService:Create(decal, info, endGoals)
 
                     tween.Completed:connect(function()
-                        tweening[character] = false
-                        decal:Destroy()
+						decal:Destroy()
+						tweening[character] = false
                     end)
 
                     tween:Play()
