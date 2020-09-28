@@ -8,6 +8,7 @@ local ContextActionService = game:GetService("ContextActionService")
 local TagsToModulesMap = import "Shared/Data/TagsToModulesMap"
 local UseTexts = import "Shared/Data/UseTexts"
 local CastRay = import "Shared/Utils/CastRay"
+local GetMouseHit = import "Shared/Utils/GetMouseHit"
 
 local itemModule
 local carryItemInstance
@@ -105,6 +106,58 @@ local function getPlaceableSurface(item)
 	end
 end
 
+local function computeLaunchAngle(dx,dy,grav, speed)
+	-- arcane
+	-- http://en.wikipedia.org/wiki/Trajectory_of_a_projectile
+
+	local g = math.abs(grav)
+	local inRoot = (speed*speed*speed*speed) - (g * ((g*dx*dx) + (2*dy*speed*speed)))
+	if inRoot <= 0 then
+		return .25 * math.pi
+	end
+	local root = math.sqrt(inRoot)
+	local inATan1 = ((speed*speed) + root) / (g*dx)
+
+	local inATan2 = ((speed*speed) - root) / (g*dx)
+	local answer1 = math.atan(inATan1)
+	local answer2 = math.atan(inATan2)
+	if answer1 < answer2 then return answer1 end
+	return answer2
+end
+
+local function getFinalVelocityTo(startPos, endPos, speed)
+	local launch = startPos
+
+	local delta = endPos - launch
+
+	local dy = delta.y
+
+	local new_delta = Vector3.new(delta.x, 0, delta.z)
+	delta = new_delta
+
+	local dx = delta.magnitude
+	local unit_delta = delta.unit
+
+	-- acceleration due to gravity in RBX units
+	local g = (-9.81 * 20)
+
+	local theta = computeLaunchAngle( dx, dy, g, speed)
+
+	local vy = math.sin(theta)
+	local xz = math.cos(theta)
+	local vx = unit_delta.x * xz
+	local vz = unit_delta.z * xz
+
+	local finalVelocity = Vector3.new(vx,vy,vz) * speed
+	return finalVelocity
+end
+
+local function computeDirection(vec)
+	local lenSquared = vec.magnitude * vec.magnitude
+	local invSqrt = 1 / math.sqrt(lenSquared)
+	return Vector3.new(vec.x * invSqrt, vec.y * invSqrt, vec.z * invSqrt)
+end
+
 local function attemptThrowItem()
     local character = GetCharacter()
     for _, possibleItem in pairs(character:GetChildren()) do
@@ -118,8 +171,30 @@ local function attemptThrowItem()
 			item.Parent = workspace
 
 			if not CollectionService:HasTag(item, "Building") then
-                item.PrimaryPart.CFrame = character.HumanoidRootPart.CFrame * CFrame.new(0,0,-4)
-				item.PrimaryPart:GetRootPart().Velocity = velocity * 1.5
+				local mouseHit, mouseHitPos = GetMouseHit()
+				-- local dir = mouseHitPos - character.Head.Position
+				-- dir = computeDirection(dir)
+				-- local startCFrame = CFrame.new(character.Head.Position + 5 * dir)
+				-- local speed = math.min(70, math.max(30, (startCFrame.p - mouseHitPos).magnitude*1.3))
+				-- if mouseHit and CollectionService:HasTag(mouseHit.Parent, "Monster") then
+				-- 	math.min(100, math.max(60, (startCFrame.p - mouseHitPos).magnitude*1.3))
+				-- end
+				-- local velocity = getFinalVelocityTo(startCFrame.p, mouseHitPos, speed)
+                -- item.PrimaryPart.CFrame = startCFrame
+				-- item.PrimaryPart:GetRootPart().Velocity = velocity * 1.5
+
+				local t = math.min(4, (character.Head.Position - mouseHitPos).magnitude/50)
+				local dir = mouseHitPos - character.Head.Position
+				dir = computeDirection(dir)
+				local startCFrame = CFrame.new(character.Head.Position + Vector3.new(0,2,0) + (5 * dir))
+				local g = Vector3.new(0, -game.Workspace.Gravity, 0);
+			    local x0 = startCFrame.p
+
+			    -- calculate the v0 needed to reach mouse.Hit.p
+			    local v0 = (mouseHitPos - x0 - 0.5*g*t*t)/t;
+
+				item.PrimaryPart.CFrame = character.HumanoidRootPart.CFrame * CFrame.new(0,0,-4)
+				item.PrimaryPart:GetRootPart().Velocity = v0
 			else
                 for _, v in pairs(item:GetDescendants()) do
                     if v:IsA("BasePart") then

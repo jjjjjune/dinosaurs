@@ -187,9 +187,9 @@ local function createOrLoadGateFromTemplate(gateTemplate, tile)
 	connectEventsForGate(gateModel, tile)
 	updateGate(gateModel, tile)
 
-	local sound = game.ReplicatedStorage.Sounds.Gate:Clone()
-	sound.Parent = gateModel.PrimaryPart
-	sound:Play()
+	-- local sound = game.ReplicatedStorage.Sounds.Gate:Clone()
+	-- sound.Parent = gateModel.PrimaryPart
+	-- sound:Play()
 end
 
 local function checkTileForGates(tile)

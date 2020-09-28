@@ -59,7 +59,7 @@ function Lizard:init(model)
     self.movementComponent = MovementComponent.new()
     self.movementComponent:init(self.model, {
         jumpDebounce = 2,
-        speed = 20,
+        speed = 18,
         closenessThreshold = 11,
         jumpLength = .5,
         rideableComponent = self.rideableComponent,
@@ -78,17 +78,17 @@ function Lizard:init(model)
     self.attackComponent:init(self.model, {
         animationComponent = self.animationComponent,
         targetComponent = self.targetComponent,
-        attackDistance = 45,
+        attackDistance = 35,
         damage = 15,
         damageType = "poison",
         reloadTime = 4,
-        chargeTime = 2,
+        chargeTime = 2.5,
         spawnAttackDebounce = 4,
         rideableComponent = self.rideableComponent,
     })
 
     self.touchComponent = TouchComponent.new()
-    self.touchComponent:init(self.model)
+    self.touchComponent:init(self.model, {})
 
     self.tameableComponent = TameableComponent.new()
     self.tameableComponent:init(self.model, {

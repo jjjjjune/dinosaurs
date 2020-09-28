@@ -7,6 +7,7 @@ TagsToModulesMap.Monsters = {}
 
 -- items
 
+TagsToModulesMap.Items.Bomb = import "Shared/ItemModules/Bomb"
 TagsToModulesMap.Items.Food = import "Shared/ItemModules/Food"
 TagsToModulesMap.Items.Seed = import "Shared/ItemModules/Seed"
 TagsToModulesMap.Items.Pickaxe = import "Shared/ItemModules/Pickaxe"

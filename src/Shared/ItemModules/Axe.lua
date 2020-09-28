@@ -72,7 +72,7 @@ Tool.damageType = "normal"
 
 Tool.damage = 14
 
-Tool.knockback = 55
+Tool.knockback = 75
 
 function Tool.damageClient(victim, part)
     Messages:send("PlayDamageEffect", victim, "normal", part)

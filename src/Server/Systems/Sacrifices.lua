@@ -48,27 +48,27 @@ local function getSacrificeValue(item)
 	if currentSeason == 1 then
 		if CollectionService:HasTag(item, "Seed") then
 			mod = 2
+			bonusText = "(seed bonus)"
+			sacrificeColor = Color3.fromRGB(110, 255, 199)
 		end
-		bonusText = "(seed bonus)"
-		sacrificeColor = Color3.fromRGB(110, 255, 199)
 	elseif currentSeason == 2 then
 		if CollectionService:HasTag(item, "Fruit") then
 			mod = 2
+			bonusText = "(fruit bonus)"
+			sacrificeColor = Color3.fromRGB(110, 255, 199)
 		end
-		bonusText = "(fruit bonus)"
-		sacrificeColor = Color3.fromRGB(110, 255, 199)
 	elseif currentSeason == 3 then
 		if CollectionService:HasTag(item, "Corpse") then
 			mod = 2
+			bonusText = "(corpse bonus)"
+			sacrificeColor = Color3.fromRGB(110, 255, 199)
 		end
-		bonusText = "(corpse bonus)"
-		sacrificeColor = Color3.fromRGB(110, 255, 199)
 	elseif currentSeason == 4 then
 		if CollectionService:HasTag(item, "Mineral") then
-			mod = 3
+			mod = 2
+			bonusText = "(mineral bonus)"
+			sacrificeColor = Color3.fromRGB(110, 255, 199)
 		end
-		bonusText = "(mineral bonus)"
-		sacrificeColor = Color3.fromRGB(110, 255, 199)
 	end
 
 	local sacrificeText = (value*mod)--..""..bonusText

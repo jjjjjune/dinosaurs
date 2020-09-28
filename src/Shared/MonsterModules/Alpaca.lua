@@ -75,7 +75,9 @@ function Alpaca:init(model)
     })
 
     self.touchComponent = TouchComponent.new()
-    self.touchComponent:init(self.model)
+    self.touchComponent:init(self.model, {
+
+	})
 
     self.tameableComponent = TameableComponent.new()
     self.tameableComponent:init(self.model, {

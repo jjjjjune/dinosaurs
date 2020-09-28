@@ -3,6 +3,7 @@ local Messages = import "Shared/Utils/Messages"
 local CollectionService = game:GetService("CollectionService")
 local TagsToModulesMap = import "Shared/Data/TagsToModulesMap"
 local CastRay = import "Shared/Utils/CastRay"
+local FastSpawn = import "Shared/Utils/FastSpawn"
 
 -- local collideMap = {}
 
@@ -146,8 +147,13 @@ local function throw(player, item, desiredCF, target)
 		welded = true
 	end
 
-    delay(6, function()
-        if item:IsDescendantOf(game) and item.PrimaryPart:CanSetNetworkOwnership() then
+	FastSpawn(function()
+		local startTime = tick()
+		repeat wait() until (item.PrimaryPart and item.PrimaryPart:IsGrounded()) or (item.Parent and item.Parent:FindFirstChild("Humanoid")) or ((tick() - startTime) > 20) or not item.Parent
+		if item:FindFirstChild("ObjectWeld") then
+			return
+		end
+		if item:IsDescendantOf(game) and item.PrimaryPart:CanSetNetworkOwnership() then
             local netOwner = item.PrimaryPart:GetNetworkOwner()
             if netOwner == nil or netOwner == player then
                 item.PrimaryPart:SetNetworkOwnershipAuto()

@@ -8,7 +8,7 @@ local MovementComponent = import "Shared/MonsterComponents/MovementComponent"
 local AnimationComponent = import "Shared/MonsterComponents/AnimationComponent"
 local IdleComponent = import "Shared/MonsterComponents/IdleComponent"
 local TargetComponent = import "Shared/MonsterComponents/TurtleTargetComponent"
-local TouchComponent = import "Shared/MonsterComponents/TurtleTouchComponent"
+local TouchComponent = import "Shared/MonsterComponents/TouchComponent"
 local RideableComponent = import "Shared/MonsterComponents/RideableComponent"
 local TameableComponent = import "Shared/MonsterComponents/TameableComponent"
 
@@ -125,7 +125,7 @@ function RedTurtle:init(model)
         jumpLength = .5,
         rideableComponent = self.rideableComponent,
         animationComponent = self.animationComponent,
-        jumpVelocity = 1050000
+        jumpVelocity = 1000000
     })
 
     self.targetComponent = TargetComponent.new()
@@ -143,6 +143,9 @@ function RedTurtle:init(model)
 		shouldDamageOnTouch = true,
 		damageTypeOnTouch = "normal",
 		damageValueOnTouch = 15,
+		immunities = {
+			Spiky = true,
+		}
 	})
 
     self.tameableComponent = TameableComponent.new()

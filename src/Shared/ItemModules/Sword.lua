@@ -32,11 +32,11 @@ end
 
 local Tool = {}
 
-Tool.debounce = .5
+Tool.debounce = .4
 
 Tool.damageType = "normal"
 
-Tool.damage = 20
+Tool.damage = 22
 
 function Tool.damageClient(victim, part)
     Messages:send("PlayDamageEffect", victim, Tool.damageType, part)

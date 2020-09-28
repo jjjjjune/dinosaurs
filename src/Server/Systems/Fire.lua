@@ -15,7 +15,7 @@ local PLAYER_BURN_DAMAGE = 1
 
 local PLAYER_BURN_DEBOUNCE = 1
 
-local GO_OUT_CHANCE = 3 -- out of 100
+local GO_OUT_CHANCE = 15 -- out of 100 every few seconds
 
 local burningObjects = {}
 
@@ -202,12 +202,13 @@ local function manageBurningObject(tableObject, elapsedTime)
         tableObject.lastSpread = tick()
     end
 
+	local shouldCheckGoOut = false
+
+
     if tick() - tableObject.lastSpread > 1 then
         tableObject.lastSpread = tick()
 		manageSpread(object)
-		if math.random(1, 100) <= GO_OUT_CHANCE then
-			return false
-		end
+		shouldCheckGoOut = true
     end
 
     local isCharacter = object:FindFirstChild("Humanoid")
@@ -248,6 +249,12 @@ local function manageBurningObject(tableObject, elapsedTime)
 	if object:FindFirstChild("BurnHitbox") then
 		local bottom = object.BurnHitbox.Position - Vector3.new(0, object.BurnHitbox.Size.Y/2, 0)
 		if bottom.Y <= workspace.Effects.Water.Position.Y then
+			return false
+		end
+	end
+
+	if shouldCheckGoOut then
+		if math.random(1, 100) <= GO_OUT_CHANCE then
 			return false
 		end
 	end
