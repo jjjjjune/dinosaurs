@@ -13,6 +13,7 @@ end
 
 function MovementComponent:setStopped(isStopped)
 	self._stopOverride = isStopped
+	self._stuckTime = 0
 end
 
 function MovementComponent:setLookAtGoal(goal)
