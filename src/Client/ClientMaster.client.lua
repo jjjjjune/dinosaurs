@@ -25,7 +25,7 @@ local loadOrder = {
 
 	"Client/Systems/ClientCollisions",
 
-	"Client/Systems/BiomeSounds",
+	"Client/Systems/BiomeEffects",
 	"Client/Systems/ClientEffects",
 	"Client/Systems/LavaBubbles",
 	"Client/Systems/ScrollingTextures",
