@@ -49,7 +49,7 @@ local function playSound(soundName, position, group, pitchshift, useFolder, forc
 	end
 	if pitchshift then
 		if forcePitch then
-			sound.PlaybackSpeed = pitchshift
+			sound.PlaybackSpeed = forcePitch
 		else
 			sound.PlaybackSpeed=math.random(1000-pitchshift,1000+pitchshift)/1000
 		end

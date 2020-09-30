@@ -197,7 +197,7 @@ local function attemptThrowItem()
 				-- item.PrimaryPart:GetRootPart().Velocity = v0
 
 				item.PrimaryPart.CFrame = character.HumanoidRootPart.CFrame * CFrame.new(0,0,-4)
-				item.PrimaryPart:GetRootPart().Velocity = velocity * 1.5
+				item.PrimaryPart:GetRootPart().Velocity = velocity * 2
 			else
                 for _, v in pairs(item:GetDescendants()) do
                     if v:IsA("BasePart") then

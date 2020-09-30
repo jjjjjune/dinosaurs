@@ -36,13 +36,32 @@ function RespawnManager:start()
             --Messages:send("PlayParticle", "DeathSmoke",  20, skull.PrimaryPart.Position)
             Messages:send("PlaySound", "Smoke", characterThatDied.PrimaryPart.Position)
             Messages:send("PlayParticle", "DeathSmoke",  20, characterThatDied.PrimaryPart.Position)
-            emptyToolInventory(player, characterThatDied)
+			emptyToolInventory(player, characterThatDied)
+
             for _, part in pairs(characterThatDied:GetDescendants()) do
                 if part:IsA("BasePart") then
-                    part:Destroy()
-                end
-            end
-            wait(1)
+					local w = Instance.new("WeldConstraint", part)
+					w.Part0 = part
+					w.Part1 = characterThatDied.PrimaryPart
+				end
+				if CollectionService:HasTag(part, "Mask") then
+					part:Destroy()
+				end
+				if part:IsA("Accessory") then
+					part:Destroy()
+				end
+			end
+
+			if characterThatDied:FindFirstChild("Head") then
+				local skull = game.ServerStorage.PlayerResources.Skull:Clone()
+				skull.CFrame = characterThatDied.Head.CFrame * CFrame.Angles(0, math.pi, 0)
+				skull.Parent = characterThatDied
+				local w = Instance.new("WeldConstraint", skull)
+				w.Part0 = skull
+				w.Part1 = characterThatDied.Head
+				characterThatDied.Head.Transparency = 1
+			end
+            wait(3)
             player:LoadCharacter()
         else
             --emptyToolInventory(player, nil)

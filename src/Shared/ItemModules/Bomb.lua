@@ -16,7 +16,7 @@ end
 function Bomb.serverUse(player, item)
 	FastSpawn(function()
 		local pos = item.PrimaryPart.Position
-		local t = 1
+		local t = .75
 		local ticks = 15
 		for i = 1, ticks do
 			if not item.PrimaryPart then
@@ -28,8 +28,8 @@ function Bomb.serverUse(player, item)
 				item.Base.Color = Color3.fromRGB(51, 88, 130)
 			end
 			pos = item.PrimaryPart.Position
-			Messages:send("PlaySound", "Click", pos, 1 + i/10)
-			t = t * .9
+			Messages:send("PlaySound", "BombTick", pos, true, 1 + i/10)
+			t = t * .8
 			wait(t)
 		end
 		Messages:send("DestroyItem", item)
