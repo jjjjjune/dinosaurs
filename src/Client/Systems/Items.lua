@@ -183,18 +183,21 @@ local function attemptThrowItem()
                 -- item.PrimaryPart.CFrame = startCFrame
 				-- item.PrimaryPart:GetRootPart().Velocity = velocity * 1.5
 
-				local t = math.min(4, (character.Head.Position - mouseHitPos).magnitude/50)
-				local dir = mouseHitPos - character.Head.Position
-				dir = computeDirection(dir)
-				local startCFrame = CFrame.new(character.Head.Position + Vector3.new(0,2,0) + (5 * dir))
-				local g = Vector3.new(0, -game.Workspace.Gravity, 0);
-			    local x0 = startCFrame.p
+				-- local t = math.min(4, (character.Head.Position - mouseHitPos).magnitude/50)
+				-- local dir = mouseHitPos - character.Head.Position
+				-- dir = computeDirection(dir)
+				-- local startCFrame = CFrame.new(character.Head.Position + Vector3.new(0,2,0) + (5 * dir))
+				-- local g = Vector3.new(0, -game.Workspace.Gravity, 0);
+			    -- local x0 = startCFrame.p
 
-			    -- calculate the v0 needed to reach mouse.Hit.p
-			    local v0 = (mouseHitPos - x0 - 0.5*g*t*t)/t;
+			    -- -- calculate the v0 needed to reach mouse.Hit.p
+			    -- local v0 = (mouseHitPos - x0 - 0.5*g*t*t)/t;
+
+				-- item.PrimaryPart.CFrame = character.HumanoidRootPart.CFrame * CFrame.new(0,0,-4)
+				-- item.PrimaryPart:GetRootPart().Velocity = v0
 
 				item.PrimaryPart.CFrame = character.HumanoidRootPart.CFrame * CFrame.new(0,0,-4)
-				item.PrimaryPart:GetRootPart().Velocity = v0
+				item.PrimaryPart:GetRootPart().Velocity = velocity * 1.5
 			else
                 for _, v in pairs(item:GetDescendants()) do
                     if v:IsA("BasePart") then

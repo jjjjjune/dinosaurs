@@ -43,7 +43,7 @@ local function playSound(soundName, position, group, pitchshift, useFolder, forc
 			sound = folder[soundName]:Clone()
 		end
 		--shift sound's pitch randomly
-		
+
 	else
         sound = folder[soundName]:Clone()
 	end
