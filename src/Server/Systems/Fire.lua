@@ -9,7 +9,9 @@ local FastSpawn = import "Shared/Utils/FastSpawn"
 local CollectionService = game:GetService("CollectionService")
 local RunService = game:GetService("RunService")
 
-local BURN_TIME_TO_DESTROY_OBJECT = 90
+local BURN_TIME_TO_DESTROY_OBJECT = 50
+
+local SPREAD_CHANCE = 20
 
 local PLAYER_BURN_DAMAGE = 1
 
@@ -149,8 +151,10 @@ local function manageSpread(object)
     for _, part in pairs(parts) do
         local potentialBurnable = part.Parent
         if potentialBurnable ~= object then
-            if canSpreadTo(object, potentialBurnable) then
-                setOnFire(potentialBurnable)
+			if canSpreadTo(object, potentialBurnable) then
+				if math.random(1, 100) < SPREAD_CHANCE then
+					setOnFire(potentialBurnable)
+				end
             end
         end
     end

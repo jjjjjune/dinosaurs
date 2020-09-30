@@ -6,6 +6,8 @@ local RunService = game:GetService("RunService")
 
 local Messages = import "Shared/Utils/Messages"
 
+local LightingData = import "Shared/Data/LightingData"
+
 local sounds = {
     ["Rainforest"] = "rbxassetid://4967510105",
     ["Desert"] = "rbxassetid://4967507617",
@@ -19,10 +21,14 @@ local maxVolumes = {
     ["Desert"] = .2,
 }
 
+local lastTweens = {}
+
 local soundInstances = {}
 local soundChannels = {}
 
 local lastSoundChange = tick()
+local lastBiome
+local lastNightString
 
 local function playSound(channel, sound)
     local goals = {
@@ -60,6 +66,34 @@ local function playSound(channel, sound)
     end
 end
 
+local function setBiomeLighting(biome)
+	if biome == nil then
+		return
+	end
+	local nightString = "Day"
+	if tick()%120 > 60 then
+		nightString = "Night"
+	end
+	if biome == lastBiome and nightString == lastNightString then
+		return
+	end
+	lastBiome = biome
+	lastNightString = nightString
+	for i, tween in pairs(lastTweens) do
+        if tween.PlaybackState == Enum.PlaybackState.Playing then
+			tween:Pause()
+			lastTweens[i] = nil
+        end
+	end
+    lastTweens = {}
+    local tweenInfo = TweenInfo.new(5, Enum.EasingStyle.Quad,Enum.EasingDirection.Out)
+    for instance, properties in pairs(LightingData[biome][nightString]) do
+        local tween = TweenService:Create(instance, tweenInfo, properties)
+        table.insert(lastTweens, tween)
+        tween:Play()
+    end
+end
+
 local function isWithin(position, part)
     local barrierCorner1 = part.Position - Vector3.new(part.Size.X/2,0,part.Size.Z/2)
     local barrierCorner2 = part.Position + Vector3.new(part.Size.X/2,0,part.Size.Z/2)
@@ -81,7 +115,8 @@ local function biomeSoundStep()
             end
         end
     end
-    playSound("BiomeChannel", biome)
+	playSound("BiomeChannel", biome)
+	setBiomeLighting(biome)
 end
 
 local BiomeSounds = {}

@@ -10,6 +10,7 @@ function Bomb.clientUse(item)
 	--Messages:send("Throw")
 	item.Fuse.Attachment.Fire.Enabled = true
 	item.Fuse.Attachment.PointLight.Enabled = true
+	item.Fuse.Fuse:Play()
 end
 
 function Bomb.serverUse(player, item)
@@ -28,8 +29,9 @@ function Bomb.serverEquip(player, item)
 end
 
 function Bomb.clientUnequip(item)
-	item.Fuse.Attachment.Fire.Enabled = false
-	item.Fuse.Attachment.PointLight.Enabled = false
+	-- item.Fuse.Attachment.Fire.Enabled = false
+	-- item.Fuse.Attachment.PointLight.Enabled = false
+	-- item.Fuse.Fuse:Stop()
 end
 
 function Bomb.serverUnequip(player, item)

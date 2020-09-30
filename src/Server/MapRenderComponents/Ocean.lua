@@ -98,7 +98,7 @@ function Ocean:lowerOcean()
 
     self.sandGenerationHeight = oceanHeight
 
-    self:updateSand()
+    --self:updateSand()
 end
 
 function Ocean:setOceanHeight(height)
@@ -113,7 +113,7 @@ function Ocean:setOceanHeight(height)
 
     self.sandGenerationHeight = newPos.Y
 
-    self:updateSand()
+    --self:updateSand()
 end
 
 function Ocean:onMapDoneGenerating()
@@ -137,7 +137,7 @@ function Ocean:start(mapTileObjects)
     end)
 
     Messages:hook("MapRerendered", function()
-        self:updateSand()
+        --self:updateSand()
     end)
 
     local oceanHeight = ServerData:getValue("oceanHeight")

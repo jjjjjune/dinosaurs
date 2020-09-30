@@ -1,6 +1,6 @@
 local import = require(game.ReplicatedStorage.Shared.Import)
 local Messages = import "Shared/Utils/Messages"
-local SeasonLighting = import "Shared/Data/SeasonLighting"
+local LightingData = import "Shared/Data/LightingData"
 local SeasonsData = import "Shared/Data/SeasonsData"
 local TweenService = game:GetService("TweenService")
 local FastSpawn = import "Shared/Utils/FastSpawn"
@@ -29,7 +29,7 @@ local function onSeasonSetTo(currentSeason, isNight)
     end
     -- that last bit there is for weather
     local tweenInfo = TweenInfo.new(3, Enum.EasingStyle.Quad,Enum.EasingDirection.Out)
-    for instance, properties in pairs(SeasonLighting[currentSeasonName]) do
+    for instance, properties in pairs(LightingData[currentSeasonName]) do
         local tween = TweenService:Create(instance, tweenInfo, properties)
         table.insert(lastTweens, tween)
         tween:Play()
@@ -60,7 +60,7 @@ local function weatherStep()
         local effect = WeatherEffectsFolder:FindFirstChild(currentWeather)
         local pos = GetCharacterPosition()
         if pos then
-            if not effect:FindFirstChild("LockToPlayer") then 
+            if not effect:FindFirstChild("LockToPlayer") then
                 local hit, hitPos = CastRay(pos, Vector3.new(0,100,0), {workspace})
                 effect.CFrame = CFrame.new(hitPos)
             else
@@ -75,30 +75,30 @@ end
 local Lighting = {}
 
 function Lighting:start()
-    FastSpawn(function()
-        workspace:WaitForChild("Effects"):WaitForChild("Sky")
-        setInitialLighting()
-    end)
-    Messages:hook("SeasonSetTo", function(currentSeason, length, isNight)
-        onSeasonSetTo(currentSeason, isNight)
-    end)
-    Messages:hook("WeatherSetTo", function(weather)
-        if SeasonLighting[weather] then
-            onSeasonSetTo(weather)
-        else
-            local seasonNumber = 1
-            for i, seasonInfo in pairs(SeasonsData) do
-                if seasonInfo.name == currentSeasonName then
-                    seasonNumber = i
-                end
-            end
-            onSeasonSetTo(seasonNumber)
-        end
-        currentWeather = weather
-    end)
-    RunService.Stepped:connect(function()
-        weatherStep()
-    end)
+    -- FastSpawn(function()
+    --     workspace:WaitForChild("Effects"):WaitForChild("Sky")
+    --     setInitialLighting()
+    -- end)
+    -- Messages:hook("SeasonSetTo", function(currentSeason, length, isNight)
+    --     onSeasonSetTo(currentSeason, isNight)
+    -- end)
+    -- Messages:hook("WeatherSetTo", function(weather)
+    --     if LightingData[weather] then
+    --         onSeasonSetTo(weather)
+    --     else
+    --         local seasonNumber = 1
+    --         for i, seasonInfo in pairs(SeasonsData) do
+    --             if seasonInfo.name == currentSeasonName then
+    --                 seasonNumber = i
+    --             end
+    --         end
+    --         onSeasonSetTo(seasonNumber)
+    --     end
+    --     currentWeather = weather
+    -- end)
+    -- RunService.Stepped:connect(function()
+    --     weatherStep()
+    -- end)
 end
 
 return Lighting
