@@ -71,7 +71,7 @@ local function setBiomeLighting(biome)
 		return
 	end
 	local nightString = "Day"
-	if tick()%120 > 60 then
+	if tick()%300 > 120 then
 		nightString = "Night"
 	end
 	if biome == lastBiome and nightString == lastNightString then

@@ -16,24 +16,28 @@ end
 function Bomb.serverUse(player, item)
 	FastSpawn(function()
 		local pos = item.PrimaryPart.Position
-		local t = .75
-		local ticks = 15
-		for i = 1, ticks do
-			if not item.PrimaryPart then
-				return
-			end
-			if item.Base.Color == Color3.fromRGB(51, 88, 130) then
-				item.Base.BrickColor = BrickColor.new("Persimmon")
-			else
-				item.Base.Color = Color3.fromRGB(51, 88, 130)
-			end
+		-- local t = .75
+		-- local ticks = 15
+		-- for i = 1, ticks do
+		-- 	if not item.PrimaryPart then
+		-- 		return
+		-- 	end
+		-- 	-- if item.Base.Color == Color3.fromRGB(51, 88, 130) then
+		-- 	-- 	item.Base.BrickColor = BrickColor.new("Persimmon")
+		-- 	-- else
+		-- 	-- 	item.Base.Color = Color3.fromRGB(51, 88, 130)
+		-- 	-- end
+		-- 	pos = item.PrimaryPart.Position
+		-- 	Messages:send("PlaySound", "BombTick", pos, true, 1 + i/10)
+		-- 	t = t * .8
+		-- 	wait(t)
+		-- end
+		wait(4)
+		if item.PrimaryPart then
 			pos = item.PrimaryPart.Position
-			Messages:send("PlaySound", "BombTick", pos, true, 1 + i/10)
-			t = t * .8
-			wait(t)
+			Messages:send("DestroyItem", item)
+			Messages:send("CreateExplosion", player, pos)
 		end
-		Messages:send("DestroyItem", item)
-		Messages:send("CreateExplosion", player, pos)
 	end)
 end
 

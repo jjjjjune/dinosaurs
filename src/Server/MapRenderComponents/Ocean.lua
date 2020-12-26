@@ -98,6 +98,14 @@ function Ocean:lowerOcean()
 
     self.sandGenerationHeight = oceanHeight
 
+	for _, v in pairs(CollectionService:GetTagged("Item")) do
+		if v:FindFirstChild("FreezeWeld") and (v.FreezeWeld.Part0 == workspace.Effects.Sand or v.FreezeWeld.Part1 == workspace.Effects.Sand) then
+			local ConstraintManager = import "Server/Systems/ConstraintManager"
+			print("unfreezing")
+			ConstraintManager.unfreeze(v, true)
+			v:SetPrimaryPartCFrame(v.PrimaryPart.CFrame + Vector3.new(0,1,0))
+		end
+	end
     --self:updateSand()
 end
 

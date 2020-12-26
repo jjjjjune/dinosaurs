@@ -44,7 +44,7 @@ local function createExplosion(player, pos)
 	local ex = Instance.new("Explosion")
 	ex.Position = pos
 	ex.Visible = false
-	ex.BlastRadius = 20
+	ex.BlastRadius = 14
 	ex.DestroyJointRadiusPercent = 0
 	ex.BlastPressure = 10000
 	local damaged = {}

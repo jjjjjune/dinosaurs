@@ -17,7 +17,7 @@ return {
 				Offset = 0,
 				Color = Color3.fromRGB(44, 234, 255),
 				Decay = Color3.fromRGB(255, 46, 46),
-				Glare = 2.08,
+				Glare = 1,
 				Haze = 2.48,
 			},
 			[workspace.Effects.Water] = {
@@ -26,9 +26,9 @@ return {
 		},
 		Night = {
 			[game.Lighting.Atmosphere] = {
-				Density = 0.49,
+				Density = 0.35,
 				Offset = 0,
-				Color = Color3.fromRGB(103, 0, 113),
+				Color = Color3.fromRGB(43, 0, 113),
 				Decay = Color3.fromRGB(0,0,0),
 				Glare = 1.79,
 				Haze = 2.08,
@@ -57,7 +57,7 @@ return {
 				ClockTime = 13,
 			},
 			[game.Lighting.Atmosphere] = {
-				Density = 0.38,
+				Density = 0.25,
 				Offset = 0,
 				Color = Color3.fromRGB(131, 203, 157),
 				Decay = Color3.fromRGB(0, 76, 31),
@@ -70,9 +70,9 @@ return {
 		},
 		Night = {
 			[game.Lighting.Atmosphere] = {
-				Density = 0.49,
+				Density = 0.45,
 				Offset = 0,
-				Color = Color3.fromRGB(103, 0, 113),
+				Color = Color3.fromRGB(40, 0, 113),
 				Decay = Color3.fromRGB(0,0,0),
 				Glare = 1.79,
 				Haze = 2.08,

@@ -76,71 +76,13 @@ local function getSacrificeValue(item)
 	return value*mod, sacrificeText, sacrificeColor
 end
 
-local function onSacrificedItem(item, pit)
-
-	local owner = item:FindFirstChild("LastOwner") and game.Players:GetPlayerByUserId(item.LastOwner.Value)
-	local Permissions = import "Server/Systems/Permissions"
-	if owner and not Permissions:playerHasPermission(owner, "can sacrifice items") then
-		--Messages:sendClient(owner, "Notify", "HUNGER_COLOR_DARK", "ANGRY", "YOUR RANK IS NOT ALLOWED TO SACRIFICE.")
-		return
-	end
-
-    local itemName = item.Name
-	local sacrificePoints, sacrificeText, sacrificeTextColor = getSacrificeValue(item)
-
-	Messages:sendAllClients("CreateDamageIndicator", item.PrimaryPart.Position, sacrificeText.."", sacrificeTextColor)
-
-    local lavaPos = Vector3.new(item.PrimaryPart.Position.X, pit.Lava.Position.Y, item.PrimaryPart.Position.Z)
-
-    Messages:send("PlaySound", "Smoke", lavaPos)
-    Messages:send("PlayParticle", "DeathSmoke",  10, lavaPos)
-
-    for tag, modifier in pairs(tagModifiers) do
-        if CollectionService:HasTag(item, tag) then
-            sacrificePoints = sacrificePoints + modifier
-        end
-    end
-
-    if itemName == "PlayerSkull" then
-        local player = item:FindFirstChild("Player")
-        if player then
-            spawn(function() player.Value:LoadCharacter() end)
-            sacrificePoints = 0
-        end
-    end
-
-	if CollectionService:HasTag(item, "Item") then
-		Messages:send("DestroyItem", item)
-	else
-		item:Destroy()
-	end
-    current = math.min(goal, current + sacrificePoints)
-
-    Messages:sendAllClients("UpdateSacrificePercent", current/goal)
-end
-
-local function initializeAltar(altar)
-    altar.Lava.Touched:connect(function(hit)
-        if hit.Parent and hit.Parent:FindFirstChild("Humanoid") then
-            --hit.Parent.Humanoid:TakeDamage(10)
-        end
-        if CollectionService:HasTag(hit.Parent, "Item") then
-            if not hit.Parent.Parent:FindFirstChild("Humanoid") then
-                onSacrificedItem(hit.Parent, altar)
-			end
-		elseif CollectionService:HasTag(hit.Parent, "Corpse") then
-			onSacrificedItem(hit.Parent, altar)
-        end
-    end)
-end
-
 local function performStandardSeasonWeather(actualCurrentSeason)
     if actualCurrentSeason == 4 then
         Messages:send("CreateWeather", "Snow", 30)
     elseif actualCurrentSeason == 1 then
-        Messages:send("CreateWeather", "Rain", 30)
+		Messages:send("CreateWeather", "Rain", 30)
     else
-        if math.random(1, 2) == 1 then
+		if math.random(1, 2) == 1 then
             Messages:send("CreateWeather", "Rain", 30)
         end
     end
@@ -202,6 +144,71 @@ local function evaluateSeason()
     end
     reactToSeason(category, actualCurrentSeason)
 end
+
+local function onSacrificedItem(item, pit)
+
+	local owner = item:FindFirstChild("LastOwner") and game.Players:GetPlayerByUserId(item.LastOwner.Value)
+	local Permissions = import "Server/Systems/Permissions"
+	if owner and not Permissions:playerHasPermission(owner, "can sacrifice items") then
+		--Messages:sendClient(owner, "Notify", "HUNGER_COLOR_DARK", "ANGRY", "YOUR RANK IS NOT ALLOWED TO SACRIFICE.")
+		return
+	end
+
+    local itemName = item.Name
+	local sacrificePoints, sacrificeText, sacrificeTextColor = getSacrificeValue(item)
+
+	Messages:sendAllClients("CreateDamageIndicator", item.PrimaryPart.Position, sacrificeText.."", sacrificeTextColor)
+
+    local lavaPos = Vector3.new(item.PrimaryPart.Position.X, pit.Lava.Position.Y, item.PrimaryPart.Position.Z)
+
+    Messages:send("PlaySound", "Smoke", lavaPos)
+    Messages:send("PlayParticle", "DeathSmoke",  10, lavaPos)
+
+    for tag, modifier in pairs(tagModifiers) do
+        if CollectionService:HasTag(item, tag) then
+            sacrificePoints = sacrificePoints + modifier
+        end
+    end
+
+    if itemName == "PlayerSkull" then
+        local player = item:FindFirstChild("Player")
+        if player then
+            spawn(function() player.Value:LoadCharacter() end)
+            sacrificePoints = 0
+        end
+    end
+
+	if CollectionService:HasTag(item, "Item") then
+		Messages:send("DestroyItem", item)
+	else
+		item:Destroy()
+	end
+	current = math.min(goal, current + sacrificePoints)
+
+	if current >= goal then
+		Messages:sendAllClients("UpdateSacrificePercent", 0)
+		evaluateSeason()
+		Messages:send("AdvanceSeason")
+	else
+		Messages:sendAllClients("UpdateSacrificePercent", current/goal)
+	end
+end
+
+local function initializeAltar(altar)
+    altar.Lava.Touched:connect(function(hit)
+        if hit.Parent and hit.Parent:FindFirstChild("Humanoid") then
+            --hit.Parent.Humanoid:TakeDamage(10)
+        end
+        if CollectionService:HasTag(hit.Parent, "Item") then
+            if not hit.Parent.Parent:FindFirstChild("Humanoid") then
+                onSacrificedItem(hit.Parent, altar)
+			end
+		elseif CollectionService:HasTag(hit.Parent, "Corpse") then
+			onSacrificedItem(hit.Parent, altar)
+        end
+    end)
+end
+
 
 local Sacrifices = {}
 

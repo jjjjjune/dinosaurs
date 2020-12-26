@@ -56,6 +56,7 @@ function Seasons:start()
 		hasLoadedSeasonData = true
 		Messages:send("SeasonSetTo", currentSeason, true) -- this order is important for dumb tween reasons
 	end)
+	Messages:hook("AdvanceSeason", advanceSeason)
 	initializeMainSeasonLoop()
 end
 
